@@ -1,0 +1,99 @@
+{
+  "vendors": {
+    "Fainor": {
+      "location": "Serbule",
+      "area": "AreaSerbule",
+      "items": {
+        "Salt": {"favor": "Neutral", "price": 37},
+        "Flour": {"favor": "Neutral", "price": 37},
+        "Sugar": {"favor": "Neutral", "price": 7},
+        "Butcher Knife": {"favor": "Neutral", "price": 200},
+        "Fuel Oil": {"favor": "Neutral", "price": 75},
+        "Basic Vinegar": {"favor": "Neutral", "price": 20},
+        "Fancy Vinegar": {"favor": "Neutral", "price": 60},
+        "Expert's Vinegar": {"favor": "Neutral", "price": 120},
+        "Vegetable Oil": {"favor": "Neutral", "price": 25},
+        "Olive Oil": {"favor": "Neutral", "price": 50}
+      }
+    },
+    "Marna": {
+      "location": "Serbule",
+      "area": "AreaSerbule",
+      "items": {
+        "Antivenom": {"favor": "Neutral", "price": 22},
+        "Word Game": {"favor": "Neutral", "price": 75},
+        "Classic Lute": {"favor": "Neutral", "price": 150},
+        "Simple First Aid Kit": {"favor": "Neutral", "price": 15},
+        "Simple Armor Patch Kit": {"favor": "Neutral", "price": 10},
+        "Basic First Aid Kit": {"favor": "Comfortable", "price": 30},
+        "Basic Armor Patch Kit": {"favor": "Comfortable", "price": 15},
+        "Belt of The Alchemist": {"favor": "Comfortable", "price": 225},
+        "Belt of The Support Archer": {"favor": "Comfortable", "price": 225},
+        "Good First Aid Kit": {"favor": "Friends", "price": 75},
+        "Good Armor Patch Kit": {"favor": "Friends", "price": 75},
+        "Curative: Feeble Fever": {"favor": "Friends", "price": 22},
+        "Curative: Roundworms": {"favor": "Close Friends", "price": 225},
+        "Curative: Slimy Tremors": {"favor": "Close Friends", "price": 225},
+        "Curative: Creakliver": {"favor": "Best Friends", "price": 750},
+        "Curative: Lunatic Shakes": {"favor": "Best Friends", "price": 750}
+      }
+    },
+    "Joeh": {
+      "location": "Serbule",
+      "area": "AreaSerbule",
+      "items": {
+        "Basic Sword": {"favor": "Neutral", "price": 57},
+        "Basic Dagger": {"favor": "Neutral", "price": 57},
+        "Basic Boots": {"favor": "Neutral", "price": 45},
+        "Basic Pants": {"favor": "Neutral", "price": 57},
+        "Basic Breastplate": {"favor": "Neutral", "price": 63},
+        "Basic Gloves": {"favor": "Neutral", "price": 45},
+        "Basic Helm": {"favor": "Neutral", "price": 45},
+        "Basic Shield": {"favor": "Neutral", "price": 57},
+        "Basic Brass Knuckles": {"favor": "Neutral", "price": 57},
+        "Healing Potion": {"favor": "Neutral", "price": 150},
+        "Armor Potion": {"favor": "Neutral", "price": 125},
+        "Power Potion": {"favor": "Neutral", "price": 300},
+        "Simple Parchment": {"favor": "Neutral", "price": 7},
+        "Basic Parchment": {"favor": "Neutral", "price": 15},
+        "Basic Ink": {"favor": "Neutral", "price": 15},
+        "Inkstone": {"favor": "Neutral", "price": 375},
+        "Belt of The Soldier": {"favor": "Comfortable", "price": 225},
+        "Belt of The Gladiator": {"favor": "Comfortable", "price": 225},
+        "Good Parchment": {"favor": "Friends", "price": 60},
+        "Advanced Ink": {"favor": "Friends", "price": 37},
+        "Blank Book": {"favor": "Friends", "price": 150},
+        "Expert's Parchment": {"favor": "Close Friends", "price": 105},
+        "Expert Ink": {"favor": "Close Friends", "price": 75},
+        "Master Parchment": {"favor": "Best Friends", "price": 150},
+        "Ink Remover": {"favor": "Best Friends", "price": 37}
+      }
+    },
+    "Therese": {
+      "location": "Serbule",
+      "area": "AreaSerbule",
+      "items": {
+        "Potato Seedling": {"favor": "Neutral", "price": 7},
+        "Onion Seedling": {"favor": "Neutral", "price": 9},
+        "Bottle of Water": {"favor": "Neutral", "price": 100},
+        "Gardening: Basic Fertilizer": {"favor": "Neutral", "price": 45},
+        "Handsaw": {"favor": "Neutral", "price": 75},
+        "Cabbage Leafling": {"favor": "Comfortable", "price": 12},
+        "Beet Seedling": {"favor": "Comfortable", "price": 15},
+        "Squash Seedling": {"favor": "Comfortable", "price": 13},
+        "Broccoli Seedling": {"favor": "Comfortable", "price": 22},
+        "Carrot Seedling": {"favor": "Friends", "price": 27},
+        "Rough Tannin Powder": {"favor": "Friends", "price": 7},
+        "Decent Tannin Powder": {"favor": "Friends", "price": 15},
+        "Quality Tannin Powder": {"favor": "Close Friends", "price": 37}
+      }
+    }
+  },
+  "metadata": {
+    "version": "2.0",
+    "last_updated": "2026-03-07",
+    "source": "Project Gorgon Wiki - Individual vendor pages with favor data",
+    "note": "This database tracks confirmed vendor buy tab inventory with favor requirements. Does not include 'Buy Used' tab items (player-sold items).",
+    "favor_levels": ["Neutral", "Comfortable", "Friends", "Close Friends", "Best Friends", "Like Family", "Soul Mates"]
+  }
+}

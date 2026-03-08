@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Gorgon VIP Quest Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .quest-list {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #f5f5f5;
+            color: #666;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .quest-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .quest-item:hover {
+            background: #f0f0f0;
+            border-left-color: #667eea;
+        }
+
+        .quest-item.active {
+            background: #e8eaf6;
+            border-left-color: #667eea;
+        }
+
+        .quest-item.completable {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+
+        .quest-item.completable:hover {
+            background: #c8e6c9;
+        }
+
+        .quest-item.completable .quest-item-name::before {
+            content: '✓ ';
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .quest-item.purchasable {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+
+        .quest-item.purchasable:hover {
+            background: #ffe0b2;
+        }
+
+        .quest-item.purchasable .quest-item-name::before {
+            content: '🛒 ';
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .quest-item-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .quest-item-location {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .quest-detail-header {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .quest-detail-name {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .quest-detail-location {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .quest-detail-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .checklist-items {
+            margin-top: 20px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .checklist-item.completed {
+            background: #e8f5e9;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .item-progress {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-left: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            transition: width 0.3s;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project Gorgon VIP Quest Tracker</h1>
+            <p class="subtitle">
+                <span class="status-indicator"></span>
+                Auto-updating from chat logs
+            </p>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('active')">Active</button>
+                    <button class="tab-btn" onclick="switchTab('completable')">✓ Ready</button>
+                    <button class="tab-btn" onclick="switchTab('purchasable')">🛒 Buyable</button>
+                    <button class="tab-btn" onclick="switchTab('search')">Search</button>
+                </div>
+
+                <input type="text"
+                       class="search-box"
+                       id="searchBox"
+                       placeholder="Search quests..."
+                       style="display: none;">
+
+                <select class="search-box" id="regionFilter" style="display: none;">
+                    <option value="">All Regions</option>
+                    <option value="Serbule">Serbule</option>
+                    <option value="Serbule Hills">Serbule Hills</option>
+                    <option value="Eltibule">Eltibule</option>
+                    <option value="Sun Vale">Sun Vale</option>
+                    <option value="Kur Mountains">Kur Mountains</option>
+                    <option value="Ilmari">Ilmari</option>
+                    <option value="Rahu">Rahu</option>
+                    <option value="Gazluk">Gazluk</option>
+                    <option value="Fae Realm">Fae Realm</option>
+                </select>
+
+                <div id="questListContainer" class="loading">Loading quests...</div>
+            </div>
+
+            <div class="quest-list" id="questDetail">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <p>Select a quest to view its checklist</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'active';
+        let selectedQuest = null;
+        let activeQuests = [];
+        let completableQuests = [];
+        let purchasableQuests = [];
+        let completableQuestSet = new Set();
+        let purchasableQuestSet = new Set();
+        let manualChecks = JSON.parse(localStorage.getItem('manualChecks') || '{}');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadActiveQuests();
+            setInterval(refreshCurrentQuest, 5000); // Auto-refresh every 5 seconds
+
+            document.getElementById('searchBox').addEventListener('input', (e) => {
+                if (e.target.value.length >= 2) {
+                    searchQuests(e.target.value);
+                } else {
+                    document.getElementById('questListContainer').innerHTML = '<p class="empty-state">Type to search...</p>';
+                }
+            });
+
+            document.getElementById('regionFilter').addEventListener('change', () => {
+                // Re-render current tab with region filter applied
+                if (currentTab === 'active') {
+                    renderQuestList(activeQuests);
+                } else if (currentTab === 'completable') {
+                    renderQuestList(completableQuests);
+                } else if (currentTab === 'purchasable') {
+                    renderQuestList(purchasableQuests);
+                }
+            });
+        });
+
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // Update button styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show/hide search box and region filter, load appropriate data
+            const searchBox = document.getElementById('searchBox');
+            const regionFilter = document.getElementById('regionFilter');
+
+            if (tab === 'search') {
+                searchBox.style.display = 'block';
+                regionFilter.style.display = 'none';
+                searchBox.focus();
+            } else {
+                searchBox.style.display = 'none';
+                searchBox.value = '';
+                regionFilter.style.display = 'block';
+
+                if (tab === 'active') {
+                    loadActiveQuests();
+                } else if (tab === 'completable') {
+                    loadCompletableQuests();
+                } else if (tab === 'purchasable') {
+                    loadPurchasableQuests();
+                }
+            }
+        }
+
+        async function loadActiveQuests() {
+            try {
+                // Load active, completable, and purchasable quests
+                const [activeResponse, completableResponse, purchasableResponse] = await Promise.all([
+                    fetch('/api/active_quests'),
+                    fetch('/api/completable_quests'),
+                    fetch('/api/purchasable_quests')
+                ]);
+                const activeData = await activeResponse.json();
+                const completableData = await completableResponse.json();
+                const purchasableData = await purchasableResponse.json();
+
+                activeQuests = activeData.quests;
+                completableQuests = completableData.quests;
+                purchasableQuests = purchasableData.quests;
+                completableQuestSet = new Set(completableQuests.map(q => q.internal_name));
+                purchasableQuestSet = new Set(purchasableQuests.map(q => q.internal_name));
+
+                renderQuestList(activeQuests);
+            } catch (error) {
+                console.error('Error loading active quests:', error);
+                document.getElementById('questListContainer').innerHTML = '<p class="empty-state">Error loading quests</p>';
+            }
+        }
+
+        async function loadCompletableQuests() {
+            try {
+                const [completableResponse, purchasableResponse] = await Promise.all([
+                    fetch('/api/completable_quests'),
+                    fetch('/api/purchasable_quests')
+                ]);
+                const completableData = await completableResponse.json();
+                const purchasableData = await purchasableResponse.json();
+
+                completableQuests = completableData.quests;
+                purchasableQuests = purchasableData.quests;
+                completableQuestSet = new Set(completableQuests.map(q => q.internal_name));
+                purchasableQuestSet = new Set(purchasableQuests.map(q => q.internal_name));
+                renderQuestList(completableQuests);
+            } catch (error) {
+                console.error('Error loading completable quests:', error);
+                document.getElementById('questListContainer').innerHTML = '<p class="empty-state">Error loading quests</p>';
+            }
+        }
+
+        async function loadPurchasableQuests() {
+            try {
+                const [completableResponse, purchasableResponse] = await Promise.all([
+                    fetch('/api/completable_quests'),
+                    fetch('/api/purchasable_quests')
+                ]);
+                const completableData = await completableResponse.json();
+                const purchasableData = await purchasableResponse.json();
+
+                completableQuests = completableData.quests;
+                purchasableQuests = purchasableData.quests;
+                completableQuestSet = new Set(completableQuests.map(q => q.internal_name));
+                purchasableQuestSet = new Set(purchasableQuests.map(q => q.internal_name));
+                renderQuestList(purchasableQuests);
+            } catch (error) {
+                console.error('Error loading purchasable quests:', error);
+                document.getElementById('questListContainer').innerHTML = '<p class="empty-state">Error loading quests</p>';
+            }
+        }
+
+        async function searchQuests(query) {
+            try {
+                const response = await fetch(`/api/search_quests?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                renderQuestList(data.quests);
+            } catch (error) {
+                console.error('Error searching quests:', error);
+            }
+        }
+
+        function renderQuestList(quests) {
+            const container = document.getElementById('questListContainer');
+            const selectedRegion = document.getElementById('regionFilter').value;
+
+            // Filter by region if one is selected
+            let filteredQuests = quests;
+            if (selectedRegion) {
+                filteredQuests = quests.filter(q => q.location === selectedRegion);
+            }
+
+            if (filteredQuests.length === 0) {
+                container.innerHTML = '<p class="empty-state">No quests found</p>';
+                return;
+            }
+
+            // Add helpful notices based on tab
+            let tabNotice = '';
+            if (currentTab === 'purchasable') {
+                tabNotice = `
+                    <div style="background: #e3f2fd; border: 2px solid #2196f3; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-weight: bold; color: #1565c0; margin-bottom: 6px; font-size: 14px;">💡 Can't find items in vendor shops?</div>
+                        <div style="font-size: 13px; color: #424242; line-height: 1.5;">
+                            <strong>Uncheck "Hide Unusable"</strong> in the vendor window. This filter may hide seeds, ingredients, and other quest items even when you can use them.
+                        </div>
+                    </div>
+                `;
+            } else if (currentTab === 'active' || currentTab === 'completable') {
+                tabNotice = `
+                    <div style="background: #f3e5f5; border: 2px solid #9c27b0; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-weight: bold; color: #6a1b9a; margin-bottom: 6px; font-size: 14px;">📋 Items not showing?</div>
+                        <div style="font-size: 13px; color: #424242; line-height: 1.5;">
+                            Generate a fresh <strong>Character Report</strong> in-game to update inventory detection.
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = tabNotice + filteredQuests.map(quest => {
+                const isCompletable = completableQuestSet.has(quest.internal_name);
+                const isPurchasable = purchasableQuestSet.has(quest.internal_name);
+                const isActive = selectedQuest === quest.internal_name;
+                const classes = ['quest-item'];
+                if (isActive) classes.push('active');
+                // Completable takes priority over purchasable
+                if (isCompletable) {
+                    classes.push('completable');
+                } else if (isPurchasable) {
+                    classes.push('purchasable');
+                }
+
+                return `
+                    <div class="${classes.join(' ')}"
+                         onclick="selectQuest('${quest.internal_name}')">
+                        <div class="quest-item-name">${quest.name}</div>
+                        <div class="quest-item-location">${quest.location}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function selectQuest(internalName) {
+            selectedQuest = internalName;
+
+            // Re-render appropriate quest list
+            if (currentTab === 'active') {
+                renderQuestList(activeQuests);
+            } else if (currentTab === 'completable') {
+                renderQuestList(completableQuests);
+            }
+
+            await loadQuestDetail(internalName);
+        }
+
+        async function loadQuestDetail(internalName) {
+            const container = document.getElementById('questDetail');
+            container.innerHTML = '<div class="loading">Loading quest details...</div>';
+
+            try {
+                const response = await fetch(`/api/quest/${internalName}`);
+                const quest = await response.json();
+                renderQuestDetail(quest);
+            } catch (error) {
+                console.error('Error loading quest detail:', error);
+                container.innerHTML = '<p class="empty-state">Error loading quest details</p>';
+            }
+        }
+
+        function renderQuestDetail(quest) {
+            const container = document.getElementById('questDetail');
+
+            if (quest.items.length === 0) {
+                container.innerHTML = `
+                    <div class="quest-detail-header">
+                        <div class="quest-detail-name">${quest.quest_name}</div>
+                        <div class="quest-detail-location">${quest.location || 'Unknown'}</div>
+                        <div class="quest-detail-description">${quest.description}</div>
+                    </div>
+                    <p class="empty-state">This quest has no item collection objectives</p>
+                `;
+                return;
+            }
+
+            const checklistHtml = quest.items.map(item => {
+                const checkKey = `${selectedQuest}_${item.internal_name}`;
+                const manualCheck = manualChecks[checkKey] || 0;
+                const totalCollected = item.collected + manualCheck;
+                const completed = totalCollected >= item.required;
+                const progress = Math.min(100, (totalCollected / item.required) * 100);
+
+                // Build location info with individual storage locations
+                let locationInfo = '';
+                if (item.in_inventory !== undefined) {
+                    const inBank = item.in_storage || 0;
+                    const total = item.in_inventory + inBank;
+
+                    if (total > 0) {
+                        locationInfo = `<div style="font-size: 13px; color: #667eea; margin-top: 4px;">`;
+                        locationInfo += `📦 Inventory: ${item.in_inventory}`;
+
+                        // Show individual storage locations
+                        if (item.storage_locations && Object.keys(item.storage_locations).length > 0) {
+                            for (const [location, count] of Object.entries(item.storage_locations)) {
+                                // Get appropriate icon for each location type
+                                let icon = '🏦'; // Default bank icon
+                                if (location.toLowerCase().includes('dream')) {
+                                    icon = '💤'; // Dream world chest
+                                } else if (location.toLowerCase().includes('saddlebag')) {
+                                    icon = '🎒'; // Saddlebag
+                                }
+                                locationInfo += ` | ${icon} ${location}: ${count}`;
+                            }
+                        }
+
+                        locationInfo += `</div>`;
+                    }
+                }
+
+                // Show matching items for keyword-based quests (like Poetry, SnailShell)
+                let keywordInfo = '';
+                if (item.keyword_match && item.matching_items && item.matching_items.length > 0) {
+                    keywordInfo = `<div style="font-size: 12px; color: #9c27b0; margin-top: 4px; font-style: italic;">`;
+                    keywordInfo += `✨ Includes: ${item.matching_items.join(', ')}`;
+                    keywordInfo += `</div>`;
+                }
+
+                // Build vendor hint info with price
+                let vendorInfo = '';
+                if (!completed && item.possible_vendors && item.possible_vendors.length > 0) {
+                    const itemsNeeded = item.required - totalCollected;
+                    // Use vendor price if available, otherwise use item value
+                    const price = item.vendor_price || item.price || 0;
+                    const costForItem = price * itemsNeeded;
+                    vendorInfo = `<div style="font-size: 12px; color: #ff9800; margin-top: 4px;">`;
+                    vendorInfo += `🛒 Can buy from: ${item.possible_vendors.join(', ')}`;
+                    if (price > 0) {
+                        vendorInfo += ` (${itemsNeeded}x ${price.toFixed(0)} = ${costForItem.toFixed(0)} councils)`;
+                    }
+                    vendorInfo += `</div>`;
+                }
+
+                return `
+                    <div class="checklist-item ${completed ? 'completed' : ''}">
+                        <input type="checkbox"
+                               class="checkbox"
+                               ${completed ? 'checked' : ''}
+                               onchange="toggleManualCheck('${item.internal_name}', ${item.required - item.collected})">
+                        <div class="item-info">
+                            <div class="item-name">${item.display_name}</div>
+                            <div class="item-progress">
+                                ${totalCollected} / ${item.required}
+                                ${item.collected > 0 ? `(${item.collected} from logs)` : ''}
+                            </div>
+                            ${keywordInfo}
+                            ${locationInfo}
+                            ${vendorInfo}
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Add total cost summary if there are items to buy
+            let costSummary = '';
+            if (quest.total_cost > 0) {
+                costSummary = `
+                    <div style="background: #fff3e0; padding: 12px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #ff9800;">
+                        <strong>💰 Total cost to buy missing items:</strong> ${quest.total_cost.toFixed(0)} councils
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="quest-detail-header">
+                    <div class="quest-detail-name">${quest.quest_name}</div>
+                    <div class="quest-detail-location">${quest.location || 'Unknown'}</div>
+                    <div class="quest-detail-description">${quest.description}</div>
+                </div>
+                ${costSummary}
+                <div class="checklist-items">
+                    ${checklistHtml}
+                </div>
+                <button class="refresh-btn" onclick="refreshCurrentQuest()">Refresh</button>
+            `;
+        }
+
+        function toggleManualCheck(itemInternalName, remaining) {
+            const checkKey = `${selectedQuest}_${itemInternalName}`;
+
+            if (manualChecks[checkKey]) {
+                delete manualChecks[checkKey];
+            } else {
+                manualChecks[checkKey] = remaining;
+            }
+
+            localStorage.setItem('manualChecks', JSON.stringify(manualChecks));
+            refreshCurrentQuest();
+        }
+
+        async function refreshCurrentQuest() {
+            if (selectedQuest) {
+                await loadQuestDetail(selectedQuest);
+            }
+        }
+    </script>
+</body>
+</html>
