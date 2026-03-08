@@ -52,6 +52,77 @@ def setup_overlay_debug_logging():
     logging.info(f"Log file: {log_file}")
     logging.info("="*60)
 
+    # Log environment variables (especially important for Linux/Wayland/Qt)
+    logging.info("\n--- Environment Variables ---")
+    env_vars_to_log = [
+        'DISPLAY', 'WAYLAND_DISPLAY', 'XDG_SESSION_TYPE', 'XDG_CURRENT_DESKTOP',
+        'QT_QPA_PLATFORM', 'QT_QPA_PLATFORMTHEME', 'QT_WAYLAND_DISABLE_WINDOWDECORATION',
+        'GDK_BACKEND', 'GTK_THEME', 'DESKTOP_SESSION',
+        'PATH', 'LD_LIBRARY_PATH', 'PYTHONPATH'
+    ]
+    for var in env_vars_to_log:
+        value = os.environ.get(var, '<not set>')
+        logging.info(f"  {var}: {value}")
+
+    # Log Python library versions
+    logging.info("\n--- Python Libraries ---")
+    try:
+        import webview
+        logging.info(f"  pywebview: {webview.__version__ if hasattr(webview, '__version__') else 'unknown'}")
+    except ImportError:
+        logging.info("  pywebview: NOT INSTALLED")
+
+    try:
+        import flask
+        logging.info(f"  flask: {flask.__version__ if hasattr(flask, '__version__') else 'unknown'}")
+    except ImportError:
+        logging.info("  flask: NOT INSTALLED")
+
+    # Linux-specific library detection
+    if platform.system() == 'Linux':
+        logging.info("\n--- Linux Display Libraries ---")
+
+        # Check GTK
+        try:
+            import gi
+            gi.require_version('Gtk', '3.0')
+            from gi.repository import Gtk
+            gtk_version = f"{Gtk.MAJOR_VERSION}.{Gtk.MINOR_VERSION}.{Gtk.MICRO_VERSION}"
+            logging.info(f"  GTK3: {gtk_version}")
+        except Exception as e:
+            logging.info(f"  GTK3: Error - {e}")
+
+        # Check WebKit2GTK
+        try:
+            import gi
+            gi.require_version('WebKit2', '4.1')
+            from gi.repository import WebKit2
+            webkit_version = WebKit2.get_major_version(), WebKit2.get_minor_version(), WebKit2.get_micro_version()
+            logging.info(f"  WebKit2GTK: {'.'.join(map(str, webkit_version))}")
+        except Exception as e:
+            logging.info(f"  WebKit2GTK: Error - {e}")
+
+        # Check Qt availability
+        try:
+            from PyQt5.QtCore import QT_VERSION_STR
+            logging.info(f"  Qt5 (PyQt5): {QT_VERSION_STR}")
+        except ImportError:
+            logging.info("  Qt5 (PyQt5): NOT INSTALLED")
+
+        try:
+            from PyQt6.QtCore import QT_VERSION_STR
+            logging.info(f"  Qt6 (PyQt6): {QT_VERSION_STR}")
+        except ImportError:
+            logging.info("  Qt6 (PyQt6): NOT INSTALLED")
+
+        try:
+            import PySide6
+            logging.info(f"  Qt6 (PySide6): {PySide6.__version__}")
+        except ImportError:
+            logging.info("  Qt6 (PySide6): NOT INSTALLED")
+
+    logging.info("="*60 + "\n")
+
     return log_file
 
 def is_port_in_use(port, host='127.0.0.1'):
@@ -77,6 +148,54 @@ def open_overlay_window(url):
     try:
         import webview
         logging.info(f"pywebview imported successfully (version: {webview.__version__ if hasattr(webview, '__version__') else 'unknown'})")
+
+        # Detect which backend will be used
+        import platform
+        if platform.system() == 'Linux':
+            logging.info("\n--- pywebview Backend Detection (Linux) ---")
+
+            # Check for available backends
+            backends_available = []
+
+            # GTK backend
+            try:
+                import gi
+                gi.require_version('Gtk', '3.0')
+                gi.require_version('WebKit2', '4.1')
+                backends_available.append("gtk")
+                logging.info("  GTK backend: AVAILABLE")
+            except Exception as e:
+                logging.info(f"  GTK backend: UNAVAILABLE ({e})")
+
+            # Qt backend (PyQt5)
+            try:
+                from PyQt5 import QtCore
+                backends_available.append("qt (PyQt5)")
+                logging.info("  Qt backend (PyQt5): AVAILABLE")
+            except ImportError as e:
+                logging.info(f"  Qt backend (PyQt5): UNAVAILABLE ({e})")
+
+            # Qt backend (PyQt6)
+            try:
+                from PyQt6 import QtCore
+                backends_available.append("qt (PyQt6)")
+                logging.info("  Qt backend (PyQt6): AVAILABLE")
+            except ImportError as e:
+                logging.info(f"  Qt backend (PyQt6): UNAVAILABLE ({e})")
+
+            # Qt backend (PySide6)
+            try:
+                from PySide6 import QtCore
+                backends_available.append("qt (PySide6)")
+                logging.info("  Qt backend (PySide6): AVAILABLE")
+            except ImportError as e:
+                logging.info(f"  Qt backend (PySide6): UNAVAILABLE ({e})")
+
+            logging.info(f"\n  Available backends: {backends_available if backends_available else 'NONE'}")
+            logging.info("  pywebview will automatically choose the first available backend")
+            logging.info("  Priority order: GTK > Qt (any variant)")
+            logging.info("="*60 + "\n")
+
     except ImportError as e:
         logging.error(f"pywebview import failed: {e}")
         print("ERROR: pywebview not installed. Overlay mode requires pywebview.")
@@ -128,17 +247,36 @@ def open_overlay_window(url):
             background_color='#000000'
         )
         logging.info("Window created successfully")
+        logging.info(f"Window object: {window}")
+        logging.info(f"Window type: {type(window)}")
     except Exception as e:
-        logging.error(f"Failed to create window: {e}")
+        logging.error(f"Failed to create window: {e}", exc_info=True)
         raise
 
     # Start the webview (blocks until window is closed)
     logging.info("Starting webview...")
+    logging.info("About to call webview.start() - this will initialize the GUI backend")
+
     try:
+        # Try to detect which backend pywebview is using
+        import platform
+        if platform.system() == 'Linux':
+            try:
+                # Try to access internal backend info
+                logging.info("Attempting to detect active pywebview backend...")
+                if hasattr(webview, 'guilib'):
+                    logging.info(f"  webview.guilib: {webview.guilib}")
+            except Exception as e:
+                logging.debug(f"Could not detect backend: {e}")
+
+        logging.info("Calling webview.start(debug=False)...")
         webview.start(debug=False)
         logging.info("Webview closed normally")
     except Exception as e:
-        logging.error(f"Webview error: {e}")
+        logging.error(f"Webview error: {e}", exc_info=True)
+        logging.error("Webview crashed or failed to start")
+        logging.error("If this is a segmentation fault, check the system logs for more details")
+        raise
 
 def check_browser_alive(app):
     """Monitor browser connection and shut down if disconnected"""
