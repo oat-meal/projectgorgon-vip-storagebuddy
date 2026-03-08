@@ -15,15 +15,54 @@ import time
 import sys
 import argparse
 import socket
+import logging
 from pathlib import Path
+from datetime import datetime
+
+def setup_overlay_debug_logging():
+    """Setup debug logging for overlay mode"""
+    import platform
+    import os
+
+    # Determine user data directory
+    if platform.system() == 'Windows':
+        data_dir = Path(os.environ.get('LOCALAPPDATA', '~')) / 'ProjectGorgon-QuestHelper'
+    elif platform.system() == 'Darwin':
+        data_dir = Path('~/Library/Application Support/ProjectGorgon-QuestHelper').expanduser()
+    else:
+        data_dir = Path('~/.local/share/projectgorgon-questhelper').expanduser()
+
+    data_dir.mkdir(parents=True, exist_ok=True)
+    log_file = data_dir / 'overlay-debug.log'
+
+    # Setup logging
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s [%(levelname)s] %(message)s',
+        handlers=[
+            logging.FileHandler(log_file, mode='w'),  # Overwrite each time
+            logging.StreamHandler(sys.stdout)  # Also print to console
+        ]
+    )
+
+    logging.info("="*60)
+    logging.info("Overlay Debug Log Started")
+    logging.info(f"Platform: {platform.system()} {platform.release()}")
+    logging.info(f"Python: {sys.version}")
+    logging.info(f"Log file: {log_file}")
+    logging.info("="*60)
+
+    return log_file
 
 def is_port_in_use(port, host='127.0.0.1'):
     """Check if a port is already in use"""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             s.bind((host, port))
+            logging.debug(f"Port {port} is available")
             return False
-        except OSError:
+        except OSError as e:
+            logging.debug(f"Port {port} is in use: {e}")
             return True
 
 def open_browser(url, delay=1.5):
@@ -33,23 +72,32 @@ def open_browser(url, delay=1.5):
 
 def open_overlay_window(url):
     """Open overlay window using pywebview"""
+    logging.info("Opening overlay window...")
+
     try:
         import webview
-    except ImportError:
+        logging.info(f"pywebview imported successfully (version: {webview.__version__ if hasattr(webview, '__version__') else 'unknown'})")
+    except ImportError as e:
+        logging.error(f"pywebview import failed: {e}")
         print("ERROR: pywebview not installed. Overlay mode requires pywebview.")
         print("Install with: pip install pywebview")
         sys.exit(1)
 
     # Wait for server to be ready
+    logging.info(f"Checking if server is ready at {url}/api/version...")
     import urllib.request
     for i in range(10):
         try:
-            urllib.request.urlopen(f"{url}/api/version", timeout=1)
+            response = urllib.request.urlopen(f"{url}/api/version", timeout=1)
+            data = response.read().decode('utf-8')
+            logging.info(f"Server ready! Response: {data}")
             break
-        except:
+        except Exception as e:
+            logging.debug(f"Server not ready (attempt {i+1}/10): {e}")
             if i < 9:
                 time.sleep(0.5)
             else:
+                logging.error("Server failed to start after 10 attempts")
                 print("ERROR: Server failed to start")
                 return
 
@@ -63,20 +111,34 @@ def open_overlay_window(url):
     print()
 
     # Create overlay window
-    window = webview.create_window(
-        'Quest Tracker Overlay',
-        f'{url}/overlay',
-        width=320,
-        height=500,
-        resizable=True,
-        frameless=True,
-        on_top=True,
-        transparent=True,
-        background_color='#000000'
-    )
+    logging.info("Creating pywebview window...")
+    logging.info(f"Window URL: {url}/overlay")
+    logging.info(f"Window parameters: width=320, height=500, frameless=True, on_top=True, transparent=True")
+
+    try:
+        window = webview.create_window(
+            'Quest Tracker Overlay',
+            f'{url}/overlay',
+            width=320,
+            height=500,
+            resizable=True,
+            frameless=True,
+            on_top=True,
+            transparent=True,
+            background_color='#000000'
+        )
+        logging.info("Window created successfully")
+    except Exception as e:
+        logging.error(f"Failed to create window: {e}")
+        raise
 
     # Start the webview (blocks until window is closed)
-    webview.start(debug=False)
+    logging.info("Starting webview...")
+    try:
+        webview.start(debug=False)
+        logging.info("Webview closed normally")
+    except Exception as e:
+        logging.error(f"Webview error: {e}")
 
 def check_browser_alive(app):
     """Monitor browser connection and shut down if disconnected"""
@@ -126,27 +188,47 @@ def main():
     url = "http://127.0.0.1:5000"
 
     if args.overlay:
+        # Setup debug logging for overlay mode
+        log_file = setup_overlay_debug_logging()
+        print(f"\nDebug logging enabled: {log_file}")
+        logging.info("Entering overlay mode")
+
         # Overlay mode: Check if server is already running
+        logging.info("Checking if port 5000 is in use...")
         server_already_running = is_port_in_use(5000)
 
         if server_already_running:
+            logging.info("Server detected on port 5000 - connecting to existing server")
             print("Detected existing server on port 5000")
             print("Connecting to existing server...")
         else:
+            logging.info("No server detected - starting new Flask server")
             print("No existing server detected")
             print("Starting Flask server in background...")
 
             # Start server in background
             def start_server():
-                app.run(debug=False, host='127.0.0.1', port=5000, use_reloader=False, threaded=True)
+                logging.info("Flask server thread started")
+                try:
+                    app.run(debug=False, host='127.0.0.1', port=5000, use_reloader=False, threaded=True)
+                except Exception as e:
+                    logging.error(f"Flask server error: {e}")
 
             server_thread = threading.Thread(target=start_server, daemon=True)
             server_thread.start()
+            logging.info("Flask server thread started in background")
 
         # Open overlay window (blocks until closed)
-        open_overlay_window(url)
+        try:
+            open_overlay_window(url)
+        except Exception as e:
+            logging.error(f"Error opening overlay window: {e}", exc_info=True)
+            print(f"\nERROR: {e}")
+            print(f"See debug log for details: {log_file}")
 
+        logging.info("Overlay window closed")
         print("\nOverlay closed. Shutting down...")
+        print(f"Debug log saved to: {log_file}")
         sys.exit(0)
 
     else:
