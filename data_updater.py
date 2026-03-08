@@ -35,26 +35,61 @@ def validate_json_file(file_path: Path) -> bool:
         return False
 
 
-def ensure_quest_data(base_dir: Path) -> bool:
-    """Ensure quest data files exist, download if missing"""
+def copy_bundled_data(bundled_dir: Path, dest_dir: Path) -> bool:
+    """Copy bundled data files from PyInstaller bundle to destination"""
+    import shutil
+
+    try:
+        quests_src = bundled_dir / 'quests.json'
+        items_src = bundled_dir / 'items.json'
+        quests_dest = dest_dir / 'quests.json'
+        items_dest = dest_dir / 'items.json'
+
+        if quests_src.exists():
+            print(f"Copying bundled quests.json to {quests_dest}...")
+            shutil.copy2(quests_src, quests_dest)
+            print("✓ Copied quests.json")
+
+        if items_src.exists():
+            print(f"Copying bundled items.json to {items_dest}...")
+            shutil.copy2(items_src, items_dest)
+            print("✓ Copied items.json")
+
+        return True
+    except Exception as e:
+        print(f"✗ Failed to copy bundled data: {e}")
+        return False
+
+
+def ensure_quest_data(base_dir: Path, bundled_dir: Optional[Path] = None) -> bool:
+    """Ensure quest data files exist, copy from bundle or download if missing"""
     quests_file = base_dir / 'quests.json'
     items_file = base_dir / 'items.json'
 
-    needs_download = False
+    needs_data = False
 
     # Check if files exist and are valid
     if not quests_file.exists() or not validate_json_file(quests_file):
         print("Quest data missing or invalid")
-        needs_download = True
+        needs_data = True
 
     if not items_file.exists() or not validate_json_file(items_file):
         print("Item data missing or invalid")
-        needs_download = True
+        needs_data = True
 
-    if not needs_download:
+    if not needs_data:
         return True
 
-    # Download missing or invalid files
+    # Try to copy from bundled resources first (PyInstaller executable)
+    if bundled_dir and bundled_dir.exists():
+        print("\nCopying game data from bundled resources...")
+        if copy_bundled_data(bundled_dir, base_dir):
+            print("\n✓ Game data copied successfully!")
+            return True
+        else:
+            print("\nBundled data copy failed, will try downloading...")
+
+    # Fall back to downloading if bundled copy failed or not available
     print("\nDownloading game data from Project Gorgon CDN...")
     print("This may take a moment...")
 

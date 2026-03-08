@@ -27,7 +27,7 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --name=QuestHelper-Windows --onefile --windowed --add-data="templates;templates" --hidden-import=flask --hidden-import=jinja2 --collect-all=flask launcher.py
+        pyinstaller --name=QuestHelper-Windows --onefile --windowed --add-data="templates;templates" --add-data="quests.json;." --add-data="items.json;." --hidden-import=flask --hidden-import=jinja2 --collect-all=flask launcher.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
@@ -67,7 +67,7 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --name=QuestHelper-Linux --onefile --add-data="templates:templates" --hidden-import=flask --hidden-import=jinja2 --collect-all=flask launcher.py
+        pyinstaller --name=QuestHelper-Linux --onefile --add-data="templates:templates" --add-data="quests.json:." --add-data="items.json:." --hidden-import=flask --hidden-import=jinja2 --collect-all=flask launcher.py
 
     - name: Make executable
       run: chmod +x dist/QuestHelper-Linux

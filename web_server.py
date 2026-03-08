@@ -18,10 +18,11 @@ app = Flask(__name__)
 config = get_config()
 base_dir = config.get_base_dir()
 
-# Ensure quest data files exist (download if needed)
+# Ensure quest data files exist (copy from bundle or download if needed)
 print(f"Data directory: {base_dir}")
-if not ensure_quest_data(base_dir):
-    print("\nWARNING: Failed to download game data files")
+bundled_dir = config.get_bundled_resource_dir()
+if not ensure_quest_data(base_dir, bundled_dir):
+    print("\nWARNING: Failed to obtain game data files")
     print("The Quest Helper may not work correctly")
     print("Please check your internet connection and try again\n")
 

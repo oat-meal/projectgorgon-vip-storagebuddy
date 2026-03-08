@@ -170,6 +170,19 @@ class Config:
         self.config['auto_detected'] = False
         self._save_config()
 
+    def get_bundled_resource_dir(self) -> Optional[Path]:
+        """Get bundled resource directory if running as PyInstaller executable"""
+        import sys
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            # Running as PyInstaller bundle
+            return Path(sys._MEIPASS)
+        else:
+            # Running as normal Python script - check if files exist locally
+            script_dir = Path(__file__).parent
+            if (script_dir / 'quests.json').exists() and (script_dir / 'items.json').exists():
+                return script_dir
+        return None
+
     def get_status(self) -> Dict:
         """Get configuration status for troubleshooting"""
         chat_dir = self.get_chat_log_dir()

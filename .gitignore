@@ -43,11 +43,8 @@ result-*
 Thumbs.db
 
 # Project specific
-quests.json
-items.json
 *.log
 config.json
-vendor_inventory.json
 
 # PyInstaller
 build/
