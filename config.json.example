@@ -1,0 +1,21 @@
+{
+  "_comment": "Copy this file to config.json and update the paths below",
+  "chat_log_dir": "REPLACE_WITH_YOUR_PATH/Project Gorgon Data/ChatLogs",
+  "reports_dir": "REPLACE_WITH_YOUR_PATH/Project Gorgon Data/Reports",
+
+  "_examples": {
+    "windows": {
+      "chat_log_dir": "C:\\Users\\YourName\\Documents\\Project Gorgon Data\\ChatLogs",
+      "reports_dir": "C:\\Users\\YourName\\Documents\\Project Gorgon Data\\Reports"
+    },
+    "linux_proton": {
+      "_comment": "Replace 342940 with your Steam app ID if different",
+      "chat_log_dir": "/home/yourusername/.steam/steam/steamapps/compatdata/342940/pfx/drive_c/users/steamuser/Documents/Project Gorgon Data/ChatLogs",
+      "reports_dir": "/home/yourusername/.steam/steam/steamapps/compatdata/342940/pfx/drive_c/users/steamuser/Documents/Project Gorgon Data/Reports"
+    },
+    "linux_native": {
+      "chat_log_dir": "/home/yourusername/Documents/Project Gorgon Data/ChatLogs",
+      "reports_dir": "/home/yourusername/Documents/Project Gorgon Data/Reports"
+    }
+  }
+}

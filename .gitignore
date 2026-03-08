@@ -46,3 +46,10 @@ Thumbs.db
 quests.json
 items.json
 *.log
+config.json
+vendor_inventory.json
+
+# PyInstaller
+build/
+dist/
+*.spec

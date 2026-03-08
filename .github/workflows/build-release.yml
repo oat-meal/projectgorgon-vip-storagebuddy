@@ -1,0 +1,90 @@
+name: Build Executable Releases
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-windows:
+    name: Build Windows Executable
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build executable
+      run: |
+        pyinstaller --name=QuestHelper-Windows --onefile --windowed --add-data="templates;templates" --hidden-import=flask --hidden-import=jinja2 --collect-all=flask launcher.py
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: QuestHelper-Windows
+        path: dist/QuestHelper-Windows.exe
+
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: dist/QuestHelper-Windows.exe
+        asset_name: QuestHelper-Windows.exe
+        asset_content_type: application/octet-stream
+
+  build-linux:
+    name: Build Linux Executable
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build executable
+      run: |
+        pyinstaller --name=QuestHelper-Linux --onefile --add-data="templates:templates" --hidden-import=flask --hidden-import=jinja2 --collect-all=flask launcher.py
+
+    - name: Make executable
+      run: chmod +x dist/QuestHelper-Linux
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: QuestHelper-Linux
+        path: dist/QuestHelper-Linux
+
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: dist/QuestHelper-Linux
+        asset_name: QuestHelper-Linux
+        asset_content_type: application/octet-stream

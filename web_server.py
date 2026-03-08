@@ -7,29 +7,58 @@ Flask-based web interface for quest tracking
 from flask import Flask, render_template, jsonify, request
 from pathlib import Path
 import json
+import sys
 from quest_parser import QuestDatabase, ChatLogParser, QuestTracker, InventoryParser
+from config import get_config
 
 app = Flask(__name__)
 
-# Initialize quest tracker
-base_dir = Path.home() / 'quest-tracker'
-chat_log_dir = Path.home() / 'Documents' / 'Project Gorgon Data' / 'ChatLogs'
-character_file = Path.home() / 'Documents' / 'Project Gorgon Data' / 'Reports'
+# Initialize configuration
+config = get_config()
+config_status = config.get_status()
 
-quest_db = QuestDatabase(
-    base_dir / 'quests.json',
-    base_dir / 'items.json'
-)
+# Initialize quest tracker only if configured
+quest_db = None
+chat_parser = None
+inventory_parser = None
+tracker = None
 
-chat_parser = ChatLogParser(chat_log_dir)
-inventory_parser = InventoryParser(character_file)
-tracker = QuestTracker(quest_db, chat_parser, inventory_parser)
+if config_status['configured']:
+    base_dir = config.get_base_dir()
+    chat_log_dir = config.get_chat_log_dir()
+    character_file = config.get_reports_dir()
+
+    print(f"Using game data from: {config.config.get('detected_path', 'custom configuration')}")
+    print(f"  Chat logs: {chat_log_dir}")
+    print(f"  Reports: {character_file}")
+
+    quest_db = QuestDatabase(
+        base_dir / 'quests.json',
+        base_dir / 'items.json'
+    )
+
+    chat_parser = ChatLogParser(chat_log_dir)
+    inventory_parser = InventoryParser(character_file)
+    tracker = QuestTracker(quest_db, chat_parser, inventory_parser)
+else:
+    print("\nQuest Helper starting in setup mode.")
+    print("Open your browser to http://127.0.0.1:5000/setup to configure.\n")
 
 
 @app.route('/')
 def index():
     """Main page"""
+    # Redirect to setup if not configured
+    if not config.get_status()['configured']:
+        from flask import redirect
+        return redirect('/setup')
     return render_template('index.html')
+
+
+@app.route('/setup')
+def setup():
+    """Setup wizard page"""
+    return render_template('setup.html')
 
 
 @app.route('/api/active_quests')
@@ -196,6 +225,68 @@ def get_log_status():
         'log_file': log_file.name,
         'last_modified': log_file.stat().st_mtime
     })
+
+
+@app.route('/api/config_status')
+def get_config_status():
+    """Get configuration status for troubleshooting"""
+    return jsonify(config.get_status())
+
+
+@app.route('/api/auto_detect', methods=['POST'])
+def auto_detect_paths():
+    """Try to auto-detect game data paths"""
+    detected = config._auto_detect_game_data()
+
+    if detected:
+        # Save the detected paths
+        config.config.update(detected)
+        config._save_config()
+
+        # Get stats about what was found
+        chat_dir = Path(detected['chat_log_dir'])
+        reports_dir = Path(detected['reports_dir'])
+
+        return jsonify({
+            'success': True,
+            'detected_path': detected['detected_path'],
+            'chat_log_dir': str(chat_dir),
+            'reports_dir': str(reports_dir),
+            'chat_log_count': len(list(chat_dir.glob('Chat-*.log'))),
+            'character_files_count': len(list(reports_dir.glob('Character_*.json')))
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'error': 'Could not find Project Gorgon game data in common locations'
+        })
+
+
+@app.route('/api/save_config', methods=['POST'])
+def save_configuration():
+    """Save custom configuration from user"""
+    data = request.get_json()
+
+    chat_log_dir = data.get('chat_log_dir', '').strip()
+    reports_dir = data.get('reports_dir', '').strip()
+
+    if not chat_log_dir or not reports_dir:
+        return jsonify({
+            'success': False,
+            'error': 'Both paths are required'
+        })
+
+    try:
+        config.set_custom_paths(chat_log_dir, reports_dir)
+        return jsonify({
+            'success': True,
+            'message': 'Configuration saved successfully'
+        })
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
 
 
 if __name__ == '__main__':

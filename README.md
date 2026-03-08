@@ -22,26 +22,51 @@ The tracker monitors your Project Gorgon chat logs and automatically detects whe
 ## Requirements
 
 - **Project Gorgon VIP Access** - Required for character reports and chat logging
-- **Nix Package Manager** - For easy dependency management
 - **Chat Logging Enabled** - Must be enabled in Project Gorgon settings (V.I.P. section)
 
 ## Installation
 
-1. Clone this repository:
+### Option 1: Download Executable (Easiest - Recommended for Most Users)
+
+**No Python installation needed!**
+
+1. Go to [Releases](https://github.com/oat-meal/projectgorgon-vip-questhelper/releases)
+2. Download the executable for your platform:
+   - **Windows**: `QuestHelper-Windows.exe`
+   - **Linux**: `QuestHelper-Linux`
+3. Double-click to run!
+4. Your browser will open automatically to the setup wizard
+5. Follow the on-screen instructions to configure your game data paths
+
+**First-time Windows users**: You may see a "Windows protected your PC" warning. Click "More info" → "Run anyway". This is normal for unsigned executables.
+
+### Option 2: Run from Source (Advanced Users)
+
+**For developers or users who want to modify the code:**
+
+#### With Nix (Linux):
 ```bash
 git clone https://github.com/oat-meal/projectgorgon-vip-questhelper.git
 cd projectgorgon-vip-questhelper
-```
-
-2. Start the tracker:
-```bash
 ./start.sh
 ```
 
-3. Open your browser to:
+#### With Python (Windows/Linux/Mac):
+```bash
+git clone https://github.com/oat-meal/projectgorgon-vip-questhelper.git
+cd projectgorgon-vip-questhelper
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Windows users:
+START_QUEST_HELPER.bat
+
+# Linux/Mac users:
+python3 web_server.py
 ```
-http://127.0.0.1:5000
-```
+
+The server will start and open your browser to `http://127.0.0.1:5000`
 
 ## Setup
 

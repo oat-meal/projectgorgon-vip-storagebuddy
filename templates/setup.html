@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup - Project Gorgon VIP Quest Helper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .status {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .status.error {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .status.success {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .status h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .status-details {
+            font-family: monospace;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .examples {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .examples h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .example {
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .example strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .example code {
+            display: block;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner.active {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner::after {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .detected-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detected-info h4 {
+            color: #0066cc;
+            margin-bottom: 8px;
+        }
+
+        .detected-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Quest Helper Setup</h1>
+            <p>Let's find your Project Gorgon game data</p>
+        </div>
+
+        <div class="content">
+            <div id="status-container"></div>
+
+            <div id="auto-detect-section">
+                <h3 style="margin-bottom: 15px;">Step 1: Try Auto-Detection</h3>
+                <p style="margin-bottom: 15px; color: #666;">
+                    Click below to search common locations for your game data.
+                </p>
+                <button class="btn-primary" onclick="autoDetect()">🔍 Auto-Detect Game Data</button>
+            </div>
+
+            <div id="manual-setup-section" style="display: none;">
+                <h3 style="margin-bottom: 15px;">Manual Configuration</h3>
+                <form id="config-form">
+                    <div class="form-group">
+                        <label for="chat_log_dir">Chat Logs Directory</label>
+                        <input type="text" id="chat_log_dir" name="chat_log_dir"
+                               placeholder="Path to ChatLogs folder">
+                        <div class="help-text">
+                            This folder contains files named Chat-YYYY-MM-DD.log
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reports_dir">Reports Directory</label>
+                        <input type="text" id="reports_dir" name="reports_dir"
+                               placeholder="Path to Reports folder">
+                        <div class="help-text">
+                            This folder contains files named Character_*.json
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="showExamples()">
+                            📖 Show Examples
+                        </button>
+                        <button type="submit" class="btn-primary">💾 Save Configuration</button>
+                    </div>
+                </form>
+
+                <div id="examples-container" style="display: none;">
+                    <div class="examples">
+                        <h4>Common Locations:</h4>
+
+                        <div class="example">
+                            <strong>Windows:</strong>
+                            <code>C:\Users\YourName\Documents\Project Gorgon Data\ChatLogs</code>
+                            <code>C:\Users\YourName\Documents\Project Gorgon Data\Reports</code>
+                        </div>
+
+                        <div class="example">
+                            <strong>Linux with Proton (Steam):</strong>
+                            <code>~/.steam/steam/steamapps/compatdata/342940/pfx/drive_c/users/steamuser/Documents/Project Gorgon Data/ChatLogs</code>
+                            <code>~/.steam/steam/steamapps/compatdata/342940/pfx/drive_c/users/steamuser/Documents/Project Gorgon Data/Reports</code>
+                        </div>
+
+                        <div class="example">
+                            <strong>Linux Native:</strong>
+                            <code>~/Documents/Project Gorgon Data/ChatLogs</code>
+                            <code>~/Documents/Project Gorgon Data/Reports</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spinner" id="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        let examplesVisible = false;
+
+        function showStatus(type, title, message) {
+            const container = document.getElementById('status-container');
+            container.innerHTML = `
+                <div class="status ${type}">
+                    <h3>${title}</h3>
+                    <div class="status-details">${message}</div>
+                </div>
+            `;
+        }
+
+        function showSpinner(show) {
+            const spinner = document.getElementById('spinner');
+            if (show) {
+                spinner.classList.add('active');
+            } else {
+                spinner.classList.remove('active');
+            }
+        }
+
+        function showExamples() {
+            const container = document.getElementById('examples-container');
+            examplesVisible = !examplesVisible;
+            container.style.display = examplesVisible ? 'block' : 'none';
+        }
+
+        async function autoDetect() {
+            showSpinner(true);
+            showStatus('', 'Searching...', 'Looking for Project Gorgon game data in common locations...');
+
+            try {
+                const response = await fetch('/api/auto_detect', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                showSpinner(false);
+
+                if (data.success) {
+                    showStatus('success', '✅ Found Game Data!', `
+                        <p><strong>Location:</strong> ${data.detected_path}</p>
+                        <p><strong>Chat Logs:</strong> ${data.chat_log_count} files found</p>
+                        <p><strong>Character Files:</strong> ${data.character_files_count} files found</p>
+                        <p style="margin-top: 10px;">Configuration saved! Redirecting to Quest Helper...</p>
+                    `);
+
+                    // Redirect to main page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    showStatus('error', '❌ Auto-Detection Failed', `
+                        <p>Could not find game data automatically.</p>
+                        <p style="margin-top: 10px;">Please use manual configuration below.</p>
+                    `);
+                    document.getElementById('manual-setup-section').style.display = 'block';
+                }
+            } catch (error) {
+                showSpinner(false);
+                showStatus('error', 'Error', 'Failed to communicate with server: ' + error.message);
+            }
+        }
+
+        document.getElementById('config-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const chatLogDir = document.getElementById('chat_log_dir').value.trim();
+            const reportsDir = document.getElementById('reports_dir').value.trim();
+
+            if (!chatLogDir || !reportsDir) {
+                showStatus('error', 'Missing Information', 'Please fill in both directory paths.');
+                return;
+            }
+
+            showSpinner(true);
+            showStatus('', 'Saving...', 'Validating and saving configuration...');
+
+            try {
+                const response = await fetch('/api/save_config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_log_dir: chatLogDir,
+                        reports_dir: reportsDir
+                    })
+                });
+
+                const data = await response.json();
+                showSpinner(false);
+
+                if (data.success) {
+                    showStatus('success', '✅ Configuration Saved!', `
+                        <p>Your paths have been saved and validated.</p>
+                        <p style="margin-top: 10px;">Redirecting to Quest Helper...</p>
+                    `);
+
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    showStatus('error', '❌ Configuration Error', data.error || 'Invalid paths provided');
+                }
+            } catch (error) {
+                showSpinner(false);
+                showStatus('error', 'Error', 'Failed to save configuration: ' + error.message);
+            }
+        });
+
+        // Check current status on load
+        window.addEventListener('load', async function() {
+            try {
+                const response = await fetch('/api/config_status');
+                const status = await response.json();
+
+                if (status.configured) {
+                    showStatus('success', '✅ Already Configured', `
+                        <p><strong>Chat Logs:</strong> ${status.chat_log_dir}</p>
+                        <p><strong>Reports:</strong> ${status.reports_dir}</p>
+                        <p><strong>Platform:</strong> ${status.platform}</p>
+                        <p style="margin-top: 10px;">
+                            <a href="/" style="color: #667eea; font-weight: 600;">Go to Quest Helper →</a>
+                        </p>
+                    `);
+                    document.getElementById('auto-detect-section').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Failed to check status:', error);
+            }
+        });
+    </script>
+</body>
+</html>
