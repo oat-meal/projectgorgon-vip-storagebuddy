@@ -11,11 +11,17 @@ import sys
 import os
 import logging
 import traceback
+import argparse
 from datetime import datetime
 from quest_parser import QuestDatabase, ChatLogParser, QuestTracker, InventoryParser
 from config import get_config
 from data_updater import ensure_quest_data
 from version import __version__
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description='Project Gorgon VIP Quest Helper')
+parser.add_argument('--debug', action='store_true', help='Enable debug logging')
+args = parser.parse_args()
 
 app = Flask(__name__)
 
@@ -23,10 +29,12 @@ app = Flask(__name__)
 config = get_config()
 base_dir = config.get_base_dir()
 
-# Set up debug logging to file
-log_file = base_dir / 'questhelper-debug.log'
+# Set up logging to file (level based on --debug flag)
+log_file = base_dir / 'questhelper.log'
+log_level = logging.DEBUG if args.debug else logging.INFO
+
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=log_level,
     format='%(asctime)s [%(levelname)s] %(message)s',
     handlers=[
         logging.FileHandler(log_file, mode='w'),  # Overwrite on each start
@@ -36,8 +44,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 logger.info("=" * 80)
-logger.info(f"Quest Helper Debug Log - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+logger.info(f"Quest Helper Log - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 logger.info("=" * 80)
+logger.info(f"Log level: {'DEBUG' if args.debug else 'INFO'}")
 logger.info(f"Log file location: {log_file}")
 logger.info(f"Version: {__version__}")
 logger.info(f"Python version: {sys.version}")
@@ -375,9 +384,14 @@ def get_config_status():
 @app.route('/api/auto_detect', methods=['POST'])
 def auto_detect_paths():
     """Try to auto-detect game data paths"""
+    logger.info("Auto-detect requested")
+    logger.info(f"Platform: {platform.system()}")
+
     detected = config._auto_detect_game_data()
 
     if detected:
+        logger.info(f"Auto-detect succeeded: {detected['detected_path']}")
+
         # Save the detected paths
         config.config.update(detected)
         config._save_config()
@@ -386,15 +400,23 @@ def auto_detect_paths():
         chat_dir = Path(detected['chat_log_dir'])
         reports_dir = Path(detected['reports_dir'])
 
+        chat_log_count = len(list(chat_dir.glob('Chat-*.log')))
+        character_files_count = len(list(reports_dir.glob('Character_*.json')))
+
+        logger.info(f"  Chat logs: {chat_dir} ({chat_log_count} files)")
+        logger.info(f"  Reports: {reports_dir} ({character_files_count} files)")
+
         return jsonify({
             'success': True,
             'detected_path': detected['detected_path'],
             'chat_log_dir': str(chat_dir),
             'reports_dir': str(reports_dir),
-            'chat_log_count': len(list(chat_dir.glob('Chat-*.log'))),
-            'character_files_count': len(list(reports_dir.glob('Character_*.json')))
+            'chat_log_count': chat_log_count,
+            'character_files_count': character_files_count
         })
     else:
+        logger.warning("Auto-detect failed: Could not find Project Gorgon game data")
+        logger.warning(f"Searched paths: {config._get_search_paths()}")
         return jsonify({
             'success': False,
             'error': 'Could not find Project Gorgon game data in common locations'

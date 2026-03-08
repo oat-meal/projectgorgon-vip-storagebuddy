@@ -5,9 +5,11 @@ Auto-download quest and item data for Project Gorgon Quest Helper
 
 import urllib.request
 import json
+import logging
 from pathlib import Path
 from typing import Optional
 
+logger = logging.getLogger(__name__)
 
 QUEST_DATA_URL = "https://cdn.projectgorgon.com/v386/data/quests.json"
 ITEMS_DATA_URL = "https://cdn.projectgorgon.com/v386/data/items.json"
@@ -16,12 +18,25 @@ ITEMS_DATA_URL = "https://cdn.projectgorgon.com/v386/data/items.json"
 def download_file(url: str, dest_path: Path) -> bool:
     """Download a file from URL to destination path"""
     try:
-        print(f"Downloading {url}...")
-        urllib.request.urlretrieve(url, dest_path)
-        print(f"✓ Downloaded to {dest_path}")
+        logger.info(f"Downloading {url}...")
+
+        # Add User-Agent header to avoid 403 Forbidden errors
+        req = urllib.request.Request(
+            url,
+            headers={'User-Agent': 'Mozilla/5.0 (ProjectGorgonQuestHelper)'}
+        )
+
+        with urllib.request.urlopen(req) as response:
+            with open(dest_path, 'wb') as out_file:
+                out_file.write(response.read())
+
+        logger.info(f"✓ Downloaded to {dest_path}")
         return True
     except Exception as e:
-        print(f"✗ Failed to download {url}: {e}")
+        logger.error(f"✗ Failed to download {url}: {e}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        import traceback
+        logger.error(f"Full traceback:\n{traceback.format_exc()}")
         return False
 
 
@@ -46,18 +61,20 @@ def copy_bundled_data(bundled_dir: Path, dest_dir: Path) -> bool:
         items_dest = dest_dir / 'items.json'
 
         if quests_src.exists():
-            print(f"Copying bundled quests.json to {quests_dest}...")
+            logger.info(f"Copying bundled quests.json to {quests_dest}...")
             shutil.copy2(quests_src, quests_dest)
-            print("✓ Copied quests.json")
+            logger.info("✓ Copied quests.json")
 
         if items_src.exists():
-            print(f"Copying bundled items.json to {items_dest}...")
+            logger.info(f"Copying bundled items.json to {items_dest}...")
             shutil.copy2(items_src, items_dest)
-            print("✓ Copied items.json")
+            logger.info("✓ Copied items.json")
 
         return True
     except Exception as e:
-        print(f"✗ Failed to copy bundled data: {e}")
+        logger.error(f"✗ Failed to copy bundled data: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 
@@ -70,11 +87,11 @@ def ensure_quest_data(base_dir: Path, bundled_dir: Optional[Path] = None) -> boo
 
     # Check if files exist and are valid
     if not quests_file.exists() or not validate_json_file(quests_file):
-        print("Quest data missing or invalid")
+        logger.info("Quest data missing or invalid")
         needs_data = True
 
     if not items_file.exists() or not validate_json_file(items_file):
-        print("Item data missing or invalid")
+        logger.info("Item data missing or invalid")
         needs_data = True
 
     if not needs_data:
@@ -82,16 +99,16 @@ def ensure_quest_data(base_dir: Path, bundled_dir: Optional[Path] = None) -> boo
 
     # Try to copy from bundled resources first (PyInstaller executable)
     if bundled_dir and bundled_dir.exists():
-        print("\nCopying game data from bundled resources...")
+        logger.info("Copying game data from bundled resources...")
         if copy_bundled_data(bundled_dir, base_dir):
-            print("\n✓ Game data copied successfully!")
+            logger.info("✓ Game data copied successfully!")
             return True
         else:
-            print("\nBundled data copy failed, will try downloading...")
+            logger.warning("Bundled data copy failed, will try downloading...")
 
     # Fall back to downloading if bundled copy failed or not available
-    print("\nDownloading game data from Project Gorgon CDN...")
-    print("This may take a moment...")
+    logger.info("Downloading game data from Project Gorgon CDN...")
+    logger.info("This may take a moment...")
 
     success = True
 
@@ -104,9 +121,9 @@ def ensure_quest_data(base_dir: Path, bundled_dir: Optional[Path] = None) -> boo
             success = False
 
     if success:
-        print("\n✓ Game data downloaded successfully!")
+        logger.info("✓ Game data downloaded successfully!")
     else:
-        print("\n✗ Failed to download some game data files")
+        logger.error("✗ Failed to download some game data files")
 
     return success
 

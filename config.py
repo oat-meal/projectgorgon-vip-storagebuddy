@@ -6,8 +6,11 @@ Handles path detection across Windows, Linux, and Proton
 
 import json
 import platform
+import logging
 from pathlib import Path
 from typing import Optional, Dict, List
+
+logger = logging.getLogger(__name__)
 
 
 class Config:
@@ -61,14 +64,25 @@ class Config:
     def _auto_detect_game_data(self) -> Optional[Dict]:
         """Try to auto-detect game data location"""
         search_paths = self._get_search_paths()
+        logger.info(f"Auto-detecting game data in {len(search_paths)} locations...")
 
         for base_path in search_paths:
+            logger.debug(f"Checking: {base_path}")
             pg_data = base_path / 'Project Gorgon Data'
+
             if pg_data.exists():
+                logger.debug(f"  Found 'Project Gorgon Data' folder")
                 chat_logs = pg_data / 'ChatLogs'
                 reports = pg_data / 'Reports'
 
-                if chat_logs.exists() and reports.exists():
+                chat_exists = chat_logs.exists()
+                reports_exists = reports.exists()
+
+                logger.debug(f"  ChatLogs exists: {chat_exists}")
+                logger.debug(f"  Reports exists: {reports_exists}")
+
+                if chat_exists and reports_exists:
+                    logger.info(f"✓ Auto-detected game data at: {pg_data}")
                     return {
                         'chat_log_dir': str(chat_logs),
                         'reports_dir': str(reports),
@@ -76,6 +90,7 @@ class Config:
                         'detected_path': str(pg_data)
                     }
 
+        logger.warning("Auto-detect failed: No valid game data found in search paths")
         return None
 
     def _get_search_paths(self) -> List[Path]:
