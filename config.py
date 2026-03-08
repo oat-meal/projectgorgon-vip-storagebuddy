@@ -68,8 +68,9 @@ class Config:
 
         for base_path in search_paths:
             logger.debug(f"Checking: {base_path}")
-            pg_data = base_path / 'Project Gorgon Data'
 
+            # Try "Project Gorgon Data" folder (old/alternate location)
+            pg_data = base_path / 'Project Gorgon Data'
             if pg_data.exists():
                 logger.debug(f"  Found 'Project Gorgon Data' folder")
                 chat_logs = pg_data / 'ChatLogs'
@@ -90,6 +91,28 @@ class Config:
                         'detected_path': str(pg_data)
                     }
 
+            # Try "Project Gorgon" folder (native Windows location)
+            pg_native = base_path / 'Project Gorgon'
+            if pg_native.exists():
+                logger.debug(f"  Found 'Project Gorgon' folder")
+                chat_logs = pg_native / 'ChatLogs'
+                reports = pg_native / 'Reports'
+
+                chat_exists = chat_logs.exists()
+                reports_exists = reports.exists()
+
+                logger.debug(f"  ChatLogs exists: {chat_exists}")
+                logger.debug(f"  Reports exists: {reports_exists}")
+
+                if chat_exists and reports_exists:
+                    logger.info(f"✓ Auto-detected game data at: {pg_native}")
+                    return {
+                        'chat_log_dir': str(chat_logs),
+                        'reports_dir': str(reports),
+                        'auto_detected': True,
+                        'detected_path': str(pg_native)
+                    }
+
         logger.warning("Auto-detect failed: No valid game data found in search paths")
         return None
 
@@ -97,6 +120,13 @@ class Config:
         """Get list of paths to search for game data"""
         search_paths = []
         home = Path.home()
+
+        # Windows-specific paths
+        if platform.system() == 'Windows':
+            # Native Windows game data location (AppData\LocalLow)
+            appdata_lowlow = home / 'AppData' / 'LocalLow' / 'Elder Game' / 'Project Gorgon'
+            if appdata_lowlow.exists():
+                search_paths.append(appdata_lowlow.parent)  # Add parent to match search pattern
 
         # Native Documents folder (Windows and Linux)
         search_paths.append(home / 'Documents')
