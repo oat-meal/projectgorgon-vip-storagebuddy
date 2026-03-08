@@ -74,6 +74,7 @@
             font-size: 11px;
             font-weight: 600;
             transition: all 0.3s;
+            margin-left: 8px;
         }
 
         .update-btn:hover {
@@ -83,6 +84,23 @@
         .update-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
+        }
+
+        .overlay-btn {
+            padding: 6px 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-left: 8px;
+        }
+
+        .overlay-btn:hover {
+            background: #218838;
         }
 
         .sidebar {
@@ -382,9 +400,14 @@
                 Quest Helper <span id="appVersion">...</span>
                 <span id="logFileInfo" style="margin-left: 10px; opacity: 0.7;"></span>
             </div>
-            <button class="update-btn" id="updateBtn" onclick="updateGameData()">
-                Update Game Data
-            </button>
+            <div>
+                <button class="overlay-btn" onclick="openOverlay()">
+                    Open Overlay
+                </button>
+                <button class="update-btn" id="updateBtn" onclick="updateGameData()">
+                    Update Game Data
+                </button>
+            </div>
         </footer>
     </div>
 
@@ -787,6 +810,31 @@
                 await fetch('/api/heartbeat', { method: 'POST' });
             } catch (error) {
                 // Server might be shutting down, that's ok
+            }
+        }
+
+        // Open overlay in transparent, always-on-top window
+        async function openOverlay() {
+            try {
+                const response = await fetch('/api/launch_overlay', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show success message briefly
+                    const btn = document.querySelector('.overlay-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Overlay Opened!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                } else {
+                    alert('Failed to launch overlay: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error launching overlay:', error);
+                alert('Failed to launch overlay: ' + error.message);
             }
         }
 

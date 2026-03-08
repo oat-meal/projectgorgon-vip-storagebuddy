@@ -200,6 +200,12 @@ def setup():
     return render_template('setup.html')
 
 
+@app.route('/overlay')
+def overlay():
+    """Overlay mode for in-game display"""
+    return render_template('overlay.html')
+
+
 @app.route('/api/active_quests')
 @require_configured
 def get_active_quests():
@@ -491,12 +497,85 @@ def update_game_data():
     })
 
 
+@app.route('/api/overlay_data')
+@require_configured
+def overlay_data():
+    """Get simplified quest data for overlay display"""
+    view = request.args.get('view', 'completable')  # completable, purchasable, or active
+
+    try:
+        if view == 'completable':
+            quests = get_completable_quests_data()
+        elif view == 'purchasable':
+            quests = get_purchasable_quests_data()
+        elif view == 'active':
+            quests = get_active_quests_data()
+        else:
+            return jsonify({'error': 'Invalid view'}), 400
+
+        # Simplify data for overlay - only include quest name and items with progress
+        simplified_quests = []
+        for quest in quests:
+            simplified_quest = {
+                'name': quest['name'],
+                'items': []
+            }
+
+            for item in quest.get('items', []):
+                simplified_quest['items'].append({
+                    'name': item['name'],
+                    'have': item['have'],
+                    'need': item['need']
+                })
+
+            simplified_quests.append(simplified_quest)
+
+        return jsonify({'quests': simplified_quests})
+    except Exception as e:
+        logger.error(f"Error getting overlay data: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/heartbeat', methods=['POST'])
 def heartbeat():
     """Browser heartbeat to detect when window closes"""
     from datetime import datetime
     app.last_heartbeat = datetime.now()
     return jsonify({'status': 'ok'})
+
+
+@app.route('/api/launch_overlay', methods=['POST'])
+def launch_overlay():
+    """Launch overlay mode in a separate process"""
+    import subprocess
+    import platform
+
+    try:
+        # Determine the executable path
+        if getattr(sys, 'frozen', False):
+            # Running as compiled executable
+            exe_path = sys.executable
+        else:
+            # Running as Python script
+            exe_path = sys.executable
+            script_path = Path(__file__).parent / 'launcher.py'
+
+        # Launch overlay in a new process
+        if getattr(sys, 'frozen', False):
+            # For compiled executable
+            if platform.system() == 'Windows':
+                subprocess.Popen([exe_path, '--overlay'],
+                               creationflags=subprocess.CREATE_NEW_CONSOLE)
+            else:
+                subprocess.Popen([exe_path, '--overlay'])
+        else:
+            # For Python script
+            subprocess.Popen([exe_path, str(script_path), '--overlay'])
+
+        return jsonify({'success': True, 'message': 'Overlay launched'})
+    except Exception as e:
+        logger.error(f"Error launching overlay: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 if __name__ == '__main__':
