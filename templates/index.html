@@ -54,11 +54,35 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-top: 20px;
             text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .version-info {
             color: #666;
             font-size: 12px;
+        }
+
+        .update-btn {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .update-btn:hover {
+            background: #5568d3;
+        }
+
+        .update-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
 
         .sidebar {
@@ -357,6 +381,9 @@
             <div class="version-info">
                 Quest Helper <span id="appVersion">...</span> • Close this window to exit
             </div>
+            <button class="update-btn" id="updateBtn" onclick="updateGameData()">
+                Update Game Data
+            </button>
         </footer>
     </div>
 
@@ -745,6 +772,48 @@
                 await fetch('/api/heartbeat', { method: 'POST' });
             } catch (error) {
                 // Server might be shutting down, that's ok
+            }
+        }
+
+        // Update game data from CDN
+        async function updateGameData() {
+            const btn = document.getElementById('updateBtn');
+            const originalText = btn.textContent;
+
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            try {
+                const response = await fetch('/api/update_data', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    btn.textContent = 'Updated!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        // Reload current quest if one is selected
+                        if (selectedQuest) {
+                            loadQuestDetail(selectedQuest);
+                        }
+                    }, 2000);
+                } else {
+                    btn.textContent = 'Failed';
+                    alert('Update failed:\n' + data.messages.join('\n'));
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }, 2000);
+                }
+            } catch (error) {
+                btn.textContent = 'Error';
+                alert('Update failed: ' + error.message);
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 2000);
             }
         }
 
