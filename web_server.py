@@ -504,28 +504,57 @@ def overlay_data():
     view = request.args.get('view', 'completable')  # completable, purchasable, or active
 
     try:
-        if view == 'completable':
-            quests = get_completable_quests()
-        elif view == 'purchasable':
-            quests = get_purchasable_quests()
-        elif view == 'active':
-            quests = get_active_quests()
-        else:
-            return jsonify({'error': 'Invalid view'}), 400
+        # Find the most recent character file
+        reports_dir = config.get_reports_dir()
+        report_files = list(reports_dir.glob('Character_*.json'))
+        if not report_files:
+            return jsonify({'quests': []})
 
-        # Simplify data for overlay - only include quest name and items with progress
+        latest_char_file = max(report_files, key=lambda p: p.stat().st_mtime)
+
+        with open(latest_char_file, 'r') as f:
+            char_data = json.load(f)
+
+        active_quest_internals = char_data.get('ActiveQuests', [])
+        log_file = chat_parser.get_latest_log_file()
+
+        # Filter quests based on view type
         simplified_quests = []
-        for quest in quests:
+        for quest_internal in active_quest_internals:
+            quest = quest_db.get_quest(quest_internal)
+            if not quest or quest.is_guild_quest() or not quest.has_collect_objectives():
+                continue
+
+            # Get checklist and update from inventory
+            checklist = tracker.get_quest_checklist(quest_internal)
+            if log_file:
+                tracker.update_checklist_from_log(checklist, log_file)
+
+            # Filter by view type
+            include_quest = False
+            if view == 'completable' and checklist.get('is_completable', False):
+                include_quest = True
+            elif view == 'purchasable' and checklist.get('is_purchasable', False):
+                include_quest = True
+            elif view == 'active':
+                include_quest = True
+
+            if not include_quest:
+                continue
+
+            # Simplify data for overlay - only include quest name and items with progress
             simplified_quest = {
-                'name': quest['name'],
+                'name': quest.name,
                 'items': []
             }
 
-            for item in quest.get('items', []):
+            for item in checklist.get('items', []):
+                # Calculate total items available (inventory + storage)
+                total_have = item.get('in_inventory', 0) + item.get('in_storage', 0)
                 simplified_quest['items'].append({
-                    'name': item['name'],
-                    'have': item['have'],
-                    'need': item['need']
+                    'name': item['display_name'],
+                    'have': total_have,
+                    'need': item['required']
                 })
 
             simplified_quests.append(simplified_quest)
