@@ -18,10 +18,10 @@ from config import get_config
 from data_updater import ensure_quest_data
 from version import __version__
 
-# Parse command-line arguments
+# Parse command-line arguments (only parse known args to allow launcher.py args like --overlay)
 parser = argparse.ArgumentParser(description='Project Gorgon VIP Quest Helper')
 parser.add_argument('--debug', action='store_true', help='Enable debug logging')
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 
 app = Flask(__name__)
 
