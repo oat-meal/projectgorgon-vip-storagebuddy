@@ -569,8 +569,8 @@ def launch_overlay():
             else:
                 subprocess.Popen([exe_path, '--overlay'])
         else:
-            # For Python script
-            subprocess.Popen([exe_path, str(script_path), '--overlay'])
+            # For Python script (use -B to bypass bytecode caching)
+            subprocess.Popen([exe_path, '-B', str(script_path), '--overlay'])
 
         return jsonify({'success': True, 'message': 'Overlay launched'})
     except Exception as e:
