@@ -71,14 +71,20 @@ chat_parser = None
 inventory_parser = None
 tracker = None
 
-if config_status['configured']:
-    logger.info("App is configured, initializing quest tracker...")
+def initialize_tracker():
+    """Initialize quest tracker components"""
+    global quest_db, chat_parser, inventory_parser, tracker
+
+    config_status = config.get_status()
+    if not config_status['configured']:
+        return False
+
     chat_log_dir = config.get_chat_log_dir()
-    character_file = config.get_reports_dir()
+    reports_dir = config.get_reports_dir()
 
     logger.info(f"Using game data from: {config.config.get('detected_path', 'custom configuration')}")
     logger.info(f"  Chat logs: {chat_log_dir}")
-    logger.info(f"  Reports: {character_file}")
+    logger.info(f"  Reports: {reports_dir}")
 
     try:
         quest_db = QuestDatabase(
@@ -90,14 +96,20 @@ if config_status['configured']:
         chat_parser = ChatLogParser(chat_log_dir)
         logger.info("ChatLogParser initialized successfully")
 
-        inventory_parser = InventoryParser(character_file)
+        inventory_parser = InventoryParser(reports_dir)
         logger.info("InventoryParser initialized successfully")
 
         tracker = QuestTracker(quest_db, chat_parser, inventory_parser)
         logger.info("QuestTracker initialized successfully")
+        return True
     except Exception as e:
         logger.error(f"Error initializing quest tracker: {e}")
         logger.error(traceback.format_exc())
+        return False
+
+if config_status['configured']:
+    logger.info("App is configured, initializing quest tracker...")
+    initialize_tracker()
 else:
     logger.info("Quest Helper starting in setup mode")
     logger.info("User needs to complete setup at http://127.0.0.1:5000/setup")
@@ -149,6 +161,16 @@ def require_configured(f):
                 'error': 'App not configured',
                 'message': 'Please complete setup at /setup before accessing quest data'
             }), 503
+
+        # Initialize tracker if not already initialized
+        if quest_db is None or chat_parser is None or tracker is None:
+            logger.info("Tracker not initialized, initializing now...")
+            if not initialize_tracker():
+                return jsonify({
+                    'error': 'Failed to initialize quest tracker',
+                    'message': 'Check debug log for details'
+                }), 500
+
         return f(*args, **kwargs)
     return decorated_function
 
@@ -174,7 +196,8 @@ def setup():
 def get_active_quests():
     """Get list of active quests from character data"""
     # Find the most recent character file
-    report_files = list(character_file.glob('Character_*.json'))
+    reports_dir = config.get_reports_dir()
+    report_files = list(reports_dir.glob('Character_*.json'))
     if not report_files:
         return jsonify({'error': 'No character data found'}), 404
 
@@ -245,7 +268,8 @@ def search_quests():
 def get_completable_quests():
     """Get list of quests that can be completed right now"""
     # Find the most recent character file
-    report_files = list(character_file.glob('Character_*.json'))
+    reports_dir = config.get_reports_dir()
+    report_files = list(reports_dir.glob('Character_*.json'))
     if not report_files:
         return jsonify({'quests': []})
 
@@ -286,7 +310,8 @@ def get_completable_quests():
 def get_purchasable_quests():
     """Get list of quests that can be completed by buying items"""
     # Find the most recent character file
-    report_files = list(character_file.glob('Character_*.json'))
+    reports_dir = config.get_reports_dir()
+    report_files = list(reports_dir.glob('Character_*.json'))
     if not report_files:
         return jsonify({'quests': []})
 
