@@ -47,6 +47,20 @@
             gap: 20px;
         }
 
+        footer {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .version-info {
+            color: #666;
+            font-size: 12px;
+        }
+
         .sidebar {
             background: white;
             padding: 20px;
@@ -338,6 +352,12 @@
                 </div>
             </div>
         </div>
+
+        <footer>
+            <div class="version-info">
+                Quest Helper <span id="appVersion">...</span> • Close this window to exit
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -707,6 +727,33 @@
                 await loadQuestDetail(selectedQuest);
             }
         }
+
+        // Load version on page load
+        async function loadVersion() {
+            try {
+                const response = await fetch('/api/version');
+                const data = await response.json();
+                document.getElementById('appVersion').textContent = `v${data.version}`;
+            } catch (error) {
+                console.error('Failed to load version:', error);
+            }
+        }
+
+        // Send heartbeat to server so it knows browser is still open
+        async function sendHeartbeat() {
+            try {
+                await fetch('/api/heartbeat', { method: 'POST' });
+            } catch (error) {
+                // Server might be shutting down, that's ok
+            }
+        }
+
+        // Initialize
+        loadVersion();
+
+        // Send heartbeat every 10 seconds
+        setInterval(sendHeartbeat, 10000);
+        sendHeartbeat(); // Send immediately on load
     </script>
 </body>
 </html>

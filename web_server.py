@@ -8,9 +8,11 @@ from flask import Flask, render_template, jsonify, request
 from pathlib import Path
 import json
 import sys
+import os
 from quest_parser import QuestDatabase, ChatLogParser, QuestTracker, InventoryParser
 from config import get_config
 from data_updater import ensure_quest_data
+from version import __version__
 
 app = Flask(__name__)
 
@@ -18,13 +20,28 @@ app = Flask(__name__)
 config = get_config()
 base_dir = config.get_base_dir()
 
-# Ensure quest data files exist (copy from bundle or download if needed)
+# Debug information
+print(f"\n=== Project Gorgon VIP Quest Helper v{__version__} ===")
+print(f"Running as executable: {getattr(sys, 'frozen', False)}")
 print(f"Data directory: {base_dir}")
+
+# Ensure quest data files exist (copy from bundle or download if needed)
 bundled_dir = config.get_bundled_resource_dir()
+if bundled_dir:
+    print(f"Bundled resource directory: {bundled_dir}")
+    print(f"  quests.json exists: {(bundled_dir / 'quests.json').exists()}")
+    print(f"  items.json exists: {(bundled_dir / 'items.json').exists()}")
+else:
+    print("No bundled resources found (running from source)")
+
 if not ensure_quest_data(base_dir, bundled_dir):
     print("\nWARNING: Failed to obtain game data files")
     print("The Quest Helper may not work correctly")
     print("Please check your internet connection and try again\n")
+else:
+    print(f"\n✓ Game data loaded from {base_dir}")
+    print(f"  quests.json: {(base_dir / 'quests.json').stat().st_size / 1024 / 1024:.1f} MB")
+    print(f"  items.json: {(base_dir / 'items.json').stat().st_size / 1024 / 1024:.1f} MB")
 
 config_status = config.get_status()
 
@@ -297,6 +314,54 @@ def save_configuration():
             'success': False,
             'error': str(e)
         })
+
+
+@app.route('/api/version')
+def get_version():
+    """Get application version"""
+    return jsonify({
+        'version': __version__,
+        'frozen': getattr(sys, 'frozen', False)
+    })
+
+
+@app.route('/api/update_data', methods=['POST'])
+def update_game_data():
+    """Manually download latest game data from CDN"""
+    from data_updater import download_file, QUEST_DATA_URL, ITEMS_DATA_URL
+
+    success = True
+    messages = []
+
+    quests_file = base_dir / 'quests.json'
+    items_file = base_dir / 'items.json'
+
+    # Download quests
+    if download_file(QUEST_DATA_URL, quests_file):
+        messages.append("✓ Downloaded quests.json")
+    else:
+        messages.append("✗ Failed to download quests.json")
+        success = False
+
+    # Download items
+    if download_file(ITEMS_DATA_URL, items_file):
+        messages.append("✓ Downloaded items.json")
+    else:
+        messages.append("✗ Failed to download items.json")
+        success = False
+
+    return jsonify({
+        'success': success,
+        'messages': messages
+    })
+
+
+@app.route('/api/heartbeat', methods=['POST'])
+def heartbeat():
+    """Browser heartbeat to detect when window closes"""
+    from datetime import datetime
+    app.last_heartbeat = datetime.now()
+    return jsonify({'status': 'ok'})
 
 
 if __name__ == '__main__':

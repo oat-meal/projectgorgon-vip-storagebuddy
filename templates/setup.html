@@ -231,6 +231,9 @@
         <div class="header">
             <h1>🎮 Quest Helper Setup</h1>
             <p>Let's find your Project Gorgon game data</p>
+            <p style="font-size: 12px; opacity: 0.7; margin-top: 10px;">
+                Version <span id="appVersion">...</span>
+            </p>
         </div>
 
         <div class="content">
@@ -414,8 +417,35 @@
             }
         });
 
+        // Load version
+        async function loadVersion() {
+            try {
+                const response = await fetch('/api/version');
+                const data = await response.json();
+                document.getElementById('appVersion').textContent = `v${data.version}`;
+            } catch (error) {
+                console.error('Failed to load version:', error);
+            }
+        }
+
+        // Send heartbeat to server so it knows browser is still open
+        async function sendHeartbeat() {
+            try {
+                await fetch('/api/heartbeat', { method: 'POST' });
+            } catch (error) {
+                // Server might be shutting down, that's ok
+            }
+        }
+
         // Check current status on load
         window.addEventListener('load', async function() {
+            // Load version
+            loadVersion();
+
+            // Start heartbeat
+            setInterval(sendHeartbeat, 10000);
+            sendHeartbeat();
+
             try {
                 const response = await fetch('/api/config_status');
                 const status = await response.json();
