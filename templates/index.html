@@ -426,6 +426,17 @@
         function switchTab(tab) {
             currentTab = tab;
 
+            // Clear selected quest when switching tabs
+            selectedQuest = null;
+
+            // Reset quest detail panel to empty state
+            document.getElementById('questDetail').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <p>Select a quest to view its checklist</p>
+                </div>
+            `;
+
             // Update button styles
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
