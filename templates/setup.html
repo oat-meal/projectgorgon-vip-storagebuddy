@@ -544,8 +544,8 @@
             // Load version
             loadVersion();
 
-            // Start heartbeat
-            setInterval(sendHeartbeat, 10000);
+            // Start heartbeat - every 2 seconds for fast shutdown detection
+            setInterval(sendHeartbeat, 2000);
             sendHeartbeat();
 
             try {

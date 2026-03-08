@@ -22,16 +22,16 @@ def check_browser_alive(app):
     from datetime import datetime, timedelta
 
     # Wait for initial browser connection
-    time.sleep(5)
+    time.sleep(3)
 
     while True:
-        time.sleep(5)  # Check every 5 seconds
+        time.sleep(1)  # Check every 1 second for fast shutdown
 
         # Check if we've received a heartbeat recently
         last_ping = getattr(app, 'last_heartbeat', None)
         if last_ping:
             time_since_ping = datetime.now() - last_ping
-            if time_since_ping > timedelta(seconds=30):
+            if time_since_ping > timedelta(seconds=6):  # 6 second timeout
                 print("\nBrowser disconnected. Shutting down...")
                 import os
                 import signal

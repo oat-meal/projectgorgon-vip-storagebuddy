@@ -824,8 +824,8 @@
         // Initialize
         loadVersion();
 
-        // Send heartbeat every 10 seconds
-        setInterval(sendHeartbeat, 10000);
+        // Send heartbeat every 2 seconds for fast shutdown detection
+        setInterval(sendHeartbeat, 2000);
         sendHeartbeat(); // Send immediately on load
     </script>
 </body>
