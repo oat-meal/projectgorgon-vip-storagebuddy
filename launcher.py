@@ -14,7 +14,17 @@ import threading
 import time
 import sys
 import argparse
+import socket
 from pathlib import Path
+
+def is_port_in_use(port, host='127.0.0.1'):
+    """Check if a port is already in use"""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind((host, port))
+            return False
+        except OSError:
+            return True
 
 def open_browser(url, delay=1.5):
     """Open browser after a short delay"""
@@ -116,12 +126,22 @@ def main():
     url = "http://127.0.0.1:5000"
 
     if args.overlay:
-        # Overlay mode: Start server in background and open pywebview window
-        def start_server():
-            app.run(debug=False, host='127.0.0.1', port=5000, use_reloader=False, threaded=True)
+        # Overlay mode: Check if server is already running
+        server_already_running = is_port_in_use(5000)
 
-        server_thread = threading.Thread(target=start_server, daemon=True)
-        server_thread.start()
+        if server_already_running:
+            print("Detected existing server on port 5000")
+            print("Connecting to existing server...")
+        else:
+            print("No existing server detected")
+            print("Starting Flask server in background...")
+
+            # Start server in background
+            def start_server():
+                app.run(debug=False, host='127.0.0.1', port=5000, use_reloader=False, threaded=True)
+
+            server_thread = threading.Thread(target=start_server, daemon=True)
+            server_thread.start()
 
         # Open overlay window (blocks until closed)
         open_overlay_window(url)
