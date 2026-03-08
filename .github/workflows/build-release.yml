@@ -30,7 +30,7 @@ jobs:
         pyinstaller --name=QuestHelper-Windows --onefile --windowed --add-data="templates;templates" --hidden-import=flask --hidden-import=jinja2 --collect-all=flask launcher.py
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: QuestHelper-Windows
         path: dist/QuestHelper-Windows.exe
@@ -73,7 +73,7 @@ jobs:
       run: chmod +x dist/QuestHelper-Linux
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: QuestHelper-Linux
         path: dist/QuestHelper-Linux
