@@ -62,7 +62,7 @@ def open_overlay_window(url):
         frameless=True,
         on_top=True,
         transparent=True,
-        background_color='#00000000'
+        background_color='#000000'
     )
 
     # Start the webview (blocks until window is closed)
