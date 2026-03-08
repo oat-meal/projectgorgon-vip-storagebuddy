@@ -570,7 +570,15 @@ def launch_overlay():
                 subprocess.Popen([exe_path, '--overlay'])
         else:
             # For Python script (use -B to bypass bytecode caching)
-            subprocess.Popen([exe_path, '-B', str(script_path), '--overlay'])
+            # Check if we're in a nix-shell environment
+            project_root = Path(__file__).parent
+            if (project_root / 'shell.nix').exists() or os.environ.get('IN_NIX_SHELL'):
+                # Running in nix-shell, wrap the command
+                subprocess.Popen(['nix-shell', '--run', f'python3 -B {script_path} --overlay'],
+                               cwd=str(project_root))
+            else:
+                # Regular Python environment
+                subprocess.Popen([exe_path, '-B', str(script_path), '--overlay'])
 
         return jsonify({'success': True, 'message': 'Overlay launched'})
     except Exception as e:
