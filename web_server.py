@@ -72,6 +72,20 @@ else:
     print("Open your browser to http://127.0.0.1:5000/setup to configure.\n")
 
 
+def require_configured(f):
+    """Decorator to ensure app is configured before accessing quest data"""
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not config.get_status()['configured']:
+            return jsonify({
+                'error': 'App not configured',
+                'message': 'Please complete setup at /setup before accessing quest data'
+            }), 503
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route('/')
 def index():
     """Main page"""
@@ -89,6 +103,7 @@ def setup():
 
 
 @app.route('/api/active_quests')
+@require_configured
 def get_active_quests():
     """Get list of active quests from character data"""
     # Find the most recent character file
@@ -118,6 +133,7 @@ def get_active_quests():
 
 
 @app.route('/api/quest/<quest_internal_name>')
+@require_configured
 def get_quest_checklist(quest_internal_name):
     """Get checklist for a specific quest"""
     checklist = tracker.get_quest_checklist(quest_internal_name)
@@ -134,6 +150,7 @@ def get_quest_checklist(quest_internal_name):
 
 
 @app.route('/api/search_quests')
+@require_configured
 def search_quests():
     """Search for quests by name"""
     query = request.args.get('q', '').lower()
@@ -157,6 +174,7 @@ def search_quests():
 
 
 @app.route('/api/completable_quests')
+@require_configured
 def get_completable_quests():
     """Get list of quests that can be completed right now"""
     # Find the most recent character file
@@ -197,6 +215,7 @@ def get_completable_quests():
 
 
 @app.route('/api/purchasable_quests')
+@require_configured
 def get_purchasable_quests():
     """Get list of quests that can be completed by buying items"""
     # Find the most recent character file
@@ -237,6 +256,7 @@ def get_purchasable_quests():
 
 
 @app.route('/api/log_status')
+@require_configured
 def get_log_status():
     """Get status of chat log monitoring"""
     log_file = chat_parser.get_latest_log_file()
