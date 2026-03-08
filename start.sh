@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Start the Project Gorgon Quest Tracker
+# Start the Project Gorgon Quest Helper
 
 cd "$(dirname "$0")"
 
-echo "Starting Project Gorgon Quest Tracker..."
+echo "Starting Project Gorgon Quest Helper..."
 echo ""
 
 # Enter nix-shell and run the server

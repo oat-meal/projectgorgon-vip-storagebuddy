@@ -1,6 +1,6 @@
-# Quick Start Guide - VIP Quest Tracker
+# Quick Start Guide - VIP Quest Helper
 
-## 1. Start the VIP Quest Tracker
+## 1. Start the VIP Quest Helper
 
 ```bash
 cd ~/quest-tracker

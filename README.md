@@ -1,6 +1,6 @@
-# Project Gorgon VIP Quest Tracker
+# Project Gorgon VIP Quest Helper
 
-A local web-based quest tracker for Project Gorgon that helps you track quest objectives, inventory, and find items you need.
+A local web-based quest helper for Project Gorgon that helps you track quest objectives, inventory, and find items you need.
 
 ## Features
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Project Gorgon VIP Quest Tracker
+Project Gorgon VIP Quest Helper
 Parses quest data and monitors chat logs for item collection
 """
 

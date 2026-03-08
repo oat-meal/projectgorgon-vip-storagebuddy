@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Project Gorgon VIP Quest Tracker - Web Server
+Project Gorgon VIP Quest Helper - Web Server
 Flask-based web interface for quest tracking
 """
 

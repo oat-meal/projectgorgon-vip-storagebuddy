@@ -8,7 +8,7 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
-    echo "Project Gorgon VIP Quest Tracker Environment"
+    echo "Project Gorgon VIP Quest Helper Environment"
     echo "Flask is ready!"
     echo ""
     echo "To start the server, run:"

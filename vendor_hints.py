@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Vendor and item source hints for Project Gorgon VIP Quest Tracker
+Vendor and item source hints for Project Gorgon VIP Quest Helper
 Based on wiki merchant data
 """
 
