@@ -10,11 +10,21 @@ import json
 import sys
 from quest_parser import QuestDatabase, ChatLogParser, QuestTracker, InventoryParser
 from config import get_config
+from data_updater import ensure_quest_data
 
 app = Flask(__name__)
 
 # Initialize configuration
 config = get_config()
+base_dir = config.get_base_dir()
+
+# Ensure quest data files exist (download if needed)
+print(f"Data directory: {base_dir}")
+if not ensure_quest_data(base_dir):
+    print("\nWARNING: Failed to download game data files")
+    print("The Quest Helper may not work correctly")
+    print("Please check your internet connection and try again\n")
+
 config_status = config.get_status()
 
 # Initialize quest tracker only if configured
@@ -24,7 +34,6 @@ inventory_parser = None
 tracker = None
 
 if config_status['configured']:
-    base_dir = config.get_base_dir()
     chat_log_dir = config.get_chat_log_dir()
     character_file = config.get_reports_dir()
 

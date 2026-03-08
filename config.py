@@ -138,9 +138,22 @@ class Config:
 
     def get_base_dir(self) -> Path:
         """Get base directory for quest tracker data"""
-        # Use current directory if not configured
-        base_str = self.config.get('base_dir', str(Path(__file__).parent))
-        return Path(base_str)
+        # Use platform-specific user data directory
+        if 'base_dir' in self.config:
+            return Path(self.config['base_dir'])
+
+        # Determine platform-specific data directory
+        if platform.system() == 'Windows':
+            # Windows: AppData\Local\ProjectGorgonQuestHelper
+            base_dir = Path.home() / 'AppData' / 'Local' / 'ProjectGorgonQuestHelper'
+        else:
+            # Linux/Mac: ~/.local/share/projectgorgon-questhelper
+            base_dir = Path.home() / '.local' / 'share' / 'projectgorgon-questhelper'
+
+        # Create directory if it doesn't exist
+        base_dir.mkdir(parents=True, exist_ok=True)
+
+        return base_dir
 
     def set_custom_paths(self, chat_log_dir: str, reports_dir: str):
         """Set custom paths for game data"""
