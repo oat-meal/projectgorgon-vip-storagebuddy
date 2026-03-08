@@ -9,6 +9,9 @@ from pathlib import Path
 import json
 import sys
 import os
+import logging
+import traceback
+from datetime import datetime
 from quest_parser import QuestDatabase, ChatLogParser, QuestTracker, InventoryParser
 from config import get_config
 from data_updater import ensure_quest_data
@@ -20,30 +23,47 @@ app = Flask(__name__)
 config = get_config()
 base_dir = config.get_base_dir()
 
-# Debug information
-print(f"\n=== Project Gorgon VIP Quest Helper v{__version__} ===")
-print(f"Running as executable: {getattr(sys, 'frozen', False)}")
-print(f"Data directory: {base_dir}")
+# Set up debug logging to file
+log_file = base_dir / 'questhelper-debug.log'
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler(log_file, mode='w'),  # Overwrite on each start
+        logging.StreamHandler(sys.stdout)  # Also print to console
+    ]
+)
+logger = logging.getLogger(__name__)
+
+logger.info("=" * 80)
+logger.info(f"Quest Helper Debug Log - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+logger.info("=" * 80)
+logger.info(f"Log file location: {log_file}")
+logger.info(f"Version: {__version__}")
+logger.info(f"Python version: {sys.version}")
+logger.info(f"Running as executable: {getattr(sys, 'frozen', False)}")
+logger.info(f"Data directory: {base_dir}")
 
 # Ensure quest data files exist (copy from bundle or download if needed)
 bundled_dir = config.get_bundled_resource_dir()
 if bundled_dir:
-    print(f"Bundled resource directory: {bundled_dir}")
-    print(f"  quests.json exists: {(bundled_dir / 'quests.json').exists()}")
-    print(f"  items.json exists: {(bundled_dir / 'items.json').exists()}")
+    logger.info(f"Bundled resource directory: {bundled_dir}")
+    logger.info(f"  quests.json exists: {(bundled_dir / 'quests.json').exists()}")
+    logger.info(f"  items.json exists: {(bundled_dir / 'items.json').exists()}")
 else:
-    print("No bundled resources found (running from source)")
+    logger.info("No bundled resources found (running from source)")
 
 if not ensure_quest_data(base_dir, bundled_dir):
-    print("\nWARNING: Failed to obtain game data files")
-    print("The Quest Helper may not work correctly")
-    print("Please check your internet connection and try again\n")
+    logger.warning("Failed to obtain game data files")
+    logger.warning("The Quest Helper may not work correctly")
+    logger.warning("Please check your internet connection and try again")
 else:
-    print(f"\n✓ Game data loaded from {base_dir}")
-    print(f"  quests.json: {(base_dir / 'quests.json').stat().st_size / 1024 / 1024:.1f} MB")
-    print(f"  items.json: {(base_dir / 'items.json').stat().st_size / 1024 / 1024:.1f} MB")
+    logger.info(f"Game data loaded from {base_dir}")
+    logger.info(f"  quests.json: {(base_dir / 'quests.json').stat().st_size / 1024 / 1024:.1f} MB")
+    logger.info(f"  items.json: {(base_dir / 'items.json').stat().st_size / 1024 / 1024:.1f} MB")
 
 config_status = config.get_status()
+logger.info(f"Configuration status: {config_status}")
 
 # Initialize quest tracker only if configured
 quest_db = None
@@ -52,24 +72,71 @@ inventory_parser = None
 tracker = None
 
 if config_status['configured']:
+    logger.info("App is configured, initializing quest tracker...")
     chat_log_dir = config.get_chat_log_dir()
     character_file = config.get_reports_dir()
 
-    print(f"Using game data from: {config.config.get('detected_path', 'custom configuration')}")
-    print(f"  Chat logs: {chat_log_dir}")
-    print(f"  Reports: {character_file}")
+    logger.info(f"Using game data from: {config.config.get('detected_path', 'custom configuration')}")
+    logger.info(f"  Chat logs: {chat_log_dir}")
+    logger.info(f"  Reports: {character_file}")
 
-    quest_db = QuestDatabase(
-        base_dir / 'quests.json',
-        base_dir / 'items.json'
-    )
+    try:
+        quest_db = QuestDatabase(
+            base_dir / 'quests.json',
+            base_dir / 'items.json'
+        )
+        logger.info("QuestDatabase initialized successfully")
 
-    chat_parser = ChatLogParser(chat_log_dir)
-    inventory_parser = InventoryParser(character_file)
-    tracker = QuestTracker(quest_db, chat_parser, inventory_parser)
+        chat_parser = ChatLogParser(chat_log_dir)
+        logger.info("ChatLogParser initialized successfully")
+
+        inventory_parser = InventoryParser(character_file)
+        logger.info("InventoryParser initialized successfully")
+
+        tracker = QuestTracker(quest_db, chat_parser, inventory_parser)
+        logger.info("QuestTracker initialized successfully")
+    except Exception as e:
+        logger.error(f"Error initializing quest tracker: {e}")
+        logger.error(traceback.format_exc())
 else:
-    print("\nQuest Helper starting in setup mode.")
-    print("Open your browser to http://127.0.0.1:5000/setup to configure.\n")
+    logger.info("Quest Helper starting in setup mode")
+    logger.info("User needs to complete setup at http://127.0.0.1:5000/setup")
+
+
+# Flask request/response logging
+@app.before_request
+def log_request():
+    logger.info(f">>> {request.method} {request.path}")
+    if request.args:
+        logger.info(f"    Query params: {dict(request.args)}")
+    if request.is_json:
+        logger.info(f"    JSON body: {request.get_json()}")
+
+
+@app.after_request
+def log_response(response):
+    logger.info(f"<<< {response.status_code} {request.method} {request.path}")
+    return response
+
+
+# Error handler for all exceptions
+@app.errorhandler(Exception)
+def handle_exception(e):
+    logger.error(f"Unhandled exception in {request.method} {request.path}")
+    logger.error(f"Exception type: {type(e).__name__}")
+    logger.error(f"Exception message: {str(e)}")
+    logger.error(f"Full traceback:\n{traceback.format_exc()}")
+
+    # Return JSON error for API endpoints
+    if request.path.startswith('/api/'):
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e),
+            'type': type(e).__name__
+        }), 500
+
+    # Return HTML error for regular pages
+    return f"<h1>Internal Server Error</h1><pre>{traceback.format_exc()}</pre>", 500
 
 
 def require_configured(f):
@@ -341,7 +408,8 @@ def get_version():
     """Get application version"""
     return jsonify({
         'version': __version__,
-        'frozen': getattr(sys, 'frozen', False)
+        'frozen': getattr(sys, 'frozen', False),
+        'log_file': str(log_file)
     })
 
 

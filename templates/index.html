@@ -379,7 +379,8 @@
 
         <footer>
             <div class="version-info">
-                Quest Helper <span id="appVersion">...</span> • Close this window to exit
+                Quest Helper <span id="appVersion">...</span>
+                <span id="logFileInfo" style="margin-left: 10px; opacity: 0.7;"></span>
             </div>
             <button class="update-btn" id="updateBtn" onclick="updateGameData()">
                 Update Game Data
@@ -761,6 +762,9 @@
                 const response = await fetch('/api/version');
                 const data = await response.json();
                 document.getElementById('appVersion').textContent = `v${data.version}`;
+                if (data.log_file) {
+                    document.getElementById('logFileInfo').textContent = `• Debug log: ${data.log_file}`;
+                }
             } catch (error) {
                 console.error('Failed to load version:', error);
             }
