@@ -505,11 +505,11 @@ def overlay_data():
 
     try:
         if view == 'completable':
-            quests = get_completable_quests_data()
+            quests = get_completable_quests()
         elif view == 'purchasable':
-            quests = get_purchasable_quests_data()
+            quests = get_purchasable_quests()
         elif view == 'active':
-            quests = get_active_quests_data()
+            quests = get_active_quests()
         else:
             return jsonify({'error': 'Invalid view'}), 400
 

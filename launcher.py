@@ -258,19 +258,23 @@ def open_overlay_window(url):
     logging.info("About to call webview.start() - this will initialize the GUI backend")
 
     try:
-        # Try to detect which backend pywebview is using
+        # Determine which backend to use
         import platform
+        gui_backend = None
         if platform.system() == 'Linux':
-            try:
-                # Try to access internal backend info
-                logging.info("Attempting to detect active pywebview backend...")
-                if hasattr(webview, 'guilib'):
-                    logging.info(f"  webview.guilib: {webview.guilib}")
-            except Exception as e:
-                logging.debug(f"Could not detect backend: {e}")
+            # Force GTK backend on Linux to avoid Qt/PySide6 segfault issues
+            # GTK with WebKit2GTK is more stable on Linux than Qt backends
+            gui_backend = 'gtk'
+            logging.info(f"Forcing GUI backend: {gui_backend}")
+            logging.info("Reason: GTK/WebKit2GTK is more stable than Qt on Linux")
 
-        logging.info("Calling webview.start(debug=False)...")
-        webview.start(debug=False)
+        if gui_backend:
+            logging.info(f"Calling webview.start(gui='{gui_backend}', debug=False)...")
+            webview.start(gui=gui_backend, debug=False)
+        else:
+            logging.info("Calling webview.start(debug=False) with auto-detection...")
+            webview.start(debug=False)
+
         logging.info("Webview closed normally")
     except Exception as e:
         logging.error(f"Webview error: {e}", exc_info=True)
