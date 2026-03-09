@@ -5,6 +5,7 @@ Flask-based web interface for quest tracking
 """
 
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 from pathlib import Path
 import json
 import sys
@@ -24,6 +25,9 @@ parser.add_argument('--debug', action='store_true', help='Enable debug logging')
 args, unknown = parser.parse_known_args()
 
 app = Flask(__name__)
+
+# Enable CORS for browser extension access
+CORS(app, resources={r"/api/*": {"origins": ["moz-extension://*", "chrome-extension://*"]}})
 
 # Initialize configuration
 config = get_config()

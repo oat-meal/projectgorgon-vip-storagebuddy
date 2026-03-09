@@ -232,7 +232,7 @@ def open_overlay_window(url):
     # Create overlay window
     logging.info("Creating pywebview window...")
     logging.info(f"Window URL: {url}/overlay")
-    logging.info(f"Window parameters: width=320, height=500, frameless=True, on_top=True, transparent=True")
+    logging.info(f"Window parameters: width=320, height=500, frameless=True, on_top=True, transparent=False")
 
     try:
         window = webview.create_window(
@@ -243,8 +243,8 @@ def open_overlay_window(url):
             resizable=True,
             frameless=True,
             on_top=True,
-            transparent=True,
-            background_color='#000000'
+            transparent=False,
+            background_color='#14141e'
         )
         logging.info("Window created successfully")
         logging.info(f"Window object: {window}")

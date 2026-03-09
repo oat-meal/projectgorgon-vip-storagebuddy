@@ -16,8 +16,8 @@
             background: rgb(20, 20, 30);
             color: #ffffff;
             padding: 10px;
-            user-select: none;
-            -webkit-app-region: drag;
+            width: 320px;
+            min-height: 400px;
         }
 
         .container {
@@ -26,7 +26,6 @@
             border: 2px solid rgba(102, 126, 234, 0.5);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
             overflow: hidden;
-            max-width: 100%;
         }
 
         .header {
@@ -35,7 +34,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            cursor: move;
         }
 
         .header-title {
@@ -45,7 +43,6 @@
         }
 
         .view-selector {
-            -webkit-app-region: no-drag;
             background: rgb(45, 45, 55);
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 4px;
@@ -62,11 +59,60 @@
             color: white;
         }
 
+        .zoom-controls {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .zoom-controls label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .zoom-button {
+            background: rgb(102, 126, 234);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            padding: 4px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .zoom-button:hover {
+            background: rgb(118, 140, 250);
+        }
+
+        .zoom-value {
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .tip {
+            background: rgba(102, 126, 234, 0.15);
+            border-left: 3px solid rgb(102, 126, 234);
+            padding: 8px 10px;
+            margin: 8px 0;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+        }
+
+        .tip strong {
+            color: rgb(168, 178, 255);
+        }
+
         .content {
             padding: 10px;
             max-height: 450px;
             overflow-y: auto;
-            -webkit-app-region: no-drag;
             background: rgb(20, 20, 30);
             color: #ffffff;
         }
@@ -162,6 +208,13 @@
             font-size: 12px;
         }
 
+        .error-state {
+            text-align: center;
+            padding: 20px;
+            color: #ff6b6b;
+            font-size: 12px;
+        }
+
         .status-bar {
             padding: 8px 12px;
             background: rgba(255, 255, 255, 0.05);
@@ -177,14 +230,24 @@
     <div class="container">
         <div class="header">
             <div class="header-title">Quest Tracker</div>
-            <select class="view-selector" id="viewSelector" onchange="switchView()">
+            <select class="view-selector" id="viewSelector">
                 <option value="completable">Ready</option>
                 <option value="purchasable">Buyable</option>
                 <option value="active">Active</option>
             </select>
         </div>
 
+        <div class="zoom-controls">
+            <label>Zoom:</label>
+            <button class="zoom-button" id="zoomOut">-</button>
+            <span class="zoom-value" id="zoomValue">100%</span>
+            <button class="zoom-button" id="zoomIn">+</button>
+        </div>
+
         <div class="content" id="content">
+            <div class="tip">
+                <strong>Tip:</strong> Pin this popup to keep it visible while you play. Use Alt+Tab to quickly switch between the game and quest tracker.
+            </div>
             <div class="loading">Loading...</div>
         </div>
 
@@ -194,83 +257,6 @@
         </div>
     </div>
 
-    <script>
-        let currentView = 'completable';
-        let lastUpdateTime = Date.now();
-
-        function switchView() {
-            currentView = document.getElementById('viewSelector').value;
-            loadData();
-        }
-
-        async function loadData() {
-            const content = document.getElementById('content');
-
-            try {
-                const response = await fetch(`/api/overlay_data?view=${currentView}`);
-                const data = await response.json();
-
-                if (data.quests.length === 0) {
-                    content.innerHTML = '<div class="empty-state">No quests found</div>';
-                    document.getElementById('questCount').textContent = '0 quests';
-                    return;
-                }
-
-                // Group items by quest
-                const questsHtml = data.quests.map(quest => {
-                    const itemsHtml = quest.items.map(item => {
-                        const isCompleted = item.have >= item.need;
-                        const progressClass = isCompleted ? 'completed' : 'incomplete';
-                        const itemClass = isCompleted ? 'item completed' : 'item';
-
-                        return `
-                            <div class="${itemClass}">
-                                <div class="item-name">${item.name}</div>
-                                <div class="item-progress ${progressClass}">${item.have}/${item.need}</div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    return `
-                        <div class="quest-group">
-                            <div class="quest-name">${quest.name}</div>
-                            <div class="item-list">${itemsHtml}</div>
-                        </div>
-                    `;
-                }).join('');
-
-                content.innerHTML = questsHtml;
-                document.getElementById('questCount').textContent = `${data.quests.length} quest${data.quests.length !== 1 ? 's' : ''}`;
-
-                lastUpdateTime = Date.now();
-                updateTimestamp();
-            } catch (error) {
-                console.error('Error loading data:', error);
-                content.innerHTML = '<div class="empty-state">Error loading data</div>';
-            }
-        }
-
-        function updateTimestamp() {
-            const secondsAgo = Math.floor((Date.now() - lastUpdateTime) / 1000);
-            let text;
-            if (secondsAgo < 5) {
-                text = 'Just now';
-            } else if (secondsAgo < 60) {
-                text = `${secondsAgo}s ago`;
-            } else {
-                text = `${Math.floor(secondsAgo / 60)}m ago`;
-            }
-            document.getElementById('lastUpdate').textContent = text;
-        }
-
-        // Initial load
-        loadData();
-
-        // Auto-refresh every 3 seconds
-        setInterval(loadData, 3000);
-
-        // Update timestamp every second
-        setInterval(updateTimestamp, 1000);
-    </script>
+    <script src="popup.js"></script>
 </body>
 </html>
