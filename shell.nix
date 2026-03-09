@@ -9,6 +9,7 @@ pkgs.mkShell {
       pygobject3
       beautifulsoup4
       requests
+      pyinstaller
     ]))
     # System dependencies for pywebview on Linux
     gtk3
