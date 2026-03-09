@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Tracker Overlay Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #14141e;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        .header {
+            background: #667eea;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 10px;
+            background: #2a2a3a;
+            color: #ffffff;
+        }
+
+        .quest {
+            margin-bottom: 10px;
+            padding: 5px;
+            background: #3a3a4a;
+        }
+
+        .quest-name {
+            color: #a8b2ff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .item {
+            color: #e0e0e0;
+            padding: 3px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Quest Tracker Test
+    </div>
+
+    <div class="content" id="content">
+        <div class="quest">
+            <div class="quest-name">Test Quest 1</div>
+            <div class="item">Test Item 1: 5/10</div>
+            <div class="item">Test Item 2: 3/5</div>
+        </div>
+        <div class="quest">
+            <div class="quest-name">Test Quest 2</div>
+            <div class="item">Test Item 3: 1/1</div>
+        </div>
+    </div>
+
+    <script>
+        console.log("Overlay test loaded");
+        console.log("Content div:", document.getElementById('content'));
+        console.log("Content HTML:", document.getElementById('content').innerHTML);
+    </script>
+</body>
+</html>

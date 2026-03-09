@@ -7,6 +7,8 @@ pkgs.mkShell {
       flask-cors
       pywebview
       pygobject3
+      beautifulsoup4
+      requests
     ]))
     # System dependencies for pywebview on Linux
     gtk3
@@ -15,7 +17,7 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
-    echo "Project Gorgon VIP Quest Helper Environment"
+    echo "Project Gorgon VIP StorageBuddy Environment"
     echo "Flask is ready!"
     echo ""
     echo "To start the server, run:"

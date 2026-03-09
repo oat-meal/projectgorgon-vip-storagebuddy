@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build standalone executable for Project Gorgon VIP Quest Helper
+Build standalone executable for Project Gorgon VIP StorageBuddy
 Uses PyInstaller to bundle Python, Flask, and all dependencies
 """
 
@@ -35,11 +35,12 @@ def build_executable():
     # PyInstaller command
     cmd = [
         'pyinstaller',
-        '--name=QuestHelper',
+        '--name=StorageBuddy',
         '--onefile',  # Single executable
         '--windowed',  # No console window (comment out for debugging)
         '--add-data=templates:templates',  # Include templates
         '--add-data=static:static',  # Include static files if any
+        '--add-data=recipes.json:.',  # Include recipes data
         '--hidden-import=flask',
         '--hidden-import=jinja2',
         '--collect-all=flask',
@@ -59,9 +60,9 @@ def build_executable():
         print("="*60)
 
         if system == 'Windows':
-            exe_path = Path('dist') / 'QuestHelper.exe'
+            exe_path = Path('dist') / 'StorageBuddy.exe'
         else:
-            exe_path = Path('dist') / 'QuestHelper'
+            exe_path = Path('dist') / 'StorageBuddy'
 
         if exe_path.exists():
             size_mb = exe_path.stat().st_size / (1024 * 1024)
@@ -79,7 +80,7 @@ def build_executable():
 
 def main():
     print("="*60)
-    print("Project Gorgon VIP Quest Helper - Executable Builder")
+    print("Project Gorgon VIP StorageBuddy - Executable Builder")
     print("="*60)
     print()
 
@@ -92,7 +93,7 @@ def main():
     print("\n" + "="*60)
     print("Next steps:")
     print("="*60)
-    print("1. Test the executable in dist/QuestHelper")
+    print("1. Test the executable in dist/StorageBuddy")
     print("2. Upload to GitHub Releases for distribution")
     print("3. Users download and double-click to run!")
     print()

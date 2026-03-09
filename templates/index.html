@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Gorgon VIP Quest Helper</title>
+    <title>Project Gorgon VIP StorageBuddy</title>
     <style>
         * {
             margin: 0;
@@ -86,22 +86,6 @@
             cursor: not-allowed;
         }
 
-        .overlay-btn {
-            padding: 6px 12px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.3s;
-            margin-left: 8px;
-        }
-
-        .overlay-btn:hover {
-            background: #218838;
-        }
 
         .sidebar {
             background: white;
@@ -349,7 +333,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Project Gorgon VIP Quest Helper</h1>
+            <h1>Project Gorgon VIP StorageBuddy</h1>
             <p class="subtitle">
                 <span class="status-indicator"></span>
                 Auto-updating from chat logs
@@ -362,7 +346,9 @@
                     <button class="tab-btn active" onclick="switchTab('active')">Active</button>
                     <button class="tab-btn" onclick="switchTab('completable')">✓ Ready</button>
                     <button class="tab-btn" onclick="switchTab('purchasable')">🛒 Buyable</button>
+                    <button class="tab-btn" onclick="switchTab('crafting')">🔨 Crafting</button>
                     <button class="tab-btn" onclick="switchTab('search')">Search</button>
+                    <button class="tab-btn" onclick="switchTab('help')">❓ Help</button>
                 </div>
 
                 <input type="text"
@@ -401,9 +387,6 @@
                 <span id="logFileInfo" style="margin-left: 10px; opacity: 0.7;"></span>
             </div>
             <div>
-                <button class="overlay-btn" onclick="openOverlay()">
-                    Open Overlay
-                </button>
                 <button class="update-btn" id="updateBtn" onclick="updateGameData()">
                     Update Game Data
                 </button>
@@ -420,6 +403,8 @@
         let completableQuestSet = new Set();
         let purchasableQuestSet = new Set();
         let manualChecks = JSON.parse(localStorage.getItem('manualChecks') || '{}');
+        let allRecipes = [];
+        let selectedRecipes = JSON.parse(localStorage.getItem('selectedRecipes') || '[]');
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -474,6 +459,16 @@
                 searchBox.style.display = 'block';
                 regionFilter.style.display = 'none';
                 searchBox.focus();
+            } else if (tab === 'crafting') {
+                searchBox.style.display = 'none';
+                searchBox.value = '';
+                regionFilter.style.display = 'none';
+                loadCraftingRecipes();
+            } else if (tab === 'help') {
+                searchBox.style.display = 'none';
+                searchBox.value = '';
+                regionFilter.style.display = 'none';
+                showHelp();
             } else {
                 searchBox.style.display = 'none';
                 searchBox.value = '';
@@ -790,6 +785,302 @@
             }
         }
 
+        async function loadCraftingRecipes() {
+            const container = document.getElementById('questListContainer');
+            container.innerHTML = '<div class="loading">Loading recipes...</div>';
+
+            try {
+                const response = await fetch('/recipes.json');
+                allRecipes = await response.json();
+                renderCraftingList();
+                updateShoppingList();
+            } catch (error) {
+                console.error('Error loading recipes:', error);
+                container.innerHTML = '<p class="empty-state">Error loading recipes</p>';
+            }
+        }
+
+        function renderCraftingList() {
+            const container = document.getElementById('questListContainer');
+
+            if (allRecipes.length === 0) {
+                container.innerHTML = '<p class="empty-state">No recipes found</p>';
+                return;
+            }
+
+            const recipesBySkill = {};
+            allRecipes.forEach(recipe => {
+                const skill = recipe.skill || 'Unknown';
+                if (!recipesBySkill[skill]) {
+                    recipesBySkill[skill] = [];
+                }
+                recipesBySkill[skill].push(recipe);
+            });
+
+            let html = `
+                <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">🔨 Crafting List</div>
+                    <div style="font-size: 13px; color: #424242; line-height: 1.5;">
+                        Select recipes to create shopping list. Materials will be aggregated automatically.
+                    </div>
+                </div>
+            `;
+
+            const skills = Object.keys(recipesBySkill).sort();
+            for (const skill of skills) {
+                const recipes = recipesBySkill[skill];
+                html += `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 16px;">${skill}</div>
+                `;
+
+                for (const recipe of recipes) {
+                    const isSelected = selectedRecipes.includes(recipe.id);
+                    const bgColor = isSelected ? '#e8eaf6' : '#f9f9f9';
+                    html += `
+                        <div class="quest-item" style="background: ${bgColor}; display: flex; align-items: center; cursor: pointer;"
+                             onclick="toggleRecipeSelection('${recipe.id}')">
+                            <input type="checkbox"
+                                   ${isSelected ? 'checked' : ''}
+                                   style="margin-right: 10px; cursor: pointer;"
+                                   onclick="event.stopPropagation(); toggleRecipeSelection('${recipe.id}')">
+                            <div style="flex: 1;">
+                                <div class="quest-item-name">${recipe.name}</div>
+                                <div class="quest-item-location">${recipe.ingredients.length} ingredients</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function toggleRecipeSelection(recipeId) {
+            const index = selectedRecipes.indexOf(recipeId);
+            if (index > -1) {
+                selectedRecipes.splice(index, 1);
+            } else {
+                selectedRecipes.push(recipeId);
+            }
+
+            localStorage.setItem('selectedRecipes', JSON.stringify(selectedRecipes));
+            renderCraftingList();
+            updateShoppingList();
+        }
+
+        function showHelp() {
+            const listContainer = document.getElementById('questListContainer');
+            const detailContainer = document.getElementById('questDetail');
+
+            listContainer.innerHTML = `
+                <div style="padding: 10px;">
+                    <h3 style="color: #667eea; margin-bottom: 10px;">Quick Start</h3>
+                    <div style="font-size: 13px; line-height: 1.6; color: #333;">
+                        <p style="margin-bottom: 10px;"><strong>1. Active Tab:</strong> View all your active quests with item collection objectives</p>
+                        <p style="margin-bottom: 10px;"><strong>2. ✓ Ready Tab:</strong> See quests you can complete right now</p>
+                        <p style="margin-bottom: 10px;"><strong>3. 🛒 Buyable Tab:</strong> Quests where you can buy missing items from vendors</p>
+                        <p style="margin-bottom: 10px;"><strong>4. 🔨 Crafting Tab:</strong> Select recipes to create shopping lists</p>
+                        <p style="margin-bottom: 10px;"><strong>5. Search Tab:</strong> Find specific quests by name</p>
+                    </div>
+                </div>
+            `;
+
+            detailContainer.innerHTML = `
+                <div style="padding: 20px;">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">StorageBuddy Help</h2>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Initial Setup</h3>
+                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
+                            <p style="margin-bottom: 12px;"><strong>First Time Setup:</strong></p>
+                            <ol style="margin-left: 20px; margin-bottom: 12px;">
+                                <li style="margin-bottom: 8px;">Launch StorageBuddy - it will open your web browser automatically</li>
+                                <li style="margin-bottom: 8px;">Click the <strong>Setup</strong> link to configure your Project Gorgon installation</li>
+                                <li style="margin-bottom: 8px;">The app will auto-detect your Project Gorgon installation on Windows</li>
+                                <li style="margin-bottom: 8px;">If auto-detection fails, manually browse to your Project Gorgon folder</li>
+                                <li style="margin-bottom: 8px;">StorageBuddy needs access to:
+                                    <ul style="margin-left: 20px; margin-top: 4px;">
+                                        <li>Chat logs (for quest tracking)</li>
+                                        <li>Character reports (for inventory detection)</li>
+                                    </ul>
+                                </li>
+                            </ol>
+
+                            <p style="margin-bottom: 8px;"><strong>Generating Character Reports:</strong></p>
+                            <p style="margin-bottom: 12px;">In Project Gorgon, type <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">/report</code> in chat to generate a character report. Do this periodically to keep inventory data current.</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Quest Tracking</h3>
+                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
+                            <p style="margin-bottom: 12px;">StorageBuddy automatically tracks your active quests by reading your Project Gorgon chat logs and character reports.</p>
+
+                            <p style="margin-bottom: 8px;"><strong>Understanding Quest Indicators:</strong></p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px;">
+                                <li><strong>✓ Ready:</strong> You have all items needed - go turn it in!</li>
+                                <li><strong>🛒 Buyable:</strong> Missing items can be purchased from vendors</li>
+                                <li><strong>Progress bars:</strong> Show how many items you have vs. need</li>
+                            </ul>
+
+                            <p style="margin-bottom: 8px;"><strong>Inventory Detection:</strong></p>
+                            <p style="margin-bottom: 12px;">Items are detected from Character Reports. Generate a fresh report in-game to update inventory detection. The app shows where items are stored: Inventory, Bank, Saddlebag, etc.</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Vendor Hints</h3>
+                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
+                            <p style="margin-bottom: 12px;">When items can be purchased, you'll see vendor names and prices.</p>
+
+                            <p style="margin-bottom: 8px;"><strong>Important Vendor Tip:</strong></p>
+                            <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 12px;">
+                                If you can't find quest items in vendor shops, <strong>uncheck "Hide Unusable"</strong> in the vendor window. This filter may hide seeds, ingredients, and other quest items even when you can use them.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Crafting Lists</h3>
+                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
+                            <p style="margin-bottom: 12px;">The Crafting tab helps you plan crafting projects:</p>
+
+                            <ul style="margin-left: 20px; margin-bottom: 12px;">
+                                <li style="margin-bottom: 8px;"><strong>Browse recipes</strong> by profession (Fletching, Cooking, etc.)</li>
+                                <li style="margin-bottom: 8px;"><strong>Select multiple recipes</strong> using checkboxes</li>
+                                <li style="margin-bottom: 8px;"><strong>View shopping list</strong> showing all materials needed</li>
+                                <li style="margin-bottom: 8px;"><strong>Materials are aggregated</strong> - if 3 recipes need Wood, it shows total Wood needed</li>
+                            </ul>
+
+                            <p style="margin-bottom: 8px;">Your recipe selections are saved automatically and persist across sessions.</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Tracker Assist Browser Extension</h3>
+                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
+                            <p style="margin-bottom: 12px;">The Tracker Assist extension shows your inventory directly on the Project Gorgon Wiki!</p>
+
+                            <p style="margin-bottom: 8px;"><strong>Installation:</strong></p>
+                            <ol style="margin-left: 20px; margin-bottom: 12px;">
+                                <li style="margin-bottom: 8px;">Find the <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">browser-extension</code> folder in your StorageBuddy installation</li>
+                                <li style="margin-bottom: 8px;"><strong>Firefox:</strong>
+                                    <ul style="margin-left: 20px; margin-top: 4px;">
+                                        <li>Open about:debugging</li>
+                                        <li>Click "This Firefox" → "Load Temporary Add-on"</li>
+                                        <li>Select the manifest.json file from the extension folder</li>
+                                    </ul>
+                                </li>
+                                <li style="margin-bottom: 8px;"><strong>Chrome:</strong>
+                                    <ul style="margin-left: 20px; margin-top: 4px;">
+                                        <li>Open chrome://extensions</li>
+                                        <li>Enable "Developer mode"</li>
+                                        <li>Click "Load unpacked"</li>
+                                        <li>Select the browser-extension folder</li>
+                                    </ul>
+                                </li>
+                            </ol>
+
+                            <p style="margin-bottom: 8px;"><strong>How to Use:</strong></p>
+                            <ul style="margin-left: 20px; margin-bottom: 12px;">
+                                <li style="margin-bottom: 8px;">Make sure StorageBuddy is running</li>
+                                <li style="margin-bottom: 8px;">Browse to wiki.projectgorgon.com</li>
+                                <li style="margin-bottom: 8px;">Hover over any item name to see your inventory</li>
+                                <li style="margin-bottom: 8px;">Shows location breakdown: Inventory, Bank, Saddlebag, etc.</li>
+                                <li style="margin-bottom: 8px;">Works on item pages, quest pages, and recipe pages</li>
+                            </ul>
+
+                            <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px; margin-bottom: 12px;">
+                                <strong>Note:</strong> The extension automatically connects to StorageBuddy running on localhost:5000. Both must be running at the same time.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Tips & Tricks</h3>
+                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
+                            <ul style="margin-left: 20px; margin-bottom: 12px;">
+                                <li style="margin-bottom: 8px;"><strong>Generate Character Reports regularly</strong> to keep inventory data fresh</li>
+                                <li style="margin-bottom: 8px;"><strong>Use region filter</strong> to focus on quests in specific areas</li>
+                                <li style="margin-bottom: 8px;"><strong>Check Buyable tab</strong> before farming - save time by buying instead</li>
+                                <li style="margin-bottom: 8px;"><strong>Manual checkboxes</strong> let you mark items complete even if not detected in reports</li>
+                                <li style="margin-bottom: 8px;"><strong>Click "Update Game Data"</strong> to download latest quest and item data from Project Gorgon</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 15px; border-radius: 6px;">
+                        <p style="font-weight: bold; color: #2e7d32; margin-bottom: 8px;">Need more help?</p>
+                        <p style="font-size: 14px; color: #424242;">Check the README file or visit the GitHub repository for detailed documentation and troubleshooting.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateShoppingList() {
+            const detailContainer = document.getElementById('questDetail');
+
+            if (selectedRecipes.length === 0) {
+                detailContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔨</div>
+                        <p>Select recipes to view shopping list</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const materialMap = {};
+            let totalRecipes = 0;
+
+            for (const recipeId of selectedRecipes) {
+                const recipe = allRecipes.find(r => r.id === recipeId);
+                if (!recipe) continue;
+
+                totalRecipes++;
+
+                for (const ingredient of recipe.ingredients) {
+                    const name = ingredient.name;
+                    if (!materialMap[name]) {
+                        materialMap[name] = { quantity: 0 };
+                    }
+                    materialMap[name].quantity += ingredient.quantity;
+                }
+            }
+
+            const materials = Object.entries(materialMap)
+                .map(([name, data]) => ({ name, quantity: data.quantity }))
+                .sort((a, b) => a.name.localeCompare(b.name));
+
+            let html = `
+                <div class="quest-detail-header">
+                    <div class="quest-detail-name">Shopping List</div>
+                    <div class="quest-detail-description">${totalRecipes} recipe${totalRecipes !== 1 ? 's' : ''} selected</div>
+                </div>
+                <div class="checklist-items">
+            `;
+
+            for (const material of materials) {
+                html += `
+                    <div class="checklist-item">
+                        <div class="item-info" style="flex: 1;">
+                            <div class="item-name">${material.name}</div>
+                            <div class="item-progress">Needed: ${material.quantity}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `
+                </div>
+            `;
+
+            detailContainer.innerHTML = html;
+        }
+
         // Load version on page load
         async function loadVersion() {
             try {
@@ -810,31 +1101,6 @@
                 await fetch('/api/heartbeat', { method: 'POST' });
             } catch (error) {
                 // Server might be shutting down, that's ok
-            }
-        }
-
-        // Open overlay in transparent, always-on-top window
-        async function openOverlay() {
-            try {
-                const response = await fetch('/api/launch_overlay', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    // Show success message briefly
-                    const btn = document.querySelector('.overlay-btn');
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Overlay Opened!';
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                    }, 2000);
-                } else {
-                    alert('Failed to launch overlay: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error launching overlay:', error);
-                alert('Failed to launch overlay: ' + error.message);
             }
         }
 

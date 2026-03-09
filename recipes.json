@@ -1,0 +1,1380 @@
+[
+  {
+    "id": "advanced-reservoir-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/advanced-reservoir-arrow",
+    "name": "Advanced Reservoir Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Advanced Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Beakers",
+        "quantity": 1
+      },
+      {
+        "name": "Potent Acidic Cleanser",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Reservoir Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "masterwork-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/masterwork-barbed-arrow",
+    "name": "Masterwork Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Masterwork Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Bone Hook",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "astonishing-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/astonishing-long-arrow",
+    "name": "Astonishing Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Astonishing Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Astonishing Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Precision Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Astonishing Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "awesome-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/awesome-barbed-arrow",
+    "name": "Awesome Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Awesome Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Awesome Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Critical Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Scorpion Stinger",
+        "quantity": 1
+      },
+      {
+        "name": "Awesome Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "marvelous-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/marvelous-dense-arrow",
+    "name": "Marvelous Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Marvelous Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Marvelous Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Grim Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Tungsten",
+        "quantity": 1
+      },
+      {
+        "name": "Marvelous Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "astonishing-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/astonishing-dense-arrow",
+    "name": "Astonishing Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Astonishing Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Astonishing Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Precision Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Copper Ore",
+        "quantity": 1
+      },
+      {
+        "name": "Astonishing Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "beginners-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/beginners-arrow",
+    "name": "Beginner's Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Beginner's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Feathers",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "incredible-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/incredible-long-arrow",
+    "name": "Incredible Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Incredible Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Incredible Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Critical Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Incredible Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "amazing-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/amazing-arrow",
+    "name": "Amazing Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Amazing Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Amazing Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Precision Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Amazing Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "basic-reservoir-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/basic-reservoir-arrow",
+    "name": "Basic Reservoir Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Basic Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Beakers",
+        "quantity": 1
+      },
+      {
+        "name": "Weak Acidic Cleanser",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Reservoir Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "advanced-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/advanced-long-arrow",
+    "name": "Advanced Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Advanced Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "masterwork-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/masterwork-long-arrow",
+    "name": "Masterwork Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Masterwork Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "experts-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/experts-barbed-arrow",
+    "name": "Expert's Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Expert's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Bone Hook",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "astounding-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/astounding-barbed-arrow",
+    "name": "Astounding Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Astonishing Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Astonishing Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Precision Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Bone Hook",
+        "quantity": 1
+      },
+      {
+        "name": "Astounding Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "amazing-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/amazing-barbed-arrow",
+    "name": "Amazing Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Amazing Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Amazing Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Precision Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Bone Hook",
+        "quantity": 1
+      },
+      {
+        "name": "Amazing Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "masterwork-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/masterwork-arrow",
+    "name": "Masterwork Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Masterwork Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "amazing-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/amazing-long-arrow",
+    "name": "Amazing Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Amazing Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Amazing Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Precision Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Amazing Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "amazing-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/amazing-dense-arrow",
+    "name": "Amazing Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Amazing Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Amazing Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Precision Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Copper Ore",
+        "quantity": 1
+      },
+      {
+        "name": "Amazing Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "durstins-mutton-stew",
+    "url": "https://www.gorgoncodex.com/recipes/durstins-mutton-stew",
+    "name": "Durstin's Mutton Stew",
+    "skill": "Cooking",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Mutton",
+        "quantity": 1
+      },
+      {
+        "name": "Potato",
+        "quantity": 1
+      },
+      {
+        "name": "Onion",
+        "quantity": 1
+      },
+      {
+        "name": "Cabbage",
+        "quantity": 1
+      },
+      {
+        "name": "Salt",
+        "quantity": 1
+      },
+      {
+        "name": "Durstin's Mutton Stew",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "beginners-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/beginners-dense-arrow",
+    "name": "Beginner's Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Beginner's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Feathers",
+        "quantity": 1
+      },
+      {
+        "name": "Antler",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "incredible-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/incredible-dense-arrow",
+    "name": "Incredible Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Incredible Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Incredible Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Critical Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Tungsten",
+        "quantity": 1
+      },
+      {
+        "name": "Incredible Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "masterwork-reservoir-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/masterwork-reservoir-arrow",
+    "name": "Masterwork Reservoir Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Masterwork Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Beakers",
+        "quantity": 1
+      },
+      {
+        "name": "Ultimate Acidic Cleanser",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Reservoir Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "incredible-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/incredible-barbed-arrow",
+    "name": "Incredible Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Incredible Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Incredible Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Critical Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Scorpion Stinger",
+        "quantity": 1
+      },
+      {
+        "name": "Incredible Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "bland-mutton-vindaloo",
+    "url": "https://www.gorgoncodex.com/recipes/bland-mutton-vindaloo",
+    "name": "Bland Mutton Vindaloo",
+    "skill": "Cooking",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Mutton",
+        "quantity": 1
+      },
+      {
+        "name": "Potato",
+        "quantity": 1
+      },
+      {
+        "name": "Onion",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Vinegar",
+        "quantity": 1
+      },
+      {
+        "name": "Bland Mutton Vindaloo",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "advanced-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/advanced-arrow",
+    "name": "Advanced Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Advanced Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "basic-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/basic-long-arrow",
+    "name": "Basic Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Basic Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "beginners-reservoir-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/beginners-reservoir-arrow",
+    "name": "Beginner's Reservoir Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Beginner's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Feathers",
+        "quantity": 1
+      },
+      {
+        "name": "Beakers",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Reservoir Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "astonishing-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/astonishing-arrow",
+    "name": "Astonishing Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Astonishing Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Astonishing Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Precision Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Astonishing Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "experts-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/experts-dense-arrow",
+    "name": "Expert's Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Expert's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Copper Ore",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "orcish-flour",
+    "url": "https://www.gorgoncodex.com/recipes/orcish-flour",
+    "name": "Orcish Flour",
+    "skill": "Cooking",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Orcish Wheat Grinder",
+        "quantity": 1
+      },
+      {
+        "name": "Orcish Wheat",
+        "quantity": 1
+      },
+      {
+        "name": "Orcish Flour",
+        "quantity": 1
+      },
+      {
+        "name": "Orcish Flour",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "beginners-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/beginners-barbed-arrow",
+    "name": "Beginner's Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Beginner's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Feathers",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "awesome-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/awesome-long-arrow",
+    "name": "Awesome Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Awesome Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Awesome Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Critical Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Awesome Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "durstins-minty-lamb-chops",
+    "url": "https://www.gorgoncodex.com/recipes/durstins-minty-lamb-chops",
+    "name": "Durstin's Minty Lamb Chops",
+    "skill": "Cooking",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Mutton",
+        "quantity": 1
+      },
+      {
+        "name": "Mint",
+        "quantity": 1
+      },
+      {
+        "name": "Olive Oil",
+        "quantity": 1
+      },
+      {
+        "name": "Peppercorns",
+        "quantity": 1
+      },
+      {
+        "name": "Salt",
+        "quantity": 1
+      },
+      {
+        "name": "Durstin's Minty Lamb Chops",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "marvelous-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/marvelous-arrow",
+    "name": "Marvelous Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Marvelous Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Marvelous Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Grim Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Marvelous Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "awesome-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/awesome-dense-arrow",
+    "name": "Awesome Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Awesome Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Awesome Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Critical Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Tungsten",
+        "quantity": 1
+      },
+      {
+        "name": "Awesome Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "experts-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/experts-arrow",
+    "name": "Expert's Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Expert's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "advanced-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/advanced-dense-arrow",
+    "name": "Advanced Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Advanced Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Copper Ore",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "basic-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/basic-barbed-arrow",
+    "name": "Basic Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Basic Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "beginners-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/beginners-long-arrow",
+    "name": "Beginner's Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Beginner's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Feathers",
+        "quantity": 1
+      },
+      {
+        "name": "Beginner's Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "experts-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/experts-long-arrow",
+    "name": "Expert's Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Expert's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "masterwork-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/masterwork-dense-arrow",
+    "name": "Masterwork Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Masterwork Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Copper Ore",
+        "quantity": 1
+      },
+      {
+        "name": "Masterwork Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "awesome-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/awesome-arrow",
+    "name": "Awesome Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Awesome Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Awesome Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Critical Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Awesome Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "basic-dense-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/basic-dense-arrow",
+    "name": "Basic Dense Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Basic Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Antler",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Dense Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "experts-reservoir-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/experts-reservoir-arrow",
+    "name": "Expert's Reservoir Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Expert's Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Elegant Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Beakers",
+        "quantity": 1
+      },
+      {
+        "name": "Potent Acidic Cleanser",
+        "quantity": 1
+      },
+      {
+        "name": "Expert's Reservoir Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "butter",
+    "url": "https://www.gorgoncodex.com/recipes/butter",
+    "name": "Butter",
+    "skill": "Cheesemaking",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "name": "Salt",
+        "quantity": 1
+      },
+      {
+        "name": "Butter Muslin",
+        "quantity": 1
+      },
+      {
+        "name": "Butter",
+        "quantity": 1
+      },
+      {
+        "name": "Empty Bottle",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "serbule-style-lamb-chops",
+    "url": "https://www.gorgoncodex.com/recipes/serbule-style-lamb-chops",
+    "name": "Serbule-Style Lamb Chops",
+    "skill": "Cooking",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Mutton",
+        "quantity": 1
+      },
+      {
+        "name": "Watercress",
+        "quantity": 1
+      },
+      {
+        "name": "Boletus Mushroom",
+        "quantity": 1
+      },
+      {
+        "name": "Salt",
+        "quantity": 1
+      },
+      {
+        "name": "Serbule-Style Lamb Chops",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "basic-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/basic-arrow",
+    "name": "Basic Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Basic Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Basic Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "marvelous-long-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/marvelous-long-arrow",
+    "name": "Marvelous Long Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Marvelous Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Marvelous Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Grim Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Marvelous Long Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "incredible-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/incredible-arrow",
+    "name": "Incredible Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Incredible Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Incredible Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Critical Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Incredible Arrow",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "advanced-barbed-arrow",
+    "url": "https://www.gorgoncodex.com/recipes/advanced-barbed-arrow",
+    "name": "Advanced Barbed Arrow",
+    "skill": "Fletching",
+    "level_required": 0,
+    "ingredients": [
+      {
+        "name": "Advanced Arrowheads",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Arrow Shafts",
+        "quantity": 1
+      },
+      {
+        "name": "Prepared Fletchings",
+        "quantity": 1
+      },
+      {
+        "name": "Advanced Barbed Arrow",
+        "quantity": 1
+      }
+    ]
+  }
+]

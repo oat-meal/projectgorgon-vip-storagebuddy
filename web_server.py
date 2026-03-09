@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Project Gorgon VIP Quest Helper - Web Server
-Flask-based web interface for quest tracking
+Project Gorgon VIP StorageBuddy - Web Server
+Flask-based web interface for quest tracking, inventory management, and crafting
 """
 
 from flask import Flask, render_template, jsonify, request
