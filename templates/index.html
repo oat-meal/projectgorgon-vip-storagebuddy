@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Gorgon VIP StorageBuddy</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon.png">
     <style>
         * {
             margin: 0;
@@ -120,20 +122,24 @@
 
         .tab-buttons {
             display: flex;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
             margin-bottom: 15px;
         }
 
         .tab-btn {
-            flex: 1;
-            padding: 10px;
+            flex: 1 1 calc(33.333% - 6px);
+            min-width: 90px;
+            padding: 8px 6px;
             border: none;
             background: #f5f5f5;
             color: #666;
             border-radius: 5px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 13px;
             transition: all 0.3s;
+            text-align: center;
         }
 
         .tab-btn.active {
@@ -189,6 +195,24 @@
             content: '🛒 ';
             color: #ff9800;
             font-weight: bold;
+        }
+
+        .quest-item.craftable {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+
+        .quest-item.craftable:hover {
+            background: #c8e6c9;
+        }
+
+        .quest-item.buyable {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+
+        .quest-item.buyable:hover {
+            background: #ffe0b2;
         }
 
         .quest-item-name {
@@ -343,19 +367,44 @@
         <div class="main-content">
             <div class="sidebar">
                 <div class="tab-buttons">
-                    <button class="tab-btn active" onclick="switchTab('active')">Active</button>
-                    <button class="tab-btn" onclick="switchTab('completable')">✓ Ready</button>
-                    <button class="tab-btn" onclick="switchTab('purchasable')">🛒 Buyable</button>
+                    <button class="tab-btn" onclick="switchTab('quests')">📋 Quests</button>
                     <button class="tab-btn" onclick="switchTab('crafting')">🔨 Crafting</button>
-                    <button class="tab-btn" onclick="switchTab('search')">Search</button>
-                    <button class="tab-btn" onclick="switchTab('help')">❓ Help</button>
+                    <button class="tab-btn active" onclick="switchTab('help')">❓ Help</button>
                 </div>
 
                 <input type="text"
                        class="search-box"
-                       id="searchBox"
+                       id="questSearchBox"
                        placeholder="Search quests..."
                        style="display: none;">
+
+                <input type="text"
+                       class="search-box"
+                       id="craftingSearchBox"
+                       placeholder="Search recipes..."
+                       style="display: none;">
+
+                <div id="questFilter" style="display: none; gap: 10px; justify-content: center; margin-bottom: 10px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                        <input type="radio" name="questView" value="all" checked style="margin-right: 5px;" onchange="switchQuestView()">
+                        All
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                        <input type="radio" name="questView" value="ready" style="margin-right: 5px;" onchange="switchQuestView()">
+                        Have Materials
+                    </label>
+                </div>
+
+                <div id="recipeFilter" style="display: none; gap: 10px; justify-content: center; margin-bottom: 10px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                        <input type="radio" name="recipeView" value="all" checked style="margin-right: 5px;" onchange="switchRecipeView()">
+                        All
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                        <input type="radio" name="recipeView" value="craftable" style="margin-right: 5px;" onchange="switchRecipeView()">
+                        Have Materials
+                    </label>
+                </div>
 
                 <select class="search-box" id="regionFilter" style="display: none;">
                     <option value="">All Regions</option>
@@ -368,6 +417,10 @@
                     <option value="Rahu">Rahu</option>
                     <option value="Gazluk">Gazluk</option>
                     <option value="Fae Realm">Fae Realm</option>
+                </select>
+
+                <select class="search-box" id="skillFilter" style="display: none;">
+                    <option value="">All Skills</option>
                 </select>
 
                 <div id="questListContainer" class="loading">Loading quests...</div>
@@ -386,16 +439,21 @@
                 Quest Helper <span id="appVersion">...</span>
                 <span id="logFileInfo" style="margin-left: 10px; opacity: 0.7;"></span>
             </div>
-            <div>
-                <button class="update-btn" id="updateBtn" onclick="updateGameData()">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="update-btn" id="updateBtn" onclick="updateGameData()" style="display: none;">
                     Update Game Data
+                </button>
+                <button class="update-btn" id="debugBtn" onclick="toggleDebugMode()" style="background: #888;">
+                    Enable Debug
                 </button>
             </div>
         </footer>
     </div>
 
     <script>
-        let currentTab = 'active';
+        let currentTab = 'help';
+        let currentQuestView = 'all';
+        let currentRecipeView = 'all';
         let selectedQuest = null;
         let activeQuests = [];
         let completableQuests = [];
@@ -404,29 +462,118 @@
         let purchasableQuestSet = new Set();
         let manualChecks = JSON.parse(localStorage.getItem('manualChecks') || '{}');
         let allRecipes = [];
-        let selectedRecipes = JSON.parse(localStorage.getItem('selectedRecipes') || '[]');
+        // Recipe quantities: { recipeId: quantity }
+        let recipeQuantities = JSON.parse(localStorage.getItem('recipeQuantities') || '{}');
+        // For backwards compatibility, convert old array format to new object format
+        let oldSelectedRecipes = JSON.parse(localStorage.getItem('selectedRecipes') || '[]');
+        if (Array.isArray(oldSelectedRecipes) && oldSelectedRecipes.length > 0) {
+            oldSelectedRecipes.forEach(id => { recipeQuantities[id] = 1; });
+            localStorage.removeItem('selectedRecipes');
+            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+        }
+        let craftableRecipeSet = new Set();
+        let buyableRecipeSet = new Set();
+        let playerInventory = {};
+        let playerInventoryDetails = {}; // Detailed storage locations
+        let itemKeywords = {}; // Keyword -> list of item names (e.g., "Bone" -> ["Femur", "Rib Bone", ...])
+        let vendorItems = {}; // Item name -> vendor info (for checking if items can be bought)
+        let debugMode = false; // Debug mode state
+
+        // Initialize tab based on currentTab value
+        function initializeTab() {
+            const questSearchBox = document.getElementById('questSearchBox');
+            const craftingSearchBox = document.getElementById('craftingSearchBox');
+            const regionFilter = document.getElementById('regionFilter');
+            const skillFilter = document.getElementById('skillFilter');
+            const questFilter = document.getElementById('questFilter');
+            const recipeFilter = document.getElementById('recipeFilter');
+
+            // Set correct tab button as active
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(currentTab)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (currentTab === 'quests') {
+                questSearchBox.style.display = 'block';
+                craftingSearchBox.style.display = 'none';
+                questFilter.style.display = 'flex';
+                recipeFilter.style.display = 'none';
+                regionFilter.style.display = 'block';
+                skillFilter.style.display = 'none';
+                loadActiveQuests().then(() => {
+                    switchQuestView();
+                });
+            } else if (currentTab === 'crafting') {
+                questSearchBox.style.display = 'none';
+                craftingSearchBox.style.display = 'block';
+                questFilter.style.display = 'none';
+                recipeFilter.style.display = 'flex';
+                regionFilter.style.display = 'none';
+                skillFilter.style.display = 'block';
+                loadCraftingRecipes().then(() => {
+                    // Restore shopping list if recipes are selected
+                    if (Object.keys(recipeQuantities).length > 0) {
+                        updateShoppingList();
+                    }
+                });
+            } else if (currentTab === 'help') {
+                questSearchBox.style.display = 'none';
+                craftingSearchBox.style.display = 'none';
+                questFilter.style.display = 'none';
+                recipeFilter.style.display = 'none';
+                regionFilter.style.display = 'none';
+                skillFilter.style.display = 'none';
+                showHelp();
+            }
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            loadActiveQuests();
+            initializeTab();
             setInterval(refreshCurrentQuest, 5000); // Auto-refresh every 5 seconds
 
-            document.getElementById('searchBox').addEventListener('input', (e) => {
+            document.getElementById('questSearchBox').addEventListener('input', (e) => {
                 if (e.target.value.length >= 2) {
-                    searchQuests(e.target.value);
+                    searchQuestsOnly(e.target.value);
                 } else {
-                    document.getElementById('questListContainer').innerHTML = '<p class="empty-state">Type to search...</p>';
+                    // Return to normal view when search is cleared
+                    switchQuestView();
+                }
+            });
+
+            document.getElementById('craftingSearchBox').addEventListener('input', (e) => {
+                if (e.target.value.length >= 2) {
+                    searchRecipesOnly(e.target.value);
+                } else {
+                    // Return to normal view when search is cleared
+                    renderCraftingList();
                 }
             });
 
             document.getElementById('regionFilter').addEventListener('change', () => {
-                // Re-render current tab with region filter applied
-                if (currentTab === 'active') {
-                    renderQuestList(activeQuests);
-                } else if (currentTab === 'completable') {
-                    renderQuestList(completableQuests);
-                } else if (currentTab === 'purchasable') {
-                    renderQuestList(purchasableQuests);
+                // Re-render current quest view with region filter applied
+                if (currentTab === 'quests') {
+                    const questSearchBox = document.getElementById('questSearchBox');
+                    if (questSearchBox.value.length >= 2) {
+                        searchQuestsOnly(questSearchBox.value);
+                    } else {
+                        switchQuestView();
+                    }
+                }
+            });
+
+            document.getElementById('skillFilter').addEventListener('change', () => {
+                // Re-render recipe list with skill filter applied
+                if (currentTab === 'crafting') {
+                    const craftingSearchBox = document.getElementById('craftingSearchBox');
+                    if (craftingSearchBox.value.length >= 2) {
+                        searchRecipesOnly(craftingSearchBox.value);
+                    } else {
+                        renderCraftingList();
+                    }
                 }
             });
         });
@@ -437,50 +584,78 @@
             // Clear selected quest when switching tabs
             selectedQuest = null;
 
-            // Reset quest detail panel to empty state
+            // Reset quest detail panel to empty state with appropriate message
+            const emptyIcon = tab === 'crafting' ? '🔨' : '📋';
+            const emptyMessage = tab === 'crafting' ? 'Select recipes to view shopping list' : 'Select a quest to view its checklist';
+
             document.getElementById('questDetail').innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">📋</div>
-                    <p>Select a quest to view its checklist</p>
+                    <div class="empty-state-icon">${emptyIcon}</div>
+                    <p>${emptyMessage}</p>
                 </div>
             `;
 
-            // Update button styles
+            // Update button styles - find button by matching tab name
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Show/hide search box and region filter, load appropriate data
-            const searchBox = document.getElementById('searchBox');
-            const regionFilter = document.getElementById('regionFilter');
-
-            if (tab === 'search') {
-                searchBox.style.display = 'block';
-                regionFilter.style.display = 'none';
-                searchBox.focus();
-            } else if (tab === 'crafting') {
-                searchBox.style.display = 'none';
-                searchBox.value = '';
-                regionFilter.style.display = 'none';
-                loadCraftingRecipes();
-            } else if (tab === 'help') {
-                searchBox.style.display = 'none';
-                searchBox.value = '';
-                regionFilter.style.display = 'none';
-                showHelp();
-            } else {
-                searchBox.style.display = 'none';
-                searchBox.value = '';
-                regionFilter.style.display = 'block';
-
-                if (tab === 'active') {
-                    loadActiveQuests();
-                } else if (tab === 'completable') {
-                    loadCompletableQuests();
-                } else if (tab === 'purchasable') {
-                    loadPurchasableQuests();
+                if (btn.textContent.toLowerCase().includes(tab)) {
+                    btn.classList.add('active');
                 }
+            });
+
+            // Show/hide filters and controls based on tab
+            const questSearchBox = document.getElementById('questSearchBox');
+            const craftingSearchBox = document.getElementById('craftingSearchBox');
+            const regionFilter = document.getElementById('regionFilter');
+            const skillFilter = document.getElementById('skillFilter');
+            const questFilter = document.getElementById('questFilter');
+            const recipeFilter = document.getElementById('recipeFilter');
+
+            if (tab === 'quests') {
+                questSearchBox.style.display = 'block';
+                craftingSearchBox.style.display = 'none';
+                questFilter.style.display = 'flex';
+                recipeFilter.style.display = 'none';
+                regionFilter.style.display = 'block';
+                skillFilter.style.display = 'none';
+                questSearchBox.value = '';
+                // Load data and apply current filter
+                loadActiveQuests().then(() => {
+                    switchQuestView();
+                });
+            } else if (tab === 'crafting') {
+                questSearchBox.style.display = 'none';
+                craftingSearchBox.style.display = 'block';
+                questFilter.style.display = 'none';
+                recipeFilter.style.display = 'flex';
+                regionFilter.style.display = 'none';
+                skillFilter.style.display = 'block';
+                craftingSearchBox.value = '';
+                loadCraftingRecipes().then(() => {
+                    // Restore shopping list if recipes are selected
+                    if (Object.keys(recipeQuantities).length > 0) {
+                        updateShoppingList();
+                    }
+                });
+            } else if (tab === 'help') {
+                questSearchBox.style.display = 'none';
+                craftingSearchBox.style.display = 'none';
+                questFilter.style.display = 'none';
+                recipeFilter.style.display = 'none';
+                regionFilter.style.display = 'none';
+                skillFilter.style.display = 'none';
+                showHelp();
+            }
+        }
+
+        function switchQuestView() {
+            const questView = document.querySelector('input[name="questView"]:checked').value;
+            currentQuestView = questView;
+
+            if (questView === 'all') {
+                renderQuestList(activeQuests);
+            } else if (questView === 'ready') {
+                loadReadyQuests();
             }
         }
 
@@ -509,7 +684,7 @@
             }
         }
 
-        async function loadCompletableQuests() {
+        async function loadReadyQuests() {
             try {
                 const [completableResponse, purchasableResponse] = await Promise.all([
                     fetch('/api/completable_quests'),
@@ -522,41 +697,394 @@
                 purchasableQuests = purchasableData.quests;
                 completableQuestSet = new Set(completableQuests.map(q => q.internal_name));
                 purchasableQuestSet = new Set(purchasableQuests.map(q => q.internal_name));
-                renderQuestList(completableQuests);
+
+                // Combine both lists, removing duplicates (completable takes priority)
+                const readyQuests = [...completableQuests];
+                const completableSet = new Set(completableQuests.map(q => q.internal_name));
+                purchasableQuests.forEach(quest => {
+                    if (!completableSet.has(quest.internal_name)) {
+                        readyQuests.push(quest);
+                    }
+                });
+
+                renderQuestList(readyQuests);
             } catch (error) {
-                console.error('Error loading completable quests:', error);
+                console.error('Error loading ready quests:', error);
                 document.getElementById('questListContainer').innerHTML = '<p class="empty-state">Error loading quests</p>';
             }
         }
 
-        async function loadPurchasableQuests() {
+        async function loadPlayerInventory() {
             try {
-                const [completableResponse, purchasableResponse] = await Promise.all([
-                    fetch('/api/completable_quests'),
-                    fetch('/api/purchasable_quests')
+                // Load full player inventory, keywords, and vendor data in parallel
+                const [invResponse, keywordsResponse, vendorsResponse] = await Promise.all([
+                    fetch('/api/inventory'),
+                    fetch('/api/keywords'),
+                    fetch('/api/vendors')
                 ]);
-                const completableData = await completableResponse.json();
-                const purchasableData = await purchasableResponse.json();
+                const invData = await invResponse.json();
+                const keywordsData = await keywordsResponse.json();
+                const vendorsData = await vendorsResponse.json();
 
-                completableQuests = completableData.quests;
-                purchasableQuests = purchasableData.quests;
-                completableQuestSet = new Set(completableQuests.map(q => q.internal_name));
-                purchasableQuestSet = new Set(purchasableQuests.map(q => q.internal_name));
-                renderQuestList(purchasableQuests);
+                // Build inventory map from full inventory data
+                playerInventory = {};
+                playerInventoryDetails = {}; // Store detailed location info
+
+                if (invData.items) {
+                    for (const [itemName, itemData] of Object.entries(invData.items)) {
+                        const totalCount = itemData.total || 0;
+                        if (totalCount > 0) {
+                            playerInventory[itemName] = totalCount;
+                            playerInventoryDetails[itemName] = {
+                                inventory: itemData.inventory || 0,
+                                storage: itemData.storage || {},
+                                total: totalCount
+                            };
+                        }
+                    }
+                }
+
+                // Store keyword mappings
+                itemKeywords = keywordsData.keywords || {};
+
+                // Store vendor items
+                vendorItems = vendorsData.vendor_items || {};
+
+                console.log(`Loaded ${Object.keys(playerInventory).length} items from player inventory`);
+                console.log(`Loaded ${Object.keys(itemKeywords).length} keyword mappings`);
+                console.log(`Loaded ${Object.keys(vendorItems).length} vendor items`);
             } catch (error) {
-                console.error('Error loading purchasable quests:', error);
-                document.getElementById('questListContainer').innerHTML = '<p class="empty-state">Error loading quests</p>';
+                console.error('Error loading player inventory:', error);
             }
+        }
+
+        // Get ingredient count from inventory, including keyword matching
+        // e.g., "Any Bone" will match items with "Bone" keyword like "Femur"
+        function getIngredientCount(ingredientName) {
+            // First, check for exact match
+            if (playerInventory[ingredientName]) {
+                return {
+                    count: playerInventory[ingredientName],
+                    matchType: 'exact',
+                    matchedItems: [ingredientName]
+                };
+            }
+
+            // Check for keyword-based ingredient (e.g., "Any Bone", "Any Fish")
+            // Extract the keyword from "Any X" pattern
+            const anyMatch = ingredientName.match(/^Any\s+(.+)$/i);
+            if (anyMatch) {
+                const keyword = anyMatch[1];
+                const matchingItems = itemKeywords[keyword] || [];
+
+                // Sum up all items that have this keyword
+                let totalCount = 0;
+                const foundItems = [];
+                for (const itemName of matchingItems) {
+                    if (playerInventory[itemName]) {
+                        totalCount += playerInventory[itemName];
+                        foundItems.push(itemName);
+                    }
+                }
+
+                if (totalCount > 0) {
+                    return {
+                        count: totalCount,
+                        matchType: 'keyword',
+                        keyword: keyword,
+                        matchedItems: foundItems
+                    };
+                }
+            }
+
+            // No match found
+            return {
+                count: 0,
+                matchType: 'none',
+                matchedItems: []
+            };
+        }
+
+        function checkRecipeCraftability() {
+            craftableRecipeSet.clear();
+            buyableRecipeSet.clear();
+
+            for (const recipe of allRecipes) {
+                let canCraft = true;
+                let allMissingBuyable = true;
+                let hasMissingIngredients = false;
+
+                for (const ingredient of recipe.ingredients) {
+                    const itemName = ingredient.item || ingredient.name;
+                    const needed = ingredient.quantity;
+                    const ingredientInfo = getIngredientCount(itemName);
+
+                    if (ingredientInfo.count < needed) {
+                        canCraft = false;
+                        hasMissingIngredients = true;
+                        // Check if this missing ingredient can be bought from a vendor
+                        if (!vendorItems[itemName]) {
+                            allMissingBuyable = false;
+                        }
+                    }
+                }
+
+                if (canCraft) {
+                    craftableRecipeSet.add(recipe.id);
+                } else if (hasMissingIngredients && allMissingBuyable) {
+                    // Only mark as buyable if ALL missing ingredients are sold by vendors
+                    buyableRecipeSet.add(recipe.id);
+                }
+            }
+            console.log('Craftable recipes count:', craftableRecipeSet.size);
+        }
+
+        function switchRecipeView() {
+            const recipeView = document.querySelector('input[name="recipeView"]:checked').value;
+            currentRecipeView = recipeView;
+
+            // Clear selected recipes when changing filter
+            recipeQuantities = {};
+            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+
+            renderCraftingList();
+
+            // Clear the shopping list display
+            document.getElementById('questDetail').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔨</div>
+                    <p>Select recipes to view shopping list</p>
+                </div>
+            `;
         }
 
         async function searchQuests(query) {
+            const container = document.getElementById('questListContainer');
+            const searchType = document.querySelector('input[name="searchType"]:checked').value;
+
             try {
-                const response = await fetch(`/api/search_quests?q=${encodeURIComponent(query)}`);
-                const data = await response.json();
-                renderQuestList(data.quests);
+                let html = '';
+                const queryLower = query.toLowerCase();
+
+                // Search quests if needed
+                if (searchType === 'all' || searchType === 'quests') {
+                    const questsResponse = await fetch(`/api/search_quests?q=${encodeURIComponent(query)}`);
+                    const questsData = await questsResponse.json();
+                    const quests = questsData.quests;
+
+                    if (quests.length > 0) {
+                        if (searchType === 'all') {
+                            html += '<h3 style="color: #667eea; margin-bottom: 10px; font-size: 16px;">Quests</h3>';
+                        }
+                        html += quests.map(quest => {
+                        const isCompletable = completableQuestSet.has(quest.internal_name);
+                        const isPurchasable = purchasableQuestSet.has(quest.internal_name);
+                        const classes = ['quest-item'];
+                        if (isCompletable) {
+                            classes.push('completable');
+                        } else if (isPurchasable) {
+                            classes.push('purchasable');
+                        }
+
+                        return `
+                            <div class="${classes.join(' ')}"
+                                 onclick="selectQuest('${quest.internal_name}')">
+                                <div class="quest-item-name">${quest.name}</div>
+                                <div class="quest-item-location">${quest.location}</div>
+                            </div>
+                        `;
+                        }).join('');
+                    }
+                }
+
+                // Search recipes if needed
+                if (searchType === 'all' || searchType === 'recipes') {
+                    const recipesData = allRecipes.length > 0 ? allRecipes : await fetch('/recipes.json').then(r => r.json());
+                    const matchingRecipes = recipesData
+                        .filter(recipe => recipe.name.toLowerCase().includes(queryLower))
+                        .slice(0, 10);
+
+                    if (matchingRecipes.length > 0) {
+                        if (searchType === 'all' && html.length > 0) {
+                            html += '<div style="margin: 20px 0; border-top: 1px solid #e0e0e0;"></div>';
+                        }
+                        if (searchType === 'all') {
+                            html += '<h3 style="color: #667eea; margin-bottom: 10px; font-size: 16px;">Recipes</h3>';
+                        }
+                        html += matchingRecipes.map(recipe => `
+                            <div class="quest-item" onclick="showRecipeDetail('${recipe.id}')">
+                                <div class="quest-item-name">🔨 ${recipe.name}</div>
+                                <div class="quest-item-location">${recipe.skill} • ${recipe.ingredients.length} ingredients</div>
+                            </div>
+                        `).join('');
+                    }
+                }
+
+                if (html === '') {
+                    html = `<p class="empty-state">No ${searchType === 'all' ? 'results' : searchType} found</p>`;
+                }
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error searching:', error);
+                container.innerHTML = '<p class="empty-state">Error searching</p>';
+            }
+        }
+
+        async function searchQuestsOnly(query) {
+            const container = document.getElementById('questListContainer');
+            const selectedRegion = document.getElementById('regionFilter').value;
+
+            try {
+                const questsResponse = await fetch(`/api/search_quests?q=${encodeURIComponent(query)}`);
+                const questsData = await questsResponse.json();
+                let quests = questsData.quests;
+
+                // Apply region filter if selected
+                if (selectedRegion) {
+                    quests = quests.filter(q => q.location === selectedRegion);
+                }
+
+                if (quests.length === 0) {
+                    container.innerHTML = '<p class="empty-state">No quests found</p>';
+                    return;
+                }
+
+                const html = quests.map(quest => {
+                    const isCompletable = completableQuestSet.has(quest.internal_name);
+                    const isPurchasable = purchasableQuestSet.has(quest.internal_name);
+                    const classes = ['quest-item'];
+                    if (isCompletable) {
+                        classes.push('completable');
+                    } else if (isPurchasable) {
+                        classes.push('purchasable');
+                    }
+
+                    return `
+                        <div class="${classes.join(' ')}"
+                             onclick="selectQuest('${quest.internal_name}')">
+                            <div class="quest-item-name">${quest.name}</div>
+                            <div class="quest-item-location">${quest.location}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = html;
             } catch (error) {
                 console.error('Error searching quests:', error);
+                container.innerHTML = '<p class="empty-state">Error searching quests</p>';
             }
+        }
+
+        async function searchRecipesOnly(query) {
+            const container = document.getElementById('questListContainer');
+            const selectedSkill = document.getElementById('skillFilter').value;
+            const queryLower = query.toLowerCase();
+
+            try {
+                // Load recipes if not already loaded
+                if (allRecipes.length === 0) {
+                    const response = await fetch('/recipes.json');
+                    allRecipes = await response.json();
+                }
+
+                // Filter recipes by search query
+                let matchingRecipes = allRecipes.filter(recipe =>
+                    recipe.name.toLowerCase().includes(queryLower) ||
+                    recipe.ingredients.some(ing => ing.item.toLowerCase().includes(queryLower))
+                );
+
+                // Apply skill filter if selected
+                if (selectedSkill) {
+                    matchingRecipes = matchingRecipes.filter(r => r.skill === selectedSkill);
+                }
+
+                if (matchingRecipes.length === 0) {
+                    container.innerHTML = '<p class="empty-state">No recipes found</p>';
+                    return;
+                }
+
+                // Group by skill for better organization
+                const recipesBySkill = {};
+                matchingRecipes.forEach(recipe => {
+                    const skill = recipe.skill || 'Unknown';
+                    if (!recipesBySkill[skill]) {
+                        recipesBySkill[skill] = [];
+                    }
+                    recipesBySkill[skill].push(recipe);
+                });
+
+                let html = `
+                    <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">🔍 Search Results</div>
+                        <div style="font-size: 13px; color: #424242; line-height: 1.5;">
+                            Found ${matchingRecipes.length} recipe${matchingRecipes.length !== 1 ? 's' : ''} matching "${query}"
+                        </div>
+                    </div>
+                `;
+
+                for (const skill of Object.keys(recipesBySkill).sort()) {
+                    const recipes = recipesBySkill[skill];
+                    html += `
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 16px;">${skill} (${recipes.length})</div>
+                    `;
+
+                    for (const recipe of recipes) {
+                        const isSelected = !!recipeQuantities[recipe.id];
+                        const bgColor = isSelected ? '#e8eaf6' : '#f9f9f9';
+                        html += `
+                            <div class="quest-item" style="background: ${bgColor}; display: flex; align-items: center; cursor: pointer;"
+                                 onclick="toggleRecipeSelection('${recipe.id}')">
+                                <input type="checkbox"
+                                       ${isSelected ? 'checked' : ''}
+                                       style="margin-right: 10px; cursor: pointer;"
+                                       onclick="event.stopPropagation(); toggleRecipeSelection('${recipe.id}')">
+                                <div style="flex: 1;">
+                                    <div class="quest-item-name">${recipe.name}</div>
+                                    <div class="quest-item-location">${recipe.ingredients.length} ingredients</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    html += `</div>`;
+                }
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error searching recipes:', error);
+                container.innerHTML = '<p class="empty-state">Error searching recipes</p>';
+            }
+        }
+
+        function showRecipeDetail(recipeId) {
+            const recipe = allRecipes.find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            const detailContainer = document.getElementById('questDetail');
+
+            let html = `
+                <div class="quest-detail-header">
+                    <div class="quest-detail-name">${recipe.name}</div>
+                    <div class="quest-detail-location">${recipe.skill}</div>
+                </div>
+                <div class="checklist-items">
+            `;
+
+            for (const ingredient of recipe.ingredients) {
+                html += `
+                    <div class="checklist-item">
+                        <div class="item-info" style="flex: 1;">
+                            <div class="item-name">${ingredient.name}</div>
+                            <div class="item-progress">Needed: ${ingredient.quantity}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            detailContainer.innerHTML = html;
         }
 
         function renderQuestList(quests) {
@@ -574,18 +1102,9 @@
                 return;
             }
 
-            // Add helpful notices based on tab
+            // Add helpful notices based on current view
             let tabNotice = '';
-            if (currentTab === 'purchasable') {
-                tabNotice = `
-                    <div style="background: #e3f2fd; border: 2px solid #2196f3; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <div style="font-weight: bold; color: #1565c0; margin-bottom: 6px; font-size: 14px;">💡 Can't find items in vendor shops?</div>
-                        <div style="font-size: 13px; color: #424242; line-height: 1.5;">
-                            <strong>Uncheck "Hide Unusable"</strong> in the vendor window. This filter may hide seeds, ingredients, and other quest items even when you can use them.
-                        </div>
-                    </div>
-                `;
-            } else if (currentTab === 'active' || currentTab === 'completable') {
+            if (currentTab === 'quests') {
                 tabNotice = `
                     <div style="background: #f3e5f5; border: 2px solid #9c27b0; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <div style="font-weight: bold; color: #6a1b9a; margin-bottom: 6px; font-size: 14px;">📋 Items not showing?</div>
@@ -622,11 +1141,21 @@
         async function selectQuest(internalName) {
             selectedQuest = internalName;
 
-            // Re-render appropriate quest list
-            if (currentTab === 'active') {
-                renderQuestList(activeQuests);
-            } else if (currentTab === 'completable') {
-                renderQuestList(completableQuests);
+            // Re-render appropriate quest list based on current view
+            if (currentTab === 'quests') {
+                if (currentQuestView === 'all') {
+                    renderQuestList(activeQuests);
+                } else if (currentQuestView === 'ready') {
+                    // Re-render ready quests list
+                    const readyQuests = [...completableQuests];
+                    const completableSet = new Set(completableQuests.map(q => q.internal_name));
+                    purchasableQuests.forEach(quest => {
+                        if (!completableSet.has(quest.internal_name)) {
+                            readyQuests.push(quest);
+                        }
+                    });
+                    renderQuestList(readyQuests);
+                }
             }
 
             await loadQuestDetail(internalName);
@@ -792,8 +1321,20 @@
             try {
                 const response = await fetch('/recipes.json');
                 allRecipes = await response.json();
+
+                // Assign IDs to recipes BEFORE checking craftability
+                allRecipes.forEach((recipe, idx) => {
+                    if (!recipe.id) {
+                        recipe.id = `${recipe.skill}_${recipe.name}_${idx}`;
+                    }
+                });
+
+                // Load inventory and check craftability
+                await loadPlayerInventory();
+                checkRecipeCraftability();
+
                 renderCraftingList();
-                updateShoppingList();
+                await updateShoppingList();
             } catch (error) {
                 console.error('Error loading recipes:', error);
                 container.innerHTML = '<p class="empty-state">Error loading recipes</p>';
@@ -802,20 +1343,48 @@
 
         function renderCraftingList() {
             const container = document.getElementById('questListContainer');
+            const selectedSkill = document.getElementById('skillFilter').value;
 
             if (allRecipes.length === 0) {
                 container.innerHTML = '<p class="empty-state">No recipes found</p>';
                 return;
             }
 
+            // Filter recipes by view
+            let recipesToShow = allRecipes;
+            if (currentRecipeView === 'craftable') {
+                recipesToShow = allRecipes.filter(r =>
+                    craftableRecipeSet.has(r.id) || buyableRecipeSet.has(r.id)
+                );
+            }
+
+            // Build recipes by skill map
             const recipesBySkill = {};
-            allRecipes.forEach(recipe => {
+            recipesToShow.forEach(recipe => {
                 const skill = recipe.skill || 'Unknown';
                 if (!recipesBySkill[skill]) {
                     recipesBySkill[skill] = [];
                 }
                 recipesBySkill[skill].push(recipe);
             });
+
+            // Populate skill filter dropdown if empty (first time)
+            const skillFilterElement = document.getElementById('skillFilter');
+            if (skillFilterElement.options.length === 1) {
+                const skills = Object.keys(recipesBySkill).sort();
+                for (const skill of skills) {
+                    const option = document.createElement('option');
+                    option.value = skill;
+                    option.textContent = `${skill} (${recipesBySkill[skill].length})`;
+                    skillFilterElement.appendChild(option);
+                }
+            }
+
+            // Filter by selected skill if one is chosen
+            let skillsToShow = Object.keys(recipesBySkill).sort();
+            if (selectedSkill) {
+                skillsToShow = [selectedSkill];
+            }
 
             let html = `
                 <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -826,19 +1395,27 @@
                 </div>
             `;
 
-            const skills = Object.keys(recipesBySkill).sort();
-            for (const skill of skills) {
+            for (const skill of skillsToShow) {
                 const recipes = recipesBySkill[skill];
+                if (!recipes) continue;
+
                 html += `
                     <div style="margin-bottom: 20px;">
-                        <div style="font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 16px;">${skill}</div>
+                        <div style="font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 16px;">${skill} (${recipes.length} recipes)</div>
                 `;
 
                 for (const recipe of recipes) {
-                    const isSelected = selectedRecipes.includes(recipe.id);
-                    const bgColor = isSelected ? '#e8eaf6' : '#f9f9f9';
+                    const isSelected = !!recipeQuantities[recipe.id];
+                    const isCraftable = craftableRecipeSet.has(recipe.id);
+                    const isBuyable = buyableRecipeSet.has(recipe.id);
+
+                    // Build CSS classes
+                    const classes = ['quest-item'];
+                    if (isCraftable) classes.push('craftable');
+                    else if (isBuyable) classes.push('buyable');
+
                     html += `
-                        <div class="quest-item" style="background: ${bgColor}; display: flex; align-items: center; cursor: pointer;"
+                        <div class="${classes.join(' ')}" style="display: flex; align-items: center; cursor: pointer; ${isSelected ? 'background: #e8eaf6;' : ''}"
                              onclick="toggleRecipeSelection('${recipe.id}')">
                             <input type="checkbox"
                                    ${isSelected ? 'checked' : ''}
@@ -858,17 +1435,47 @@
             container.innerHTML = html;
         }
 
-        function toggleRecipeSelection(recipeId) {
-            const index = selectedRecipes.indexOf(recipeId);
-            if (index > -1) {
-                selectedRecipes.splice(index, 1);
+        async function toggleRecipeSelection(recipeId) {
+            if (recipeQuantities[recipeId]) {
+                delete recipeQuantities[recipeId];
             } else {
-                selectedRecipes.push(recipeId);
+                recipeQuantities[recipeId] = 1;
             }
 
-            localStorage.setItem('selectedRecipes', JSON.stringify(selectedRecipes));
+            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
             renderCraftingList();
-            updateShoppingList();
+            await updateShoppingList();
+        }
+
+        async function updateRecipeQuantity(recipeId, delta) {
+            if (!recipeQuantities[recipeId]) return;
+
+            const newQty = (recipeQuantities[recipeId] || 1) + delta;
+            if (newQty <= 0) {
+                delete recipeQuantities[recipeId];
+            } else {
+                recipeQuantities[recipeId] = Math.min(newQty, 999);
+            }
+
+            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+            renderCraftingList();
+            await updateShoppingList();
+        }
+
+        async function setRecipeQuantity(recipeId, value) {
+            if (!recipeQuantities[recipeId]) return;
+
+            const newQty = parseInt(value, 10);
+            if (isNaN(newQty) || newQty <= 0) {
+                // Don't delete on invalid input, just reset to 1
+                recipeQuantities[recipeId] = 1;
+            } else {
+                recipeQuantities[recipeId] = Math.min(newQty, 999);
+            }
+
+            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+            renderCraftingList();
+            await updateShoppingList();
         }
 
         function showHelp() {
@@ -877,153 +1484,201 @@
 
             listContainer.innerHTML = `
                 <div style="padding: 10px;">
-                    <h3 style="color: #667eea; margin-bottom: 10px;">Quick Start</h3>
-                    <div style="font-size: 13px; line-height: 1.6; color: #333;">
-                        <p style="margin-bottom: 10px;"><strong>1. Active Tab:</strong> View all your active quests with item collection objectives</p>
-                        <p style="margin-bottom: 10px;"><strong>2. ✓ Ready Tab:</strong> See quests you can complete right now</p>
-                        <p style="margin-bottom: 10px;"><strong>3. 🛒 Buyable Tab:</strong> Quests where you can buy missing items from vendors</p>
-                        <p style="margin-bottom: 10px;"><strong>4. 🔨 Crafting Tab:</strong> Select recipes to create shopping lists</p>
-                        <p style="margin-bottom: 10px;"><strong>5. Search Tab:</strong> Find specific quests by name</p>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Color Legend</h3>
+                    <div style="font-size: 13px; line-height: 1.6;">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <div style="width: 24px; height: 24px; background: #e8f5e9; border-left: 4px solid #4caf50; margin-right: 10px;"></div>
+                            <div><strong>Green</strong> = Have all materials</div>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <div style="width: 24px; height: 24px; background: #fff3e0; border-left: 4px solid #ff9800; margin-right: 10px;"></div>
+                            <div><strong>Orange</strong> = Can buy missing items</div>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <div style="width: 24px; height: 24px; background: white; border-left: 4px solid #667eea; margin-right: 10px;"></div>
+                            <div><strong>Default</strong> = Need to gather items</div>
+                        </div>
+                    </div>
+
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Keeping Data Fresh</h3>
+                    <div style="font-size: 13px; line-height: 1.6; color: #555;">
+                        <p style="margin-bottom: 8px;">Type <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">/report</code> in-game to update your inventory data.</p>
+                        <p style="color: #888; font-size: 12px;">StorageBuddy reads your character export files to track items across inventory, storage, and saddlebags.</p>
                     </div>
                 </div>
             `;
 
             detailContainer.innerHTML = `
                 <div style="padding: 20px;">
-                    <h2 style="color: #667eea; margin-bottom: 20px;">StorageBuddy Help</h2>
+                    <h2 style="color: #667eea; margin-bottom: 25px;">Welcome to StorageBuddy</h2>
 
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Initial Setup</h3>
-                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
-                            <p style="margin-bottom: 12px;"><strong>First Time Setup:</strong></p>
-                            <ol style="margin-left: 20px; margin-bottom: 12px;">
-                                <li style="margin-bottom: 8px;">Launch StorageBuddy - it will open your web browser automatically</li>
-                                <li style="margin-bottom: 8px;">Click the <strong>Setup</strong> link to configure your Project Gorgon installation</li>
-                                <li style="margin-bottom: 8px;">The app will auto-detect your Project Gorgon installation on Windows</li>
-                                <li style="margin-bottom: 8px;">If auto-detection fails, manually browse to your Project Gorgon folder</li>
-                                <li style="margin-bottom: 8px;">StorageBuddy needs access to:
-                                    <ul style="margin-left: 20px; margin-top: 4px;">
-                                        <li>Chat logs (for quest tracking)</li>
-                                        <li>Character reports (for inventory detection)</li>
-                                    </ul>
-                                </li>
-                            </ol>
+                    <!-- Getting Started -->
+                    <div style="margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 8px; border: 1px solid #667eea30;">
+                        <h3 style="color: #667eea; margin-bottom: 12px; font-size: 16px;">Getting Started</h3>
+                        <div style="font-size: 14px; line-height: 1.7; color: #555;">
+                            <p style="margin-bottom: 12px;">StorageBuddy helps you track quest items and crafting materials across your inventory, storage chests, and saddlebags.</p>
 
-                            <p style="margin-bottom: 8px;"><strong>Generating Character Reports:</strong></p>
-                            <p style="margin-bottom: 12px;">In Project Gorgon, type <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">/report</code> in chat to generate a character report. Do this periodically to keep inventory data current.</p>
-                        </div>
-                    </div>
+                            <div style="margin-bottom: 15px; padding: 12px; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
+                                <p style="margin: 0; font-weight: 600; color: #856404;">Requirements:</p>
+                                <ul style="margin: 8px 0 0 15px; padding: 0; color: #856404;">
+                                    <li>VIP status in Project Gorgon</li>
+                                    <li>Enable log exports: In-game, open the <strong>VIP menu</strong> and enable <strong>Logs Export</strong></li>
+                                </ul>
+                            </div>
 
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Quest Tracking</h3>
-                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
-                            <p style="margin-bottom: 12px;">StorageBuddy automatically tracks your active quests by reading your Project Gorgon chat logs and character reports.</p>
-
-                            <p style="margin-bottom: 8px;"><strong>Understanding Quest Indicators:</strong></p>
-                            <ul style="margin-left: 20px; margin-bottom: 12px;">
-                                <li><strong>✓ Ready:</strong> You have all items needed - go turn it in!</li>
-                                <li><strong>🛒 Buyable:</strong> Missing items can be purchased from vendors</li>
-                                <li><strong>Progress bars:</strong> Show how many items you have vs. need</li>
-                            </ul>
-
-                            <p style="margin-bottom: 8px;"><strong>Inventory Detection:</strong></p>
-                            <p style="margin-bottom: 12px;">Items are detected from Character Reports. Generate a fresh report in-game to update inventory detection. The app shows where items are stored: Inventory, Bank, Saddlebag, etc.</p>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Vendor Hints</h3>
-                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
-                            <p style="margin-bottom: 12px;">When items can be purchased, you'll see vendor names and prices.</p>
-
-                            <p style="margin-bottom: 8px;"><strong>Important Vendor Tip:</strong></p>
-                            <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 12px;">
-                                If you can't find quest items in vendor shops, <strong>uncheck "Hide Unusable"</strong> in the vendor window. This filter may hide seeds, ingredients, and other quest items even when you can use them.
+                            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <p style="margin-bottom: 6px; font-weight: 600;">First time setup:</p>
+                                    <ol style="margin: 0 0 0 15px; padding: 0; color: #666;">
+                                        <li>Log into Project Gorgon</li>
+                                        <li>Type <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">/report</code> in chat</li>
+                                        <li>Your data will appear automatically</li>
+                                    </ol>
+                                </div>
+                                <div style="flex: 1; min-width: 200px;">
+                                    <p style="margin-bottom: 6px; font-weight: 600;">To keep data current:</p>
+                                    <p style="margin: 0; color: #666;">Run <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">/report</code> after looting, crafting, or banking.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Crafting Lists</h3>
-                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
-                            <p style="margin-bottom: 12px;">The Crafting tab helps you plan crafting projects:</p>
+                    <!-- Quests Tab Section -->
+                    <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <h3 style="color: #333; margin-bottom: 12px; font-size: 16px;">📋 Quests Tab</h3>
+                        <div style="font-size: 14px; line-height: 1.7; color: #555;">
+                            <p style="margin-bottom: 10px;">View your active quests that need item collection.</p>
 
-                            <ul style="margin-left: 20px; margin-bottom: 12px;">
-                                <li style="margin-bottom: 8px;"><strong>Browse recipes</strong> by profession (Fletching, Cooking, etc.)</li>
-                                <li style="margin-bottom: 8px;"><strong>Select multiple recipes</strong> using checkboxes</li>
-                                <li style="margin-bottom: 8px;"><strong>View shopping list</strong> showing all materials needed</li>
-                                <li style="margin-bottom: 8px;"><strong>Materials are aggregated</strong> - if 3 recipes need Wood, it shows total Wood needed</li>
-                            </ul>
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Filters:</strong></p>
+                                <ul style="margin-left: 15px; color: #666;">
+                                    <li><strong>All</strong> — Show all active quests</li>
+                                    <li><strong>Have Materials</strong> — Only show quests you can complete now</li>
+                                </ul>
+                            </div>
 
-                            <p style="margin-bottom: 8px;">Your recipe selections are saved automatically and persist across sessions.</p>
-                        </div>
-                    </div>
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Region dropdown</strong> — Filter quests by turn-in location</p>
+                            </div>
 
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Tracker Assist Browser Extension</h3>
-                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
-                            <p style="margin-bottom: 12px;">The Tracker Assist extension shows your inventory directly on the Project Gorgon Wiki!</p>
-
-                            <p style="margin-bottom: 8px;"><strong>Installation:</strong></p>
-                            <ol style="margin-left: 20px; margin-bottom: 12px;">
-                                <li style="margin-bottom: 8px;">Find the <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">browser-extension</code> folder in your StorageBuddy installation</li>
-                                <li style="margin-bottom: 8px;"><strong>Firefox:</strong>
-                                    <ul style="margin-left: 20px; margin-top: 4px;">
-                                        <li>Open about:debugging</li>
-                                        <li>Click "This Firefox" → "Load Temporary Add-on"</li>
-                                        <li>Select the manifest.json file from the extension folder</li>
-                                    </ul>
-                                </li>
-                                <li style="margin-bottom: 8px;"><strong>Chrome:</strong>
-                                    <ul style="margin-left: 20px; margin-top: 4px;">
-                                        <li>Open chrome://extensions</li>
-                                        <li>Enable "Developer mode"</li>
-                                        <li>Click "Load unpacked"</li>
-                                        <li>Select the browser-extension folder</li>
-                                    </ul>
-                                </li>
-                            </ol>
-
-                            <p style="margin-bottom: 8px;"><strong>How to Use:</strong></p>
-                            <ul style="margin-left: 20px; margin-bottom: 12px;">
-                                <li style="margin-bottom: 8px;">Make sure StorageBuddy is running</li>
-                                <li style="margin-bottom: 8px;">Browse to wiki.projectgorgon.com</li>
-                                <li style="margin-bottom: 8px;">Hover over any item name to see your inventory</li>
-                                <li style="margin-bottom: 8px;">Shows location breakdown: Inventory, Bank, Saddlebag, etc.</li>
-                                <li style="margin-bottom: 8px;">Works on item pages, quest pages, and recipe pages</li>
-                            </ul>
-
-                            <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px; margin-bottom: 12px;">
-                                <strong>Note:</strong> The extension automatically connects to StorageBuddy running on localhost:5000. Both must be running at the same time.
+                            <div style="margin-left: 15px;">
+                                <p style="margin-bottom: 6px;"><strong>Quest details show:</strong></p>
+                                <ul style="margin-left: 15px; color: #666;">
+                                    <li>Progress bars for each required item</li>
+                                    <li>Where items are stored (inventory, bank, saddlebag)</li>
+                                    <li>Vendor info if items can be purchased</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">Tips & Tricks</h3>
-                        <div style="font-size: 14px; line-height: 1.8; color: #555;">
-                            <ul style="margin-left: 20px; margin-bottom: 12px;">
-                                <li style="margin-bottom: 8px;"><strong>Generate Character Reports regularly</strong> to keep inventory data fresh</li>
-                                <li style="margin-bottom: 8px;"><strong>Use region filter</strong> to focus on quests in specific areas</li>
-                                <li style="margin-bottom: 8px;"><strong>Check Buyable tab</strong> before farming - save time by buying instead</li>
-                                <li style="margin-bottom: 8px;"><strong>Manual checkboxes</strong> let you mark items complete even if not detected in reports</li>
-                                <li style="margin-bottom: 8px;"><strong>Click "Update Game Data"</strong> to download latest quest and item data from Project Gorgon</li>
-                            </ul>
+                    <!-- Crafting Tab Section -->
+                    <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <h3 style="color: #333; margin-bottom: 12px; font-size: 16px;">🔨 Crafting Tab</h3>
+                        <div style="font-size: 14px; line-height: 1.7; color: #555;">
+                            <p style="margin-bottom: 10px;">Build shopping lists for crafting projects.</p>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Filters:</strong></p>
+                                <ul style="margin-left: 15px; color: #666;">
+                                    <li><strong>All</strong> — Show all recipes</li>
+                                    <li><strong>Have Materials</strong> — Only show recipes you can craft now</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Skill dropdown</strong> — Filter by crafting skill (Cooking, Carpentry, etc.)</p>
+                            </div>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>To build a shopping list:</strong></p>
+                                <ol style="margin-left: 15px; color: #666;">
+                                    <li>Click recipe checkboxes to add them</li>
+                                    <li>Use +/− or type a number to set quantity (1-999)</li>
+                                    <li>Materials are totaled across all selected recipes</li>
+                                    <li>Vendor info shows where to buy materials</li>
+                                </ol>
+                            </div>
+
+                            <p style="color: #888; font-size: 13px; margin-top: 10px;">Selections are saved automatically.</p>
                         </div>
                     </div>
 
-                    <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 15px; border-radius: 6px;">
-                        <p style="font-weight: bold; color: #2e7d32; margin-bottom: 8px;">Need more help?</p>
-                        <p style="font-size: 14px; color: #424242;">Check the README file or visit the GitHub repository for detailed documentation and troubleshooting.</p>
+                    <!-- Vendor Tip -->
+                    <div style="margin-bottom: 30px; padding: 15px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 0 8px 8px 0;">
+                        <p style="font-weight: 600; color: #e65100; margin-bottom: 6px;">Vendor Tip</p>
+                        <p style="font-size: 14px; color: #555; margin: 0;">Can't find items at vendors? <strong>Uncheck "Hide Unusable"</strong> in the vendor window — this filter often hides quest items like seeds and ingredients.</p>
+                    </div>
+
+                    <!-- Browser Extension Section -->
+                    <div style="margin-bottom: 30px; padding: 20px; background: #e3f2fd; border-radius: 8px;">
+                        <h3 style="color: #1565c0; margin-bottom: 12px; font-size: 16px;">Browser Extension & In-Game Overlay</h3>
+                        <div style="font-size: 14px; line-height: 1.7; color: #555;">
+                            <p style="margin-bottom: 10px;">Track quests and crafting while playing!</p>
+
+                            <div style="margin-left: 15px; margin-bottom: 15px;">
+                                <p style="margin-bottom: 6px;"><strong>Installation:</strong></p>
+                                <ol style="margin-left: 15px; color: #666;">
+                                    <li>Open Chrome/Edge → Extensions → Enable "Developer mode"</li>
+                                    <li>Click "Load unpacked" → Select the <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">browser-extension</code> folder</li>
+                                    <li>Pin the extension to your toolbar for easy access</li>
+                                </ol>
+                            </div>
+
+                            <div style="margin-left: 15px; margin-bottom: 15px;">
+                                <p style="margin-bottom: 6px;"><strong>Features:</strong></p>
+                                <ul style="margin-left: 15px; color: #666;">
+                                    <li><strong>Quests tab</strong> — View active quests with progress and item locations</li>
+                                    <li><strong>Crafting tab</strong> — See your shopping list (synced from this app)</li>
+                                    <li><strong>Zoom controls</strong> — Adjust text size for readability</li>
+                                    <li><strong>Auto-refresh</strong> — Updates every 3 seconds</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: #fff; padding: 12px; border-radius: 6px; border-left: 4px solid #1565c0;">
+                                <p style="margin: 0 0 8px 0; font-weight: 600; color: #1565c0;">⧉ Pop-Out for In-Game Overlay</p>
+                                <p style="margin: 0; color: #555; font-size: 13px;">
+                                    Click the <strong>"Pop Out"</strong> button in the extension header to open a separate window.
+                                    Position it over your game and use your window manager's "Always on Top" feature
+                                    (right-click title bar → More Actions → Keep Above Others on KDE) for a floating overlay while you play.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Tips -->
+                    <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: #333; margin-bottom: 10px; font-size: 14px;">Quick Tips</h3>
+                        <ul style="font-size: 13px; line-height: 1.8; color: #666; margin: 0; padding-left: 20px;">
+                            <li>Use the search box to find specific quests or recipes</li>
+                            <li>Check "Have Materials" filters to see what you can do right now</li>
+                            <li>Run <code style="background: #fff; padding: 1px 4px; border-radius: 2px;">/report</code> after looting to update inventory</li>
+                        </ul>
+                    </div>
+
+                    <!-- Debug Mode Section -->
+                    <div style="padding: 15px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px;">
+                        <h3 style="color: #666; margin-bottom: 10px; font-size: 14px;">Troubleshooting</h3>
+                        <div style="font-size: 13px; line-height: 1.7; color: #666;">
+                            <p style="margin-bottom: 8px;"><strong>Enable Debug</strong> (footer button) activates diagnostic features:</p>
+                            <ul style="margin: 0 0 10px 15px; padding: 0;">
+                                <li>Logs app activity to browser console (F12 → Console)</li>
+                                <li>Shows the "Update Game Data" button to refresh quest/item data</li>
+                            </ul>
+                            <p style="margin: 0; color: #888; font-size: 12px;">Share console output when reporting issues.</p>
+                        </div>
                     </div>
                 </div>
             `;
         }
 
-        function updateShoppingList() {
+        async function updateShoppingList() {
             const detailContainer = document.getElementById('questDetail');
+            const selectedRecipeIds = Object.keys(recipeQuantities);
 
-            if (selectedRecipes.length === 0) {
+            if (selectedRecipeIds.length === 0) {
                 detailContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">🔨</div>
@@ -1034,41 +1689,164 @@
             }
 
             const materialMap = {};
-            let totalRecipes = 0;
+            let totalCrafts = 0;
 
-            for (const recipeId of selectedRecipes) {
+            for (const recipeId of selectedRecipeIds) {
                 const recipe = allRecipes.find(r => r.id === recipeId);
                 if (!recipe) continue;
 
-                totalRecipes++;
+                const qty = recipeQuantities[recipeId] || 1;
+                totalCrafts += qty;
 
                 for (const ingredient of recipe.ingredients) {
-                    const name = ingredient.name;
+                    const name = ingredient.item || ingredient.name;
                     if (!materialMap[name]) {
                         materialMap[name] = { quantity: 0 };
                     }
-                    materialMap[name].quantity += ingredient.quantity;
+                    materialMap[name].quantity += ingredient.quantity * qty;
                 }
             }
+
+            // Use the already-loaded player inventory details
+            // playerInventoryDetails is populated by loadPlayerInventory() using /api/inventory
 
             const materials = Object.entries(materialMap)
                 .map(([name, data]) => ({ name, quantity: data.quantity }))
                 .sort((a, b) => a.name.localeCompare(b.name));
 
+            // Build header with selected recipes info and quantity controls
+            let recipesInfo = '';
+            for (const recipeId of selectedRecipeIds) {
+                const recipe = allRecipes.find(r => r.id === recipeId);
+                const qty = recipeQuantities[recipeId] || 1;
+                if (recipe) {
+                    // Escape recipeId for use in onclick handlers
+                    const escapedId = recipeId.replace(/'/g, "\\'");
+                    recipesInfo += `<div style="margin-bottom: 8px; padding: 8px; background: #f5f5f5; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500; color: #333;">${recipe.name}</div>
+                            <div style="font-size: 13px; color: #666; margin-top: 2px;">${recipe.skill} • Level ${recipe.level}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button onclick="updateRecipeQuantity('${escapedId}', -1)" style="width: 28px; height: 28px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-size: 16px;">−</button>
+                            <input type="number" value="${qty}" min="1" max="999"
+                                onchange="setRecipeQuantity('${escapedId}', this.value)"
+                                style="width: 48px; height: 28px; text-align: center; font-weight: 500; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
+                            <button onclick="updateRecipeQuantity('${escapedId}', 1)" style="width: 28px; height: 28px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-size: 16px;">+</button>
+                            <button onclick="toggleRecipeSelection('${escapedId}')" style="width: 28px; height: 28px; border: 1px solid #f44336; border-radius: 4px; background: #fff; color: #f44336; cursor: pointer; font-size: 14px;" title="Remove">✕</button>
+                        </div>
+                    </div>`;
+                }
+            }
+
             let html = `
                 <div class="quest-detail-header">
                     <div class="quest-detail-name">Shopping List</div>
-                    <div class="quest-detail-description">${totalRecipes} recipe${totalRecipes !== 1 ? 's' : ''} selected</div>
+                    <div class="quest-detail-description">${selectedRecipeIds.length} recipe${selectedRecipeIds.length !== 1 ? 's' : ''}, ${totalCrafts} craft${totalCrafts !== 1 ? 's' : ''}</div>
                 </div>
+                ${recipesInfo}
                 <div class="checklist-items">
             `;
 
             for (const material of materials) {
+                // Use getIngredientCount for keyword matching (e.g., "Any Bone" -> "Femur")
+                const ingredientInfo = getIngredientCount(material.name);
+                const totalOwned = ingredientInfo.count;
+                const needed = material.quantity;
+                const missing = Math.max(0, needed - totalOwned);
+
+                // Get detailed inventory info for matched items
+                let inInventory = 0;
+                let storageLocations = {};
+
+                if (ingredientInfo.matchType === 'exact') {
+                    const invDetails = playerInventoryDetails[material.name];
+                    inInventory = invDetails ? invDetails.inventory : 0;
+                    storageLocations = invDetails ? invDetails.storage : {};
+                } else if (ingredientInfo.matchType === 'keyword') {
+                    // Sum up from all matched items
+                    for (const matchedItem of ingredientInfo.matchedItems) {
+                        const invDetails = playerInventoryDetails[matchedItem];
+                        if (invDetails) {
+                            inInventory += invDetails.inventory || 0;
+                            for (const [loc, count] of Object.entries(invDetails.storage || {})) {
+                                storageLocations[loc] = (storageLocations[loc] || 0) + count;
+                            }
+                        }
+                    }
+                }
+
+                // Build location info similar to quest page format
+                let locationInfo = '';
+                if (totalOwned > 0) {
+                    locationInfo = `<div style="font-size: 13px; color: #667eea; margin-top: 4px;">`;
+                    if (inInventory > 0) {
+                        locationInfo += `📦 Inventory: ${inInventory}`;
+                    }
+
+                    // Show individual storage locations
+                    if (storageLocations && Object.keys(storageLocations).length > 0) {
+                        for (const [location, count] of Object.entries(storageLocations)) {
+                            // Get appropriate icon for each location type
+                            let icon = '🏦'; // Default bank icon
+                            if (location.toLowerCase().includes('dream')) {
+                                icon = '💤'; // Dream world chest
+                            } else if (location.toLowerCase().includes('saddlebag')) {
+                                icon = '🎒'; // Saddlebag
+                            }
+                            if (inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
+                            locationInfo += `${icon} ${location}: ${count}`;
+                        }
+                    }
+
+                    locationInfo += `</div>`;
+                }
+
+                // Determine retrieval method
+                let retrievalMethod = '';
+                let methodColor = '#999';
+
+                if (totalOwned >= needed) {
+                    retrievalMethod = '✓ Have materials';
+                    methodColor = '#4caf50';
+                } else if (vendorItems[material.name]) {
+                    // Item can be bought from vendor - show vendor info with price
+                    const vendors = vendorItems[material.name];
+                    const firstVendor = vendors[0];
+                    const price = firstVendor.price || 0;
+                    const totalCost = price * missing;
+                    retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                    if (price > 0) {
+                        retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
+                    }
+                    methodColor = '#ff9800';
+                } else {
+                    retrievalMethod = '🔍 Farm/Gather';
+                    methodColor = '#999';
+                }
+
+                // Show matched items for keyword-based ingredients
+                let matchedItemsInfo = '';
+                if (ingredientInfo.matchType === 'keyword' && ingredientInfo.matchedItems.length > 0) {
+                    const itemsList = ingredientInfo.matchedItems.slice(0, 3).join(', ');
+                    const moreCount = ingredientInfo.matchedItems.length - 3;
+                    matchedItemsInfo = `<div style="font-size: 12px; color: #9c27b0; margin-top: 2px; font-style: italic;">
+                        Matched: ${itemsList}${moreCount > 0 ? ` (+${moreCount} more)` : ''}
+                    </div>`;
+                }
+
                 html += `
                     <div class="checklist-item">
                         <div class="item-info" style="flex: 1;">
                             <div class="item-name">${material.name}</div>
-                            <div class="item-progress">Needed: ${material.quantity}</div>
+                            ${matchedItemsInfo}
+                            <div class="item-progress">
+                                Needed: ${needed}${missing > 0 ? ` | <span style="color: #f44336;">Missing: ${missing}</span>` : ''}
+                            </div>
+                            ${locationInfo}
+                            <div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">
+                                ${retrievalMethod}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1079,6 +1857,37 @@
             `;
 
             detailContainer.innerHTML = html;
+
+            // Sync selections to server for browser extension
+            await syncRecipeSelections();
+        }
+
+        // Sync recipe selections to server for browser extension access
+        async function syncRecipeSelections() {
+            try {
+                // Build recipe data with names, skill, level for display in extension
+                const recipes = {};
+                for (const recipeId of Object.keys(recipeQuantities)) {
+                    const recipe = allRecipes.find(r => r.id === recipeId);
+                    if (recipe) {
+                        recipes[recipeId] = {
+                            quantity: recipeQuantities[recipeId] || 1,
+                            name: recipe.name,
+                            skill: recipe.skill,
+                            level: recipe.level
+                        };
+                    }
+                }
+
+                await fetch('/api/shopping_list', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ recipes })
+                });
+                debugLog('Recipe selections synced to server');
+            } catch (error) {
+                debugLog('Failed to sync recipe selections:', error);
+            }
         }
 
         // Load version on page load
@@ -1143,6 +1952,40 @@
                     btn.textContent = originalText;
                     btn.disabled = false;
                 }, 2000);
+            }
+        }
+
+        function toggleDebugMode() {
+            debugMode = !debugMode;
+            const debugBtn = document.getElementById('debugBtn');
+            const updateBtn = document.getElementById('updateBtn');
+
+            if (debugMode) {
+                debugBtn.textContent = 'Debug ON';
+                debugBtn.style.background = '#f44336';
+                updateBtn.style.display = 'inline-block';
+                debugLog('Debug mode enabled');
+                debugLog('App state:', {
+                    currentTab,
+                    currentQuestView,
+                    currentRecipeView,
+                    selectedQuest,
+                    activeQuestsCount: activeQuests.length,
+                    recipesCount: allRecipes.length,
+                    inventoryItemCount: Object.keys(playerInventory).length,
+                    vendorItemCount: Object.keys(vendorItems).length
+                });
+            } else {
+                debugBtn.textContent = 'Enable Debug';
+                debugBtn.style.background = '#888';
+                updateBtn.style.display = 'none';
+                console.log('[StorageBuddy] Debug mode disabled');
+            }
+        }
+
+        function debugLog(...args) {
+            if (debugMode) {
+                console.log('[StorageBuddy]', ...args);
             }
         }
 

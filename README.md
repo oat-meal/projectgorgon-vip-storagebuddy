@@ -4,16 +4,32 @@ A local web-based quest helper for Project Gorgon that helps you track quest obj
 
 ## Features
 
+### Quest Tracking
 - **Active Quest Tracking** - Automatically detects active quests from character reports
 - **Inventory Detection** - Monitors chat logs and character reports to track collected items
 - **Storage Location Tracking** - Shows where items are stored (Inventory, Bank, Saddlebag, Dream World Chest)
 - **Vendor Information** - Displays confirmed vendors and favor requirements for purchasable items
 - **Completable Quest Detection** - Highlights quests you can complete with current inventory
 - **Buyable Quest Filter** - Shows quests where all missing items can be purchased
-- **Auto-refresh** - Updates quest progress every 5 seconds
 - **Keyword-based Items** - Supports quests requiring item categories (e.g., "Poetry", "SnailShell")
-- **Interactive checklist** with manual checkboxes for items
 - **Search functionality** to find any quest in the game
+
+### Crafting
+- **Recipe Browser** - Browse all crafting recipes by skill
+- **Shopping List** - Select recipes and see aggregated material requirements
+- **Inventory Integration** - Shows what materials you have and where they're stored
+- **Quantity Selection** - Set how many of each recipe you want to craft
+- **Persistent Selections** - Shopping list persists when switching tabs
+
+### Browser Extension
+- **Compact Overlay** - View quest progress and shopping lists in a browser popup
+- **Pop-Out Window** - Pin overlay on screen while gaming for quick reference
+- **Auto-Refresh** - Updates every 3 seconds
+- **Quests & Crafting Tabs** - Switch between quest progress and crafting materials
+
+### General
+- **Auto-refresh** - Updates quest progress every 5 seconds
+- **Interactive Help** - Built-in documentation with setup instructions
 
 ## How It Works
 
@@ -93,10 +109,18 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed usage instructions.
 
 ### Features by Tab
 
-- **Active Quests** - Shows quests from your character data
-- **Ready** - Quests you can complete with current inventory
-- **Buyable** - Quests where all missing items can be purchased
-- **Search** - Find any quest in the game database
+- **Quests** - Shows active quests from your character data, filterable by region
+- **Crafting** - Browse recipes by skill, build shopping lists with quantity selection
+- **Help** - Built-in documentation and setup instructions
+
+### Browser Extension
+
+A companion browser extension provides a compact overlay for in-game reference:
+
+1. Load the extension from `browser-extension/` folder in Chrome/Edge (developer mode)
+2. Click the extension icon to see quest progress or crafting materials
+3. Use **Pop Out** to pin the overlay on screen while gaming
+4. Data syncs automatically with the main app
 
 ## Project Structure
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quest Tracker Overlay</title>
+    <title>StorageBuddy Overlay</title>
     <style>
         * {
             margin: 0;
@@ -11,21 +11,29 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: rgb(20, 20, 30);
             color: #ffffff;
-            padding: 10px;
-            width: 320px;
+            padding: 0;
+            width: 340px;
             min-height: 400px;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
             background: rgb(20, 20, 30);
-            border-radius: 12px;
-            border: 2px solid rgba(102, 126, 234, 0.5);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
         }
 
         .header {
@@ -33,7 +41,12 @@
             padding: 12px 15px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .header-icon {
+            font-size: 20px;
         }
 
         .header-title {
@@ -42,16 +55,70 @@
             flex: 1;
         }
 
+        .connection-status {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .connection-status.connected {
+            color: #76ff76;
+        }
+
+        .connection-status.disconnected {
+            color: #ff6b6b;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: #a8b2ff;
+            border-bottom-color: #667eea;
+        }
+
+        .controls {
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
         .view-selector {
+            flex: 1;
             background: rgb(45, 45, 55);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 4px;
             color: rgb(255, 255, 255);
-            padding: 4px 8px;
+            padding: 6px 10px;
             font-size: 12px;
             cursor: pointer;
             outline: none;
-            font-weight: 600;
         }
 
         .view-selector option {
@@ -60,83 +127,39 @@
         }
 
         .zoom-controls {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .zoom-controls label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.7);
+            gap: 4px;
         }
 
         .zoom-button {
-            background: rgb(102, 126, 234);
+            background: rgb(60, 60, 75);
             border: none;
             border-radius: 4px;
             color: white;
-            padding: 4px 12px;
-            font-size: 12px;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
             cursor: pointer;
-            font-weight: 600;
         }
 
         .zoom-button:hover {
-            background: rgb(118, 140, 250);
+            background: rgb(80, 80, 100);
         }
 
         .zoom-value {
-            font-size: 11px;
-            font-weight: 600;
-            min-width: 40px;
+            font-size: 10px;
+            min-width: 32px;
             text-align: center;
-        }
-
-        .overlay-button-container {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .overlay-button {
-            width: 100%;
-            background: rgb(76, 175, 80);
-            border: none;
-            border-radius: 4px;
-            color: white;
-            padding: 8px 16px;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .overlay-button:hover {
-            background: rgb(92, 195, 96);
-        }
-
-        .tip {
-            background: rgba(102, 126, 234, 0.15);
-            border-left: 3px solid rgb(102, 126, 234);
-            padding: 8px 10px;
-            margin: 8px 0;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.4;
-        }
-
-        .tip strong {
-            color: rgb(168, 178, 255);
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .content {
             padding: 10px;
-            max-height: 450px;
+            flex: 1;
             overflow-y: auto;
             background: rgb(20, 20, 30);
-            color: #ffffff;
+            min-height: 0;
         }
 
         .content::-webkit-scrollbar {
@@ -153,139 +176,249 @@
             border-radius: 3px;
         }
 
+        /* Quest styles */
         .quest-group {
-            margin-bottom: 15px;
-            display: block !important;
-            visibility: visible !important;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .quest-group.ready {
+            border-left-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .quest-group.buyable {
+            border-left-color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
         }
 
         .quest-name {
             font-size: 13px;
             font-weight: 600;
-            color: #a8b2ff !important;
-            margin-bottom: 6px;
-            padding: 4px 6px;
-            background: rgba(102, 126, 234, 0.15) !important;
-            border-radius: 4px;
-            display: block !important;
-            visibility: visible !important;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .quest-location {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
         }
 
         .item-list {
-            margin-left: 8px;
-            display: block !important;
-            visibility: visible !important;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .item {
-            display: flex !important;
+            display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 8px;
-            margin-bottom: 3px;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 8px;
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 4px;
             font-size: 12px;
-            visibility: visible !important;
         }
 
         .item.completed {
-            background: rgba(76, 175, 80, 0.2);
+            background: rgba(76, 175, 80, 0.15);
         }
 
         .item-name {
             flex: 1;
-            color: #e0e0e0 !important;
-            display: block !important;
-            visibility: visible !important;
+            color: #b0b0b0;
+            min-width: 120px;
+        }
+
+        .item.completed .item-name {
+            color: #70d070;
         }
 
         .item-progress {
             font-weight: 600;
-            min-width: 50px;
-            text-align: right;
-            display: block !important;
-            visibility: visible !important;
+            color: #ffaa66;
+            font-size: 11px;
         }
 
-        .item-progress.completed {
-            color: #76ff76 !important;
+        .item.completed .item-progress {
+            color: #70d070;
         }
 
-        .item-progress.incomplete {
-            color: #ffaa66 !important;
-        }
-
-        .item-locations {
+        .item-details {
+            width: 100%;
             font-size: 10px;
             color: #667eea;
             margin-top: 4px;
-            padding-left: 4px;
+            padding-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        .vendor-info {
+            color: #ff9800;
+            font-size: 10px;
+        }
+
+        /* Crafting styles */
+        .recipe-group {
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .recipe-group.ready {
+            border-left-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .recipe-group.buyable {
+            border-left-color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .recipe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .recipe-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .recipe-qty {
+            font-size: 11px;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .recipe-skill {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Empty/Error states */
         .empty-state {
             text-align: center;
-            padding: 30px 20px;
+            padding: 40px 20px;
             color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
         }
 
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
+        .empty-state-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
         }
 
         .error-state {
             text-align: center;
-            padding: 20px;
+            padding: 30px 20px;
             color: #ff6b6b;
             font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .error-state code {
+            display: block;
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 4px;
+            font-size: 11px;
         }
 
         .status-bar {
             padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
             display: flex;
             justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .open-app-link {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .open-app-link:hover {
+            text-decoration: underline;
+        }
+
+        .popout-btn {
+            background: rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            border-radius: 4px;
+            color: #a8b2ff;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .popout-btn:hover {
+            background: rgba(102, 126, 234, 0.5);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-title">Quest Tracker</div>
+            <span class="header-icon">📦</span>
+            <span class="header-title">StorageBuddy</span>
+            <button class="popout-btn" id="popoutBtn" title="Pop out to separate window">
+                <span>⧉</span> Pop Out
+            </button>
+            <span class="connection-status" id="connectionStatus">Connecting...</span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="questsTab" data-tab="quests">Quests</button>
+            <button class="tab-btn" id="craftingTab" data-tab="crafting">Crafting</button>
+        </div>
+
+        <div class="controls" id="questControls">
             <select class="view-selector" id="viewSelector">
-                <option value="completable">Ready</option>
-                <option value="purchasable">Buyable</option>
-                <option value="active">Active</option>
+                <option value="all">All Quests</option>
+                <option value="ready">Have Materials</option>
             </select>
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomOut">−</button>
+                <span class="zoom-value" id="zoomValue">100%</span>
+                <button class="zoom-button" id="zoomIn">+</button>
+            </div>
         </div>
 
-        <div class="zoom-controls">
-            <label>Zoom:</label>
-            <button class="zoom-button" id="zoomOut">-</button>
-            <span class="zoom-value" id="zoomValue">100%</span>
-            <button class="zoom-button" id="zoomIn">+</button>
-        </div>
-
-        <div class="overlay-button-container">
-            <button class="overlay-button" id="openOverlayBtn">Open Overlay Window</button>
+        <div class="controls" id="craftingControls" style="display: none;">
+            <span style="font-size: 11px; color: rgba(255,255,255,0.6);">Shopping list from StorageBuddy</span>
         </div>
 
         <div class="content" id="content">
-            <div class="tip">
-                <strong>Tip:</strong> Pin this popup to keep it visible while you play. Use Alt+Tab to quickly switch between the game and quest tracker.
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p>Loading...</p>
             </div>
-            <div class="loading">Loading...</div>
         </div>
 
         <div class="status-bar">
-            <span id="questCount">0 quests</span>
+            <span id="itemCount">0 items</span>
+            <a href="http://127.0.0.1:5000" target="_blank" class="open-app-link">Open StorageBuddy</a>
             <span id="lastUpdate">Just now</span>
         </div>
     </div>

@@ -1,158 +1,293 @@
 #!/usr/bin/env python3
 """
-Recipe scraper for Gorgon Codex
-Pulls all crafting recipes and saves to recipes.json
+Scrape Project Gorgon Wiki recipes to build comprehensive recipes.json
+Scrapes all skill recipe pages from wiki.projectgorgon.com
 """
 
 import requests
 from bs4 import BeautifulSoup
 import json
-import time
 import re
-from urllib.parse import urljoin
+import time
+from pathlib import Path
 
-BASE_URL = "https://www.gorgoncodex.com"
-RECIPES_URL = f"{BASE_URL}/recipes"
+# Wiki URLs
+CATEGORY_URL = "https://wiki.projectgorgon.com/wiki/Category:Recipes"
+WIKI_BASE = "https://wiki.projectgorgon.com"
 
-def get_all_recipe_links():
-    """Fetch all recipe links from the main recipes page"""
-    print("Fetching recipe list from Gorgon Codex...")
+def get_skill_pages():
+    """Get list of all skill recipe pages from Category:Recipes"""
+    print("Fetching skill recipe pages from wiki...")
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
+    try:
+        response = requests.get(CATEGORY_URL, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-    response = requests.get(RECIPES_URL, headers=headers)
-    soup = BeautifulSoup(response.content, 'html.parser')
+        # Find all links in the category page
+        skill_pages = []
 
-    # Find all recipe links - adjust selector based on actual page structure
-    # This is a placeholder - we'll need to inspect the actual page
-    recipe_links = []
-    for link in soup.find_all('a', href=True):
-        href = link['href']
-        if href.startswith('/recipes/') and href != '/recipes':
-            full_url = urljoin(BASE_URL, href)
-            recipe_links.append(full_url)
+        # Look for links in the mw-category div
+        category_div = soup.find('div', {'class': 'mw-category'})
+        if category_div:
+            links = category_div.find_all('a')
+            for link in links:
+                href = link.get('href', '')
+                title = link.get('title', '')
+                if '/Recipes' in title and title:
+                    skill_name = title.replace('/Recipes', '')
+                    skill_pages.append({
+                        'skill': skill_name,
+                        'url': WIKI_BASE + href
+                    })
 
-    # Remove duplicates
-    recipe_links = list(set(recipe_links))
-    print(f"Found {len(recipe_links)} recipe links")
+        print(f"Found {len(skill_pages)} skill recipe pages")
+        return skill_pages
 
-    return recipe_links
+    except Exception as e:
+        print(f"Error fetching skill pages: {e}")
+        return []
 
-def scrape_recipe(url):
-    """Scrape a single recipe page"""
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
+def parse_ingredient(ingredient_text):
+    """Parse ingredient text to extract name and quantity
 
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.content, 'html.parser')
+    Examples:
+    - "Spider Egg x1" -> ("Spider Egg", 1)
+    - "Basic Fish Scales x2" -> ("Basic Fish Scales", 2)
+    - "Any Bone x1" -> ("Any Bone", 1)
+    """
+    # Strip whitespace
+    ingredient_text = ingredient_text.strip()
 
-    recipe = {
-        "id": url.split('/')[-1],
-        "url": url,
-        "name": "",
-        "skill": "",
-        "level_required": 0,
-        "ingredients": []
-    }
+    # Match pattern "name xN" or just "name"
+    match = re.match(r'^(.+?)\s+x(\d+)$', ingredient_text)
+    if match:
+        name = match.group(1).strip()
+        quantity = int(match.group(2))
+        return (name, quantity)
+    else:
+        # No quantity specified, assume 1
+        return (ingredient_text, 1)
 
-    # Extract recipe name from title or h1
-    title_tag = soup.find('h1')
-    if title_tag:
-        recipe["name"] = title_tag.get_text().strip()
+def parse_recipe_table(soup, skill_name):
+    """Parse recipe table from a skill page"""
+    recipes = []
 
-    # Extract structured data if available
-    script_tags = soup.find_all('script', type='application/ld+json')
-    for script in script_tags:
-        try:
-            data = json.loads(script.string)
-            if data.get('@type') == 'Thing':
-                recipe["name"] = data.get('name', recipe["name"])
-        except:
-            pass
+    # Find the recipe table - look for tables that have 'sortable' as one of their classes
+    all_tables = soup.find_all('table')
+    tables = [t for t in all_tables if t.get('class') and 'sortable' in t.get('class')]
 
-    # Extract skill from link to /skills/
-    skill_links = soup.find_all('a', href=re.compile(r'^/skills/'))
-    if skill_links:
-        # Get the first skill link
-        skill_href = skill_links[0]['href']
-        skill_name = skill_href.replace('/skills/', '').replace('-', ' ').title()
-        recipe["skill"] = skill_name
-
-        # Extract level from the skill link text (e.g., "Fletching Lv 6")
-        skill_text = skill_links[0].get_text().strip()
-        level_match = re.search(r'Lv\s*(\d+)', skill_text)
-        if level_match:
-            recipe["level_required"] = int(level_match.group(1))
-
-    # Extract ingredients
-    # Look for ingredient items - they typically have item icons and quantities
-    # Find all links that point to /items/
-    item_links = soup.find_all('a', href=re.compile(r'^/items/'))
-
-    for link in item_links:
-        item_name = link.get_text().strip()
-        if not item_name:
+    for table in tables:
+        # Get header row to find column indices
+        header_row = table.find('tr')
+        if not header_row:
             continue
 
-        # Look for quantity in nearby text
-        # Quantities are typically in format "×N"
-        parent = link.parent
-        quantity = 1  # default quantity
+        headers = [th.get_text(strip=True) for th in header_row.find_all('th')]
 
-        if parent:
-            text = parent.get_text()
-            qty_match = re.search(r'×\s*(\d+)', text)
-            if qty_match:
-                quantity = int(qty_match.group(1))
+        # Find column indices
+        level_idx = None
+        name_idx = None
+        ing_idx = None
+        res_idx = None
 
-        recipe["ingredients"].append({
-            "name": item_name,
-            "quantity": quantity
-        })
+        for idx, header in enumerate(headers):
+            header_lower = header.lower()
+            if 'lvl' in header_lower or 'level' in header_lower:
+                level_idx = idx
+            elif 'name' in header_lower:
+                name_idx = idx
+            elif 'ingredient' in header_lower:
+                ing_idx = idx
+            elif 'result' in header_lower:
+                res_idx = idx
 
-    return recipe
+        # Parse data rows
+        rows = table.find_all('tr')[1:]  # Skip header row
+
+        for row in rows:
+            cols = row.find_all('td')
+
+            if len(cols) < 2:  # Need at least name and something else
+                continue
+
+            try:
+                # Extract data
+                level = 0
+                name = ""
+                ingredients = []
+                results = []
+
+                if level_idx is not None and level_idx < len(cols):
+                    level_text = cols[level_idx].get_text(strip=True)
+                    if level_text.isdigit():
+                        level = int(level_text)
+
+                if name_idx is not None and name_idx < len(cols):
+                    name = cols[name_idx].get_text(strip=True)
+
+                # Parse ingredients
+                if ing_idx is not None and ing_idx < len(cols):
+                    ing_cell = cols[ing_idx]
+
+                    # Get all text, split by newlines
+                    ing_text = ing_cell.get_text(separator='\n')
+                    ing_lines = [line.strip() for line in ing_text.split('\n') if line.strip()]
+
+                    # Join ingredient names with quantities (they're on separate lines)
+                    # Pattern: "Item Name" on one line, "x2" on next line
+                    i = 0
+                    while i < len(ing_lines):
+                        line = ing_lines[i]
+
+                        # Check if next line is a quantity (starts with 'x' or 'X')
+                        if i + 1 < len(ing_lines) and re.match(r'^x\d+$', ing_lines[i + 1], re.IGNORECASE):
+                            # Join item name with quantity
+                            combined = f"{line} {ing_lines[i + 1]}"
+                            item_name, quantity = parse_ingredient(combined)
+                            if item_name:
+                                ingredients.append({
+                                    'item': item_name,
+                                    'quantity': quantity
+                                })
+                            i += 2  # Skip both lines
+                        else:
+                            # Try parsing this line as-is (might already have "item x quantity")
+                            if 'x' in line.lower():
+                                item_name, quantity = parse_ingredient(line)
+                                if item_name:
+                                    ingredients.append({
+                                        'item': item_name,
+                                        'quantity': quantity
+                                    })
+                            i += 1
+
+                # Parse results (same logic as ingredients)
+                if res_idx is not None and res_idx < len(cols):
+                    res_cell = cols[res_idx]
+                    res_text = res_cell.get_text(separator='\n')
+                    res_lines = [line.strip() for line in res_text.split('\n') if line.strip()]
+
+                    # Join result names with quantities
+                    i = 0
+                    while i < len(res_lines):
+                        line = res_lines[i]
+
+                        # Check if next line is a quantity
+                        if i + 1 < len(res_lines) and re.match(r'^x\d+$', res_lines[i + 1], re.IGNORECASE):
+                            combined = f"{line} {res_lines[i + 1]}"
+                            item_name, quantity = parse_ingredient(combined)
+                            if item_name:
+                                results.append({
+                                    'item': item_name,
+                                    'quantity': quantity
+                                })
+                            i += 2
+                        else:
+                            if 'x' in line.lower():
+                                item_name, quantity = parse_ingredient(line)
+                                if item_name:
+                                    results.append({
+                                        'item': item_name,
+                                        'quantity': quantity
+                                    })
+                            i += 1
+
+                # Only add recipe if we have a name and ingredients
+                if name and ingredients:
+                    recipe = {
+                        'name': name,
+                        'skill': skill_name,
+                        'level': level,
+                        'ingredients': ingredients,
+                        'results': results if results else [{'item': name, 'quantity': 1}]
+                    }
+                    recipes.append(recipe)
+
+            except Exception as e:
+                print(f"  Warning: Could not parse recipe row: {e}")
+                continue
+
+    return recipes
+
+def scrape_skill_recipes(skill_info):
+    """Scrape recipes for a single skill"""
+    skill_name = skill_info['skill']
+    url = skill_info['url']
+
+    print(f"Scraping {skill_name}...")
+
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        recipes = parse_recipe_table(soup, skill_name)
+        print(f"  Found {len(recipes)} recipes")
+
+        return recipes
+
+    except Exception as e:
+        print(f"  Error scraping {skill_name}: {e}")
+        return []
 
 def main():
-    print("Gorgon Codex Recipe Scraper")
-    print("=" * 50)
+    print("="*60)
+    print("Project Gorgon Wiki Recipe Scraper")
+    print("="*60)
+    print()
 
-    # Get all recipe links
-    recipe_links = get_all_recipe_links()
+    # Get all skill pages
+    skill_pages = get_skill_pages()
 
-    if not recipe_links:
-        print("No recipe links found. The page structure may have changed.")
-        print("Please check the Gorgon Codex recipes page manually.")
+    if not skill_pages:
+        print("No skill pages found. Exiting.")
         return
 
+    print()
+    print(f"Starting to scrape {len(skill_pages)} skills...")
+    print()
+
     # Scrape all recipes
-    print(f"\nScraping {len(recipe_links)} recipes...")
+    all_recipes = []
 
-    recipes = []
-    for i, url in enumerate(recipe_links, 1):
-        print(f"[{i}/{len(recipe_links)}] Scraping: {url}")
+    for skill_info in skill_pages:
+        recipes = scrape_skill_recipes(skill_info)
+        all_recipes.extend(recipes)
 
-        try:
-            recipe = scrape_recipe(url)
-            recipes.append(recipe)
+        # Be polite to the wiki server
+        time.sleep(0.5)
 
-            # Be respectful - don't hammer the server
-            time.sleep(0.5)
-        except Exception as e:
-            print(f"  ERROR: {e}")
-            continue
+    print()
+    print("="*60)
+    print(f"Total recipes scraped: {len(all_recipes)}")
+    print("="*60)
+
+    # Show breakdown by skill
+    skill_counts = {}
+    for recipe in all_recipes:
+        skill = recipe['skill']
+        skill_counts[skill] = skill_counts.get(skill, 0) + 1
+
+    print("\nRecipes by skill:")
+    for skill, count in sorted(skill_counts.items()):
+        print(f"  {skill}: {count}")
 
     # Save to recipes.json
-    output_file = "recipes.json"
-    with open(output_file, 'w') as f:
-        json.dump(recipes, f, indent=2)
+    output_file = Path(__file__).parent / 'recipes.json'
 
-    print(f"\nSaved {len(recipes)} recipes to {output_file}")
-    print("\nSample recipe:")
-    if recipes:
-        print(json.dumps(recipes[0], indent=2))
+    print()
+    print(f"Saving to {output_file}...")
 
-if __name__ == "__main__":
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(all_recipes, f, indent=2, ensure_ascii=False)
+
+    print(f"✓ Saved {len(all_recipes)} recipes to recipes.json")
+
+    # Show file size
+    size_kb = output_file.stat().st_size / 1024
+    print(f"File size: {size_kb:.1f} KB")
+    print()
+
+if __name__ == '__main__':
     main()

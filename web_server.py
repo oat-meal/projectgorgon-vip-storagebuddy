@@ -29,6 +29,9 @@ app = Flask(__name__)
 # Enable CORS for browser extension access
 CORS(app, resources={r"/api/*": {"origins": ["moz-extension://*", "chrome-extension://*"]}})
 
+# In-memory store for recipe selections (synced from web app localStorage)
+recipe_selections = {}
+
 # Initialize configuration
 config = get_config()
 base_dir = config.get_base_dir()
@@ -570,6 +573,313 @@ def overlay_data():
     except Exception as e:
         logger.error(f"Error getting overlay data: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/shopping_list', methods=['GET', 'POST'])
+def shopping_list():
+    """Get or update shopping list for selected recipes (for browser extension)"""
+    global inventory_parser, recipe_selections
+
+    if request.method == 'POST':
+        # Update recipe selections from web app
+        try:
+            data = request.get_json()
+            recipe_selections.clear()
+            recipe_selections.update(data.get('recipes', {}))
+            return jsonify({'success': True, 'count': len(recipe_selections)})
+        except Exception as e:
+            logger.error(f"Error updating recipe selections: {e}")
+            return jsonify({'error': str(e)}), 400
+
+    # GET - return shopping list based on stored selections
+    try:
+        # Extract quantities from recipe_selections (which may contain objects with quantity, name, skill, level)
+        recipe_quantities = {}
+        for recipe_id, data in recipe_selections.items():
+            if isinstance(data, dict):
+                recipe_quantities[recipe_id] = data.get('quantity', 1)
+            else:
+                recipe_quantities[recipe_id] = data
+
+        # Load recipes
+        recipes_file = Path(__file__).parent / 'recipes.json'
+        if not recipes_file.exists():
+            return jsonify({'recipes': [], 'error': 'Recipes file not found'})
+
+        with open(recipes_file, 'r') as f:
+            all_recipes = json.load(f)
+
+        # Build recipe lookup by ID - must match the ID format from the web app
+        # Web app uses: `${recipe.skill}_${recipe.name}_${idx}` where idx is the array index
+        recipe_lookup = {}
+        for idx, recipe in enumerate(all_recipes):
+            recipe_id = f"{recipe.get('skill', 'Unknown')}_{recipe.get('name', 'Unknown')}_{idx}"
+            recipe_lookup[recipe_id] = recipe
+
+        # Get player inventory with full location details
+        player_inventory = {}
+        inventory_details = {}
+        if inventory_parser:
+            items_file = inventory_parser.get_latest_items_file()
+            if items_file:
+                inventory_data = inventory_parser.parse_items(items_file)
+                for name, data in inventory_data.items():
+                    player_inventory[name] = data['total']
+                    inventory_details[name] = data
+
+        # Load vendor data - build item->vendor lookup
+        vendor_items = {}
+        vendor_file = Path(__file__).parent / 'vendor_inventory.json'
+        if vendor_file.exists():
+            with open(vendor_file, 'r') as f:
+                vendor_data = json.load(f)
+                # Handle the format: { "vendors": { "VendorName": { "location": ..., "items": {...} } } }
+                vendors_dict = vendor_data.get('vendors', vendor_data)
+                for vendor_name, vendor_info in vendors_dict.items():
+                    if isinstance(vendor_info, dict) and 'items' in vendor_info:
+                        location = vendor_info.get('location', '')
+                        for item_name in vendor_info.get('items', {}):
+                            if item_name not in vendor_items:
+                                vendor_items[item_name] = f"{vendor_name} ({location})"
+
+        # Build shopping list
+        result_recipes = []
+        for recipe_id, quantity in recipe_quantities.items():
+            recipe = recipe_lookup.get(recipe_id)
+            if not recipe:
+                continue
+
+            recipe_result = {
+                'id': recipe_id,
+                'name': recipe.get('name', 'Unknown'),
+                'skill': recipe.get('skill', 'Unknown'),
+                'level': recipe.get('level', 0),
+                'quantity': quantity,
+                'materials': []
+            }
+
+            for ingredient in recipe.get('ingredients', []):
+                mat_name = ingredient.get('item') or ingredient.get('name', 'Unknown')
+                mat_qty = ingredient.get('quantity', 1) * quantity
+                mat_have = player_inventory.get(mat_name, 0)
+
+                # Get detailed location info
+                details = inventory_details.get(mat_name, {})
+                in_inventory = details.get('in_inventory', 0) if isinstance(details, dict) else 0
+                # Safely sum storage values
+                in_storage = 0
+                storage_locations = {}
+                if isinstance(details, dict):
+                    for k, v in details.items():
+                        if k not in ['total', 'in_inventory'] and isinstance(v, (int, float)) and v > 0:
+                            in_storage += v
+                            storage_locations[k] = v
+
+                mat_result = {
+                    'name': mat_name,
+                    'need': mat_qty,
+                    'have': min(mat_have, mat_qty),
+                    'in_inventory': in_inventory,
+                    'in_storage': in_storage,
+                    'storage_locations': storage_locations
+                }
+
+                # Add vendor info if available
+                if mat_name in vendor_items and mat_have < mat_qty:
+                    mat_result['vendor_info'] = vendor_items[mat_name]
+
+                recipe_result['materials'].append(mat_result)
+
+            result_recipes.append(recipe_result)
+
+        return jsonify({'recipes': result_recipes})
+    except Exception as e:
+        logger.error(f"Error getting shopping list: {e}")
+        return jsonify({'error': str(e), 'recipes': []}), 500
+
+
+@app.route('/recipes.json')
+def get_recipes():
+    """Serve recipes.json file for crafting tab"""
+    try:
+        recipes_file = Path(__file__).parent / 'recipes.json'
+        if not recipes_file.exists():
+            return jsonify({'error': 'Recipes file not found'}), 404
+
+        with open(recipes_file, 'r') as f:
+            recipes = json.load(f)
+        return jsonify(recipes)
+    except Exception as e:
+        logger.error(f"Error loading recipes: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/inventory')
+def get_player_inventory():
+    """Get full player inventory with storage locations"""
+    global inventory_parser
+
+    if not inventory_parser:
+        return jsonify({'error': 'Inventory parser not initialized', 'items': {}}), 200
+
+    try:
+        items_file = inventory_parser.get_latest_items_file()
+        if not items_file:
+            return jsonify({'error': 'No inventory export found', 'items': {}}), 200
+
+        inventory_data = inventory_parser.parse_items(items_file)
+
+        # Return with file info for debugging
+        return jsonify({
+            'items': inventory_data,
+            'source_file': items_file.name,
+            'item_count': len(inventory_data)
+        })
+    except Exception as e:
+        logger.error(f"Error loading player inventory: {e}")
+        return jsonify({'error': str(e), 'items': {}}), 500
+
+
+@app.route('/api/items')
+def get_items_index():
+    """Get global item index with game data, vendor info, and crafting recipes"""
+    try:
+        items_file = Path(__file__).parent / 'items.json'
+        recipes_file = Path(__file__).parent / 'recipes.json'
+        vendor_file = Path(__file__).parent / 'vendor_inventory.json'
+
+        # Load items database
+        items = {}
+        if items_file.exists():
+            with open(items_file, 'r') as f:
+                items = json.load(f)
+
+        # Load recipes and index by output item
+        recipes_by_item = {}
+        if recipes_file.exists():
+            with open(recipes_file, 'r') as f:
+                recipes = json.load(f)
+                for recipe in recipes:
+                    output_name = recipe.get('name', '')
+                    if output_name not in recipes_by_item:
+                        recipes_by_item[output_name] = []
+                    recipes_by_item[output_name].append({
+                        'id': recipe.get('id'),
+                        'skill': recipe.get('skill'),
+                        'level': recipe.get('level'),
+                        'ingredients': recipe.get('ingredients', [])
+                    })
+
+        # Load vendor data
+        vendors_by_item = {}
+        if vendor_file.exists():
+            with open(vendor_file, 'r') as f:
+                vendor_data = json.load(f)
+                for vendor_name, vendor_info in vendor_data.items():
+                    for item_name in vendor_info.get('items', []):
+                        if item_name not in vendors_by_item:
+                            vendors_by_item[item_name] = []
+                        vendors_by_item[item_name].append({
+                            'vendor': vendor_name,
+                            'location': vendor_info.get('location', 'Unknown')
+                        })
+
+        # Build combined index keyed by display name
+        item_index = {}
+        for item_id, item_data in items.items():
+            name = item_data.get('Name', 'Unknown')
+            item_index[name] = {
+                'id': item_id,
+                'internal_name': item_data.get('InternalName', ''),
+                'description': item_data.get('Description', ''),
+                'value': item_data.get('Value', 0),
+                'keywords': item_data.get('Keywords', []),
+                'max_stack': item_data.get('MaxStackSize', 1),
+                'icon_id': item_data.get('IconId'),
+                'crafted_by': recipes_by_item.get(name, []),
+                'sold_by': vendors_by_item.get(name, [])
+            }
+
+        return jsonify({
+            'items': item_index,
+            'item_count': len(item_index)
+        })
+    except Exception as e:
+        logger.error(f"Error building item index: {e}")
+        return jsonify({'error': str(e), 'items': {}}), 500
+
+
+@app.route('/api/vendors')
+def get_vendor_items():
+    """Get items available from vendors"""
+    try:
+        vendor_file = Path(__file__).parent / 'vendor_inventory.json'
+
+        if not vendor_file.exists():
+            return jsonify({'error': 'Vendor file not found', 'vendor_items': {}}), 200
+
+        with open(vendor_file, 'r') as f:
+            vendor_data = json.load(f)
+
+        # Build item -> vendor info mapping
+        vendor_items = {}
+        vendors = vendor_data.get('vendors', {})
+        for vendor_name, vendor_info in vendors.items():
+            location = vendor_info.get('location', 'Unknown')
+            items = vendor_info.get('items', {})
+            for item_name, item_info in items.items():
+                if item_name not in vendor_items:
+                    vendor_items[item_name] = []
+                vendor_items[item_name].append({
+                    'vendor': vendor_name,
+                    'location': location,
+                    'price': item_info.get('price', 0),
+                    'favor': item_info.get('favor', 'Unknown')
+                })
+
+        return jsonify({
+            'vendor_items': vendor_items,
+            'item_count': len(vendor_items)
+        })
+    except Exception as e:
+        logger.error(f"Error loading vendor items: {e}")
+        return jsonify({'error': str(e), 'vendor_items': {}}), 500
+
+
+@app.route('/api/keywords')
+def get_item_keywords():
+    """Get keyword to item mappings for ingredient matching"""
+    try:
+        items_file = Path(__file__).parent / 'items.json'
+
+        if not items_file.exists():
+            return jsonify({'error': 'Items file not found', 'keywords': {}}), 200
+
+        with open(items_file, 'r') as f:
+            items = json.load(f)
+
+        # Build keyword -> item names mapping
+        keyword_map = {}
+        for item_id, item_data in items.items():
+            display_name = item_data.get('Name', '')
+            if not display_name:
+                continue
+
+            for keyword in item_data.get('Keywords', []):
+                # Normalize keyword by removing "=value" suffix (e.g., "Bone=50" -> "Bone")
+                normalized_keyword = keyword.split('=')[0]
+                if normalized_keyword not in keyword_map:
+                    keyword_map[normalized_keyword] = []
+                if display_name not in keyword_map[normalized_keyword]:
+                    keyword_map[normalized_keyword].append(display_name)
+
+        return jsonify({
+            'keywords': keyword_map,
+            'keyword_count': len(keyword_map)
+        })
+    except Exception as e:
+        logger.error(f"Error building keyword map: {e}")
+        return jsonify({'error': str(e), 'keywords': {}}), 500
 
 
 @app.route('/api/heartbeat', methods=['POST'])
