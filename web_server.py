@@ -558,7 +558,10 @@ def overlay_data():
                 simplified_quest['items'].append({
                     'name': item['display_name'],
                     'have': total_have,
-                    'need': item['required']
+                    'need': item['required'],
+                    'in_inventory': item.get('in_inventory', 0),
+                    'in_storage': item.get('in_storage', 0),
+                    'storage_locations': item.get('storage_locations', {})
                 })
 
             simplified_quests.append(simplified_quest)

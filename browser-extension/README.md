@@ -5,7 +5,8 @@ A cross-platform browser extension for tracking Project Gorgon VIP quests while 
 ## Features
 
 - Quest tracking popup window
-- Adjustable zoom (50% to 200%)
+- **Separate overlay window** for better multitasking
+- Adjustable zoom (50% to 200%) for the popup
 - Three view modes: Ready, Buyable, and Active quests
 - Auto-refreshes every 3 seconds
 - Works on Windows, Linux, and macOS
@@ -60,11 +61,17 @@ A cross-platform browser extension for tracking Project Gorgon VIP quests while 
    - **Buyable**: Quests you can complete by purchasing items
    - **Active**: All active quests
 
-4. Use the +/- buttons to adjust zoom level
+4. Use the +/- buttons to adjust zoom level for the popup
 
-5. **Tip**: Pin the popup window to keep it visible while you play. Use Alt+Tab to quickly switch between the game and quest tracker.
+5. Click **"Open Overlay Window"** to open a separate window that you can:
+   - Move anywhere on your screen
+   - Resize to your preference
+   - Keep visible alongside other windows
+   - Use for better multitasking
 
-6. The tracker auto-updates every 3 seconds
+6. **Tip**: The separate overlay window is better than pinning the popup. It's a real window you can position anywhere and Alt+Tab to.
+
+7. The tracker auto-updates every 3 seconds
 
 ## Troubleshooting
 
@@ -85,11 +92,14 @@ A cross-platform browser extension for tracking Project Gorgon VIP quests while 
 - `manifest.json` - Extension configuration
 - `popup.html` - Extension popup interface
 - `popup.js` - Popup functionality and data loading
+- `background.js` - Background service worker for overlay window
+- `overlay-window.html` - Separate overlay window interface
+- `overlay-window.js` - Overlay window functionality
 - `icons/` - Extension icons (16px, 48px, 128px)
 
 ## Version
 
-Current version: 0.2.8
+Current version: 0.3.0
 
 ## Cross-Platform Compatibility
 

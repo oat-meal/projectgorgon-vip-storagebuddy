@@ -95,6 +95,28 @@
             text-align: center;
         }
 
+        .overlay-button-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .overlay-button {
+            width: 100%;
+            background: rgb(76, 175, 80);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            padding: 8px 16px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .overlay-button:hover {
+            background: rgb(92, 195, 96);
+        }
+
         .tip {
             background: rgba(102, 126, 234, 0.15);
             border-left: 3px solid rgb(102, 126, 234);
@@ -194,6 +216,13 @@
             color: #ffaa66 !important;
         }
 
+        .item-locations {
+            font-size: 10px;
+            color: #667eea;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
         .empty-state {
             text-align: center;
             padding: 30px 20px;
@@ -242,6 +271,10 @@
             <button class="zoom-button" id="zoomOut">-</button>
             <span class="zoom-value" id="zoomValue">100%</span>
             <button class="zoom-button" id="zoomIn">+</button>
+        </div>
+
+        <div class="overlay-button-container">
+            <button class="overlay-button" id="openOverlayBtn">Open Overlay Window</button>
         </div>
 
         <div class="content" id="content">

@@ -1,19 +1,14 @@
-// Quest Tracker Extension - Popup Script
+// Quest Tracker Overlay Window Script
 
 let currentView = 'completable';
 let lastUpdateTime = Date.now();
-let currentZoom = 100;
 const API_URL = 'http://127.0.0.1:5000';
 
-// Load saved preferences
-chrome.storage.local.get(['view', 'zoom'], (result) => {
+// Load saved view preference
+chrome.storage.local.get(['view'], (result) => {
     if (result.view) {
         currentView = result.view;
         document.getElementById('viewSelector').value = currentView;
-    }
-    if (result.zoom) {
-        currentZoom = result.zoom;
-        applyZoom(currentZoom);
     }
 });
 
@@ -23,32 +18,6 @@ document.getElementById('viewSelector').addEventListener('change', (e) => {
     chrome.storage.local.set({ view: currentView });
     loadData();
 });
-
-// Zoom controls
-document.getElementById('zoomIn').addEventListener('click', () => {
-    currentZoom = Math.min(200, currentZoom + 10);
-    applyZoom(currentZoom);
-    chrome.storage.local.set({ zoom: currentZoom });
-});
-
-document.getElementById('zoomOut').addEventListener('click', () => {
-    currentZoom = Math.max(50, currentZoom - 10);
-    applyZoom(currentZoom);
-    chrome.storage.local.set({ zoom: currentZoom });
-});
-
-// Open overlay window
-document.getElementById('openOverlayBtn').addEventListener('click', () => {
-    chrome.runtime.sendMessage({ action: 'openOverlay' });
-});
-
-function applyZoom(zoom) {
-    document.body.style.transform = `scale(${zoom / 100})`;
-    document.body.style.transformOrigin = 'top left';
-    document.body.style.width = `${100 / (zoom / 100)}%`;
-    document.body.style.height = `${100 / (zoom / 100)}%`;
-    document.getElementById('zoomValue').textContent = `${zoom}%`;
-}
 
 async function loadData() {
     const content = document.getElementById('content');
