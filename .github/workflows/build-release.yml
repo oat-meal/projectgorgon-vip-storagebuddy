@@ -17,6 +17,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Get version
+      id: version
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "release" ]]; then
+          VERSION="${{ github.event.release.tag_name }}"
+        else
+          VERSION=$(python -c "exec(open('version.py').read()); print(__version__)")
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -30,19 +42,19 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --name=QuestHelper-Windows --onefile --windowed --add-data="templates;templates" --add-data="quests.json;." --add-data="items.json;." --add-data="recipes.json;." --add-data="vendor_inventory.json;." --add-data="static;static" --add-data="browser-extension;browser-extension" --hidden-import=flask --hidden-import=flask_cors --hidden-import=jinja2 --hidden-import=webview --collect-all=flask --collect-all=flask_cors --collect-all=webview launcher.py
+        pyinstaller --name=QuestHelper-Windows-${{ steps.version.outputs.version }} --onefile --windowed --add-data="templates;templates" --add-data="quests.json;." --add-data="items.json;." --add-data="recipes.json;." --add-data="vendor_inventory.json;." --add-data="static;static" --add-data="browser-extension;browser-extension" --hidden-import=flask --hidden-import=flask_cors --hidden-import=jinja2 --hidden-import=webview --collect-all=flask --collect-all=flask_cors --collect-all=webview launcher.py
 
     - name: Upload executable artifact
       uses: actions/upload-artifact@v4
       with:
-        name: QuestHelper-Windows
-        path: dist/QuestHelper-Windows.exe
+        name: QuestHelper-Windows-${{ steps.version.outputs.version }}
+        path: dist/QuestHelper-Windows-${{ steps.version.outputs.version }}.exe
 
     - name: Upload executable to release
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/QuestHelper-Windows.exe
+        files: dist/QuestHelper-Windows-${{ steps.version.outputs.version }}.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -53,6 +65,17 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Get version
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "release" ]]; then
+          VERSION="${{ github.event.release.tag_name }}"
+        else
+          VERSION=$(python -c "exec(open('version.py').read()); print(__version__)")
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -73,22 +96,22 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --name=QuestHelper-Linux --onefile --add-data="templates:templates" --add-data="quests.json:." --add-data="items.json:." --add-data="recipes.json:." --add-data="vendor_inventory.json:." --add-data="static:static" --add-data="browser-extension:browser-extension" --hidden-import=flask --hidden-import=flask_cors --hidden-import=jinja2 --hidden-import=webview --collect-all=flask --collect-all=flask_cors --collect-all=webview launcher.py
+        pyinstaller --name=QuestHelper-Linux-${{ steps.version.outputs.version }} --onefile --add-data="templates:templates" --add-data="quests.json:." --add-data="items.json:." --add-data="recipes.json:." --add-data="vendor_inventory.json:." --add-data="static:static" --add-data="browser-extension:browser-extension" --hidden-import=flask --hidden-import=flask_cors --hidden-import=jinja2 --hidden-import=webview --collect-all=flask --collect-all=flask_cors --collect-all=webview launcher.py
 
     - name: Make executable executable
       run: |
-        chmod +x dist/QuestHelper-Linux
+        chmod +x dist/QuestHelper-Linux-${{ steps.version.outputs.version }}
 
     - name: Upload executable artifact
       uses: actions/upload-artifact@v4
       with:
-        name: QuestHelper-Linux
-        path: dist/QuestHelper-Linux
+        name: QuestHelper-Linux-${{ steps.version.outputs.version }}
+        path: dist/QuestHelper-Linux-${{ steps.version.outputs.version }}
 
     - name: Upload executable to release
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/QuestHelper-Linux
+        files: dist/QuestHelper-Linux-${{ steps.version.outputs.version }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
