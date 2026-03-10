@@ -1,105 +1,72 @@
-# Quick Start Guide - VIP Quest Helper
+# Quick Start Guide - StorageBuddy
 
-## 1. Start the VIP Quest Helper
+## 1. First-Time Setup
 
-```bash
-cd ~/quest-tracker
-./start.sh
-```
+1. **Enable VIP exports** in Project Gorgon:
+   - Open the **VIP Menu** in-game
+   - Enable **Logs Export**
 
-The server will start and display:
-```
-* Running on http://127.0.0.1:5000
-```
+2. **Export your data**:
+   - In the VIP Menu, export **Storage JSON** (inventory & storage)
+   - Export **Character JSON** (quests & skill levels)
 
-## 2. Open in Your Browser
+3. **Start StorageBuddy**:
+   - Run the executable, or use `./start.sh` from source
+   - Your browser opens to `http://127.0.0.1:5000`
 
-Open your web browser and go to:
-```
-http://127.0.0.1:5000
-```
+## 2. Using StorageBuddy
 
-## 3. Using the Tracker
+### Quests Tab
+- Shows active quests that need item collection
+- **Filters**: All, Ready (can complete now), Pinned
+- **Pin quests** by clicking the checkbox for quick access
+- **Region dropdown** filters by turn-in location
+- Quest details show item locations, vendor info, and wiki links
 
-### Active Quests Tab
-- Shows all quests from your character data
-- Click any quest to see its checklist
+### Crafting Tab
+- Browse recipes by skill using the dropdown
+- **Pin recipes** (up to 20) to build a shopping list
+- Use +/− to set quantities
+- **Color coding**: Green (ready), Orange (buyable), Purple (needs favor), Blue (gather), Gray (need skill)
+- Materials panel shows aggregated requirements with sources
 
-### Search Tab
-- Search for any quest in the game
-- Type at least 2 characters to search
+### Pop-Out Overlay
+- Click **"Pop Out Overlay"** for a compact in-game tracker
+- Use PowerToys (Windows) or window manager (Linux) to keep it on top
+- Syncs theme and pinned items automatically
 
-### Checklist Features
-- **Auto-detected items**: Items you've collected (from chat logs) are shown in the progress
-- **Manual checkboxes**: Check off items you already have in your inventory
-- **Progress bars**: Visual indication of completion
-- **Auto-refresh**: Updates every 5 seconds automatically
-- **Manual refresh**: Click the "Refresh" button to update immediately
+### Themes
+- Click theme buttons in the header to change colors
+- Choice persists across sessions
 
-## 4. How Items Are Tracked
+## 3. Keeping Data Current
 
-The tracker monitors your chat logs for messages like:
-```
-[Status] Red Apple x2 added to inventory.
-[Status] Large Strawberry added to inventory.
-```
+Re-export from the VIP Menu after:
+- Looting or crafting items
+- Banking or moving items between storage
+- Gaining skill levels
+- Accepting or completing quests
 
-When you pick up items in-game:
-1. The chat log is updated
-2. The tracker reads the new entries
-3. Your checklist updates automatically
+## 4. Troubleshooting
 
-## 5. Important Notes
-
-- **Chat logging must be enabled** in Project Gorgon settings (V.I.P. section)
-- **Character reports** help auto-detect active quests (optional)
-- **Manual checks are saved** in your browser's localStorage
-- **The tracker runs locally** - no internet required (except for initial data download)
-
-## Example Workflow
-
-1. Accept a quest in-game
-2. Open the quest tracker in your browser
-3. Find the quest in the "Active" tab or use "Search"
-4. See all required items listed
-5. As you collect items in-game, watch them automatically check off!
-6. Manually check items you already had in your inventory
-
-## Troubleshooting
-
-**Nothing showing in Active tab?**
-- Generate a character report in-game
-- Use the Search tab instead
+**No quests showing?**
+- Export Character JSON from VIP Menu
 
 **Items not updating?**
-- Make sure chat logging is enabled
-- Check that Status messages are visible in your chat tab
-- Click the Refresh button manually
+- Export Storage JSON from VIP Menu
 
-**Vendor says they sell an item but you can't see it in their shop?**
-- **IMPORTANT**: Uncheck "Hide Unusable" in the vendor window
-- This option hides items like seeds, ingredients, and crafting materials even when you can use them
-- The filter is overly aggressive and will hide quest items you're looking for
-- Keep "Hide Unusable" unchecked when shopping for quest items
+**Can't find vendor items?**
+- Uncheck "Hide Unusable" in vendor windows
 
 **Server won't start?**
-- Make sure you're running `./start.sh` from the `~/quest-tracker` directory
-- Check that Nix is installed and working
+- Ensure port 5000 is available
+- Check Python/Nix installation
 
-## Updating Quest Data
+## 5. Updating Game Data
 
-To get the latest quest and item data:
+To refresh quest/item/recipe data from the wiki:
 ```bash
-cd ~/quest-tracker
 ./update_data.sh
 ```
 
-This downloads fresh data from the official Project Gorgon CDN.
-
-## Stopping the Server
-
-Press `Ctrl+C` in the terminal where the server is running.
-
----
-
-Enjoy tracking your quests!
+Use sparingly - this scrapes the wiki.

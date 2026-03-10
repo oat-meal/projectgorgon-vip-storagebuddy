@@ -42,19 +42,19 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --name=QuestHelper-Windows-${{ steps.version.outputs.version }} --onefile --windowed --add-data="templates;templates" --add-data="quests.json;." --add-data="items.json;." --add-data="recipes.json;." --add-data="vendor_inventory.json;." --add-data="static;static" --add-data="browser-extension;browser-extension" --hidden-import=flask --hidden-import=flask_cors --hidden-import=jinja2 --hidden-import=webview --collect-all=flask --collect-all=flask_cors --collect-all=webview launcher.py
+        pyinstaller --name=StorageBuddy-Windows-${{ steps.version.outputs.version }} --onefile --windowed --add-data="templates;templates" --add-data="quests.json;." --add-data="items.json;." --add-data="recipes.json;." --add-data="vendor_inventory.json;." --add-data="static;static" --hidden-import=flask --hidden-import=flask_cors --hidden-import=jinja2 --hidden-import=webview --collect-all=flask --collect-all=flask_cors --collect-all=webview launcher.py
 
     - name: Upload executable artifact
       uses: actions/upload-artifact@v4
       with:
-        name: QuestHelper-Windows-${{ steps.version.outputs.version }}
-        path: dist/QuestHelper-Windows-${{ steps.version.outputs.version }}.exe
+        name: StorageBuddy-Windows-${{ steps.version.outputs.version }}
+        path: dist/StorageBuddy-Windows-${{ steps.version.outputs.version }}.exe
 
     - name: Upload executable to release
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/QuestHelper-Windows-${{ steps.version.outputs.version }}.exe
+        files: dist/StorageBuddy-Windows-${{ steps.version.outputs.version }}.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -96,22 +96,22 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --name=QuestHelper-Linux-${{ steps.version.outputs.version }} --onefile --add-data="templates:templates" --add-data="quests.json:." --add-data="items.json:." --add-data="recipes.json:." --add-data="vendor_inventory.json:." --add-data="static:static" --add-data="browser-extension:browser-extension" --hidden-import=flask --hidden-import=flask_cors --hidden-import=jinja2 --hidden-import=webview --collect-all=flask --collect-all=flask_cors --collect-all=webview launcher.py
+        pyinstaller --name=StorageBuddy-Linux-${{ steps.version.outputs.version }} --onefile --add-data="templates:templates" --add-data="quests.json:." --add-data="items.json:." --add-data="recipes.json:." --add-data="vendor_inventory.json:." --add-data="static:static" --hidden-import=flask --hidden-import=flask_cors --hidden-import=jinja2 --hidden-import=webview --collect-all=flask --collect-all=flask_cors --collect-all=webview launcher.py
 
     - name: Make executable executable
       run: |
-        chmod +x dist/QuestHelper-Linux-${{ steps.version.outputs.version }}
+        chmod +x dist/StorageBuddy-Linux-${{ steps.version.outputs.version }}
 
     - name: Upload executable artifact
       uses: actions/upload-artifact@v4
       with:
-        name: QuestHelper-Linux-${{ steps.version.outputs.version }}
-        path: dist/QuestHelper-Linux-${{ steps.version.outputs.version }}
+        name: StorageBuddy-Linux-${{ steps.version.outputs.version }}
+        path: dist/StorageBuddy-Linux-${{ steps.version.outputs.version }}
 
     - name: Upload executable to release
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/QuestHelper-Linux-${{ steps.version.outputs.version }}
+        files: dist/StorageBuddy-Linux-${{ steps.version.outputs.version }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,44 +1,46 @@
-# Project Gorgon VIP Quest Helper
+# Project Gorgon VIP StorageBuddy
 
-A local web-based quest helper for Project Gorgon that helps you track quest objectives, inventory, and find items you need.
+A local web-based tool for Project Gorgon that helps you track quest objectives, crafting materials, and inventory across all your storage locations.
 
 ## Features
 
 ### Quest Tracking
 - **Active Quest Tracking** - Automatically detects active quests from exported Character JSON
-- **Inventory Detection** - Monitors chat logs and exported Storage/Character JSON to track collected items
-- **Color-Coded Progress** - Shows items ready to turn in (green), in storage (orange), or still needed (gray)
-- **Item Descriptions** - Displays item descriptions from game data for context
+- **Quest Pinning** - Pin up to 20 quests for quick access
+- **Inventory Detection** - Reads exported Storage/Character JSON to track collected items
+- **Color-Coded Progress** - Green (ready), orange (buyable from vendor), purple (needs favor), gray (gather)
 - **Storage Location Tracking** - Shows where items are stored (Inventory, Bank, Saddlebag, Dream World Chest)
-- **Vendor Information** - Displays confirmed vendors and favor requirements for purchasable items
+- **Vendor Information** - Displays vendors, prices, and favor requirements for purchasable items
+- **Favor Tracking** - Reads NPC favor levels from Character JSON to show which vendor items you can access
 - **Wiki Links** - Quick links to Project Gorgon Wiki for items that need to be farmed/gathered
-- **Completable Quest Detection** - Highlights quests you can complete with current inventory
-- **Buyable Quest Filter** - Shows quests where all missing items can be purchased
-- **Keyword-based Items** - Supports quests requiring item categories (e.g., "Poetry", "SnailShell")
-- **Search functionality** to find any quest in the game
+- **Region Filter** - Filter quests by turn-in location
+- **Search** - Find any quest in the game
 
 ### Crafting
 - **Recipe Browser** - Browse all crafting recipes by skill
 - **Skill Level Tracking** - Recipes show level requirements; grayed-out recipes require higher skill
-- **Smart Craftability** - Color-coded recipes: green (ready), orange (buyable), blue (gather), gray (need skill)
+- **Smart Craftability** - Color-coded: green (ready), orange (buyable), purple (needs favor), blue (gather), gray (need skill)
 - **Pinned Recipes** - Pin up to 20 recipes and see aggregated material requirements
 - **Recursive Sub-components** - Automatically detects craftable sub-items (3 levels deep)
 - **Inventory Integration** - Shows what materials you have and where they're stored
-- **Material Sources** - Each ingredient shows its source: storage, craft, buy, or gather with wiki links
+- **Material Sources** - Each ingredient shows its source: have, craft, buy, need favor, or gather
 - **Quantity Selection** - Set how many of each recipe you want to craft (1-999)
-- **Persistent Selections** - Pinned recipes persist when switching tabs and filters
 
 ### Pop-Out Overlay
 - **Compact Window** - View quest progress and crafting materials in a separate window
-- **Pin on Screen** - Keep visible over your game for quick reference
+- **Always-On-Top** - Keep visible over your game using PowerToys (Windows) or window manager (Linux)
+- **Theme Sync** - Automatically matches your selected theme
+- **Pinned Sync** - Pinned quests and recipes sync from main page
 - **Auto-Refresh** - Updates every 3 seconds
-- **Auto-Close** - Overlay closes automatically when main window closes
-- **Quests & Crafting Tabs** - Switch between quest progress and pinned materials
-- **Region Filter** - Filter quests by turn-in location
+
+### Themes
+- **6 Color Themes** - Sepia, Catppuccin Latte, Catppuccin Mocha, Solarized Light, Nord, Gruvbox
+- **Persistent Selection** - Theme choice saved to browser
+- **Synced Overlay** - Pop-out overlay matches main window theme
 
 ### General
-- **Auto-refresh** - Updates quest progress every 5 seconds
-- **Interactive Help** - Built-in documentation with setup instructions
+- **Auto-refresh** - Updates every 5 seconds
+- **Interactive Help** - Built-in documentation with color legends and setup instructions
 
 ## How It Works
 
@@ -56,10 +58,10 @@ The tracker monitors your Project Gorgon chat logs and automatically detects whe
 
 **No Python installation needed!**
 
-1. Go to [Releases](https://github.com/oat-meal/projectgorgon-vip-questhelper/releases)
+1. Go to [Releases](https://github.com/oat-meal/projectgorgon-vip-storagebuddy/releases)
 2. Download the executable for your platform:
-   - **Windows**: `QuestHelper-Windows.exe`
-   - **Linux**: `QuestHelper-Linux`
+   - **Windows**: `StorageBuddy-Windows-x.x.x.exe`
+   - **Linux**: `StorageBuddy-Linux-x.x.x`
 3. Double-click to run!
 4. Your browser will open automatically to the setup wizard
 5. Follow the on-screen instructions to configure your game data paths
@@ -72,15 +74,15 @@ The tracker monitors your Project Gorgon chat logs and automatically detects whe
 
 #### With Nix (Linux):
 ```bash
-git clone https://github.com/oat-meal/projectgorgon-vip-questhelper.git
-cd projectgorgon-vip-questhelper
+git clone https://github.com/oat-meal/projectgorgon-vip-storagebuddy.git
+cd projectgorgon-vip-storagebuddy
 ./start.sh
 ```
 
 #### With Python (Windows/Linux/Mac):
 ```bash
-git clone https://github.com/oat-meal/projectgorgon-vip-questhelper.git
-cd projectgorgon-vip-questhelper
+git clone https://github.com/oat-meal/projectgorgon-vip-storagebuddy.git
+cd projectgorgon-vip-storagebuddy
 
 # Install dependencies
 pip install -r requirements.txt
@@ -129,29 +131,31 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed usage instructions.
 
 Use the built-in overlay for in-game reference:
 
-1. Click **"Pop Out Overlay"** button in the top-right of the main page
+1. Click **"Pop Out Overlay"** button in the header
 2. A compact window opens with quest progress and crafting materials
 3. Position it over your game window
 4. Use an always-on-top tool to keep it visible:
    - **Windows**: [PowerToys Always on Top](https://learn.microsoft.com/en-us/windows/powertoys/always-on-top) (Win+Ctrl+T)
    - **Linux**: Right-click title bar → "Always on Top"
-5. Data syncs automatically every 3 seconds
+5. Theme and pinned items sync automatically from main window
 
 ## Project Structure
 
 ```
-projectgorgon-vip-questhelper/
+projectgorgon-vip-storagebuddy/
 ├── web_server.py          # Flask web server
 ├── quest_parser.py        # Quest and inventory parsing
 ├── vendor_hints.py        # Vendor information system
 ├── vendor_inventory.json  # Confirmed vendor data with favor levels
 ├── templates/
-│   └── index.html         # Web interface
-├── quests.json           # Game quest data (downloaded)
-├── items.json            # Game item data (downloaded)
-├── start.sh              # Startup script
-├── update_data.sh        # Data update script
-└── shell.nix             # Nix environment
+│   ├── index.html         # Main web interface
+│   └── overlay.html       # Pop-out overlay interface
+├── quests.json            # Game quest data
+├── items.json             # Game item data
+├── recipes.json           # Crafting recipe data
+├── start.sh               # Startup script
+├── update_data.sh         # Data update script
+└── shell.nix              # Nix environment
 ```
 
 ## Game Data Locations
