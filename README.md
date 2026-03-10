@@ -5,8 +5,8 @@ A local web-based quest helper for Project Gorgon that helps you track quest obj
 ## Features
 
 ### Quest Tracking
-- **Active Quest Tracking** - Automatically detects active quests from character reports
-- **Inventory Detection** - Monitors chat logs and character reports to track collected items
+- **Active Quest Tracking** - Automatically detects active quests from exported Character JSON
+- **Inventory Detection** - Monitors chat logs and exported Storage/Character JSON to track collected items
 - **Storage Location Tracking** - Shows where items are stored (Inventory, Bank, Saddlebag, Dream World Chest)
 - **Vendor Information** - Displays confirmed vendors and favor requirements for purchasable items
 - **Completable Quest Detection** - Highlights quests you can complete with current inventory
@@ -37,8 +37,9 @@ The tracker monitors your Project Gorgon chat logs and automatically detects whe
 
 ## Requirements
 
-- **Project Gorgon VIP Access** - Required for character reports and chat logging
+- **Project Gorgon VIP Access** - Required for JSON exports and chat logging
 - **Chat Logging Enabled** - Must be enabled in Project Gorgon settings (V.I.P. section)
+- **JSON Export** - Export Storage and Character JSON from the VIP Menu
 
 ## Installation
 
@@ -91,8 +92,9 @@ The server will start and open your browser to `http://127.0.0.1:5000`
    - Go to V.I.P. section
    - Enable "Chat Logs"
 
-2. **Generate Character Report** (for auto-detecting active quests):
-   - In-game, use the character report feature
+2. **Export Character and Storage JSON** (for auto-detecting active quests and inventory):
+   - Open the **VIP Menu** in-game
+   - Export **Storage JSON** and **Character JSON**
    - This creates files in `~/Documents/Project Gorgon Data/Reports/`
 
 ## Usage
@@ -102,7 +104,7 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed usage instructions.
 ### Quick Overview
 
 1. **Enable chat logging** in Project Gorgon (V.I.P. settings)
-2. **Generate character reports** in-game to update inventory
+2. **Export Storage and Character JSON** from the VIP Menu to update inventory
 3. **Accept quests** in-game and they'll appear in the tracker
 4. **Track progress** automatically as you collect items
 5. **Check vendor hints** for items you can purchase
@@ -155,7 +157,7 @@ To get the latest quest and item data from the official Project Gorgon CDN:
 ## Troubleshooting
 
 ### Items not showing in inventory?
-- Generate a fresh character report in-game
+- Export fresh Storage and Character JSON from the VIP Menu
 - Make sure chat logging is enabled
 - Check that Status messages are visible in your chat tab
 
@@ -165,7 +167,7 @@ To get the latest quest and item data from the official Project Gorgon CDN:
 - The filter is overly aggressive and will hide quest items you're looking for
 
 ### No active quests showing?
-- Make sure you've generated a character report in-game
+- Make sure you've exported Character JSON from the VIP Menu
 - Use the Search tab to find quests manually
 
 ### Server won't start?
