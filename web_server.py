@@ -19,6 +19,17 @@ from config import get_config
 from data_updater import ensure_quest_data
 from version import __version__
 
+
+def get_bundled_path(relative_path):
+    """Get the path to a bundled resource (works for PyInstaller and normal execution)"""
+    if getattr(sys, 'frozen', False):
+        # Running as PyInstaller bundle
+        base_path = Path(sys._MEIPASS)
+    else:
+        # Running as normal Python script
+        base_path = Path(__file__).parent
+    return base_path / relative_path
+
 # Parse command-line arguments (only parse known args to allow launcher.py args like --overlay)
 parser = argparse.ArgumentParser(description='Project Gorgon VIP Quest Helper')
 parser.add_argument('--debug', action='store_true', help='Enable debug logging')
@@ -602,7 +613,7 @@ def shopping_list():
                 recipe_quantities[recipe_id] = data
 
         # Load recipes
-        recipes_file = Path(__file__).parent / 'recipes.json'
+        recipes_file = get_bundled_path('recipes.json')
         if not recipes_file.exists():
             return jsonify({'recipes': [], 'error': 'Recipes file not found'})
 
@@ -629,7 +640,7 @@ def shopping_list():
 
         # Load vendor data - build item->vendor lookup
         vendor_items = {}
-        vendor_file = Path(__file__).parent / 'vendor_inventory.json'
+        vendor_file = get_bundled_path('vendor_inventory.json')
         if vendor_file.exists():
             with open(vendor_file, 'r') as f:
                 vendor_data = json.load(f)
@@ -702,7 +713,7 @@ def shopping_list():
 def get_recipes():
     """Serve recipes.json file for crafting tab"""
     try:
-        recipes_file = Path(__file__).parent / 'recipes.json'
+        recipes_file = get_bundled_path('recipes.json')
         if not recipes_file.exists():
             return jsonify({'error': 'Recipes file not found'}), 404
 
@@ -744,9 +755,9 @@ def get_player_inventory():
 def get_items_index():
     """Get global item index with game data, vendor info, and crafting recipes"""
     try:
-        items_file = Path(__file__).parent / 'items.json'
-        recipes_file = Path(__file__).parent / 'recipes.json'
-        vendor_file = Path(__file__).parent / 'vendor_inventory.json'
+        items_file = get_bundled_path('items.json')
+        recipes_file = get_bundled_path('recipes.json')
+        vendor_file = get_bundled_path('vendor_inventory.json')
 
         # Load items database
         items = {}
@@ -813,7 +824,7 @@ def get_items_index():
 def get_vendor_items():
     """Get items available from vendors"""
     try:
-        vendor_file = Path(__file__).parent / 'vendor_inventory.json'
+        vendor_file = get_bundled_path('vendor_inventory.json')
 
         if not vendor_file.exists():
             return jsonify({'error': 'Vendor file not found', 'vendor_items': {}}), 200
@@ -850,7 +861,7 @@ def get_vendor_items():
 def get_item_keywords():
     """Get keyword to item mappings for ingredient matching"""
     try:
-        items_file = Path(__file__).parent / 'items.json'
+        items_file = get_bundled_path('items.json')
 
         if not items_file.exists():
             return jsonify({'error': 'Items file not found', 'keywords': {}}), 200
