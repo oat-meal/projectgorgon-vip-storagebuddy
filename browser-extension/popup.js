@@ -4,12 +4,13 @@ const API_URL = 'http://127.0.0.1:5000';
 
 let currentTab = 'quests';
 let currentView = 'all';
-let currentZoom = 100;
+let currentRegion = '';
 let lastUpdateTime = Date.now();
 let isConnected = false;
+let allQuests = []; // Cache quests for filtering
 
 // Load saved preferences
-chrome.storage.local.get(['tab', 'view', 'zoom'], (result) => {
+chrome.storage.local.get(['tab', 'view', 'region'], (result) => {
     if (result.tab) {
         currentTab = result.tab;
         switchTab(currentTab);
@@ -18,9 +19,8 @@ chrome.storage.local.get(['tab', 'view', 'zoom'], (result) => {
         currentView = result.view;
         document.getElementById('viewSelector').value = currentView;
     }
-    if (result.zoom) {
-        currentZoom = result.zoom;
-        applyZoom(currentZoom);
+    if (result.region) {
+        currentRegion = result.region;
     }
 });
 
@@ -55,22 +55,113 @@ document.getElementById('viewSelector').addEventListener('change', (e) => {
     loadData();
 });
 
-// Zoom controls
-document.getElementById('zoomIn').addEventListener('click', () => {
-    currentZoom = Math.min(150, currentZoom + 10);
-    applyZoom(currentZoom);
-    chrome.storage.local.set({ zoom: currentZoom });
+// Region selector change
+document.getElementById('regionSelector').addEventListener('change', (e) => {
+    currentRegion = e.target.value;
+    chrome.storage.local.set({ region: currentRegion });
+    renderFilteredQuests();
 });
 
-document.getElementById('zoomOut').addEventListener('click', () => {
-    currentZoom = Math.max(70, currentZoom - 10);
-    applyZoom(currentZoom);
-    chrome.storage.local.set({ zoom: currentZoom });
-});
+function updateRegionSelector(quests) {
+    const regionSelector = document.getElementById('regionSelector');
+    const regions = [...new Set(quests.map(q => q.location).filter(Boolean))].sort();
 
-function applyZoom(zoom) {
-    document.getElementById('content').style.fontSize = `${zoom}%`;
-    document.getElementById('zoomValue').textContent = `${zoom}%`;
+    // Remember current selection
+    const currentSelection = regionSelector.value;
+
+    // Clear and rebuild options
+    regionSelector.innerHTML = '<option value="">All Regions</option>';
+    regions.forEach(region => {
+        const option = document.createElement('option');
+        option.value = region;
+        option.textContent = region;
+        regionSelector.appendChild(option);
+    });
+
+    // Restore selection if still valid
+    if (currentRegion && regions.includes(currentRegion)) {
+        regionSelector.value = currentRegion;
+    } else if (currentSelection && regions.includes(currentSelection)) {
+        regionSelector.value = currentSelection;
+    }
+}
+
+function renderFilteredQuests() {
+    const content = document.getElementById('content');
+    let quests = allQuests;
+
+    // Apply region filter
+    if (currentRegion) {
+        quests = quests.filter(q => q.location === currentRegion);
+    }
+
+    if (quests.length === 0) {
+        const emptyMessage = currentRegion
+            ? `No quests in ${currentRegion}`
+            : (currentView === 'ready' ? 'No quests ready to complete' : 'No active quests with items');
+        content.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p>${emptyMessage}</p>
+            </div>
+        `;
+        document.getElementById('itemCount').textContent = '0 quests';
+        return;
+    }
+
+    // Render quests
+    const questsHtml = quests.map(quest => {
+        const isReady = quest.items.every(item => item.have >= item.need);
+        const isBuyable = !isReady && quest.items.some(item => item.vendor_info);
+        const questClass = isReady ? 'quest-group ready' : (isBuyable ? 'quest-group buyable' : 'quest-group');
+
+        const itemsHtml = quest.items.map(item => {
+            const isCompleted = item.have >= item.need;
+            const itemClass = isCompleted ? 'item completed' : 'item';
+
+            let detailsHtml = '';
+            const total = (item.in_inventory || 0) + (item.in_storage || 0);
+            if (total > 0) {
+                let locationParts = [];
+                if (item.in_inventory) locationParts.push(`📦 Inventory: ${item.in_inventory}`);
+                if (item.storage_locations) {
+                    for (const [location, count] of Object.entries(item.storage_locations)) {
+                        let icon = '🏦';
+                        let shortName = location;
+                        if (location.toLowerCase().includes('saddlebag')) {
+                            icon = '🎒';
+                            shortName = 'Saddlebag';
+                        }
+                        locationParts.push(`${icon} ${shortName}: ${count}`);
+                    }
+                }
+                if (locationParts.length > 0) {
+                    detailsHtml += `<div class="item-details">${locationParts.join(' • ')}</div>`;
+                }
+            }
+            if (item.vendor_info && !isCompleted) {
+                detailsHtml += `<div class="vendor-info">🛒 ${escapeHtml(item.vendor_info)}</div>`;
+            }
+
+            return `
+                <div class="${itemClass}">
+                    <span class="item-name">${escapeHtml(item.name)}</span>
+                    <span class="item-progress">${item.have}/${item.need}</span>
+                    ${detailsHtml}
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="${questClass}">
+                <div class="quest-name">${escapeHtml(quest.name)}</div>
+                <div class="item-list">${itemsHtml}</div>
+            </div>
+        `;
+    }).join('');
+
+    content.innerHTML = questsHtml;
+    document.getElementById('itemCount').textContent = `${quests.length} quest${quests.length !== 1 ? 's' : ''}`;
 }
 
 async function loadData() {
@@ -118,80 +209,14 @@ async function loadQuestData(content) {
 
     const data = await response.json();
 
-    if (data.quests.length === 0) {
-        const emptyMessage = currentView === 'ready'
-            ? 'No quests ready to complete'
-            : 'No active quests with items';
-        content.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📋</div>
-                <p>${emptyMessage}</p>
-            </div>
-        `;
-        document.getElementById('itemCount').textContent = '0 quests';
-        return;
-    }
+    // Cache quests for filtering
+    allQuests = data.quests;
 
-    // Render quests
-    const questsHtml = data.quests.map(quest => {
-        const isReady = quest.items.every(item => item.have >= item.need);
-        const isBuyable = !isReady && quest.items.some(item => item.vendor_info);
-        const questClass = isReady ? 'quest-group ready' : (isBuyable ? 'quest-group buyable' : 'quest-group');
+    // Update region selector with available regions
+    updateRegionSelector(allQuests);
 
-        const itemsHtml = quest.items.map(item => {
-            const isCompleted = item.have >= item.need;
-            const itemClass = isCompleted ? 'item completed' : 'item';
-
-            // Build details section
-            let detailsHtml = '';
-
-            // Location info
-            const total = (item.in_inventory || 0) + (item.in_storage || 0);
-            if (total > 0) {
-                let locationParts = [];
-                if (item.in_inventory) locationParts.push(`📦 Inventory: ${item.in_inventory}`);
-
-                if (item.storage_locations) {
-                    for (const [location, count] of Object.entries(item.storage_locations)) {
-                        let icon = '🏦';
-                        let shortName = location;
-                        if (location.toLowerCase().includes('saddlebag')) {
-                            icon = '🎒';
-                            shortName = 'Saddlebag';
-                        }
-                        locationParts.push(`${icon} ${shortName}: ${count}`);
-                    }
-                }
-
-                if (locationParts.length > 0) {
-                    detailsHtml += `<div class="item-details">${locationParts.join(' • ')}</div>`;
-                }
-            }
-
-            // Vendor info
-            if (item.vendor_info && !isCompleted) {
-                detailsHtml += `<div class="vendor-info">🛒 ${escapeHtml(item.vendor_info)}</div>`;
-            }
-
-            return `
-                <div class="${itemClass}">
-                    <span class="item-name">${escapeHtml(item.name)}</span>
-                    <span class="item-progress">${item.have}/${item.need}</span>
-                    ${detailsHtml}
-                </div>
-            `;
-        }).join('');
-
-        return `
-            <div class="${questClass}">
-                <div class="quest-name">${escapeHtml(quest.name)}</div>
-                <div class="item-list">${itemsHtml}</div>
-            </div>
-        `;
-    }).join('');
-
-    content.innerHTML = questsHtml;
-    document.getElementById('itemCount').textContent = `${data.quests.length} quest${data.quests.length !== 1 ? 's' : ''}`;
+    // Render with current filter
+    renderFilteredQuests();
 }
 
 async function loadCraftingData(content) {

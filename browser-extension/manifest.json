@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "StorageBuddy - Quest Tracker",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Quest and crafting overlay for Project Gorgon VIP StorageBuddy",
   "icons": {
     "16": "icons/icon16.png",

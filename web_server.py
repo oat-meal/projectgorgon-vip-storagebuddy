@@ -560,9 +560,10 @@ def overlay_data():
             if not include_quest:
                 continue
 
-            # Simplify data for overlay - only include quest name and items with progress
+            # Simplify data for overlay - only include quest name, location and items with progress
             simplified_quest = {
                 'name': quest.name,
+                'location': quest.displayed_location or 'Unknown',
                 'items': []
             }
 
