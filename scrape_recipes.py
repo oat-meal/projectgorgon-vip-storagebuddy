@@ -13,19 +13,68 @@ from pathlib import Path
 
 # Wiki URLs
 CATEGORY_URL = "https://wiki.projectgorgon.com/wiki/Category:Recipes"
+SKILLS_URL = "https://wiki.projectgorgon.com/wiki/Skills"
 WIKI_BASE = "https://wiki.projectgorgon.com"
 
+
+def get_trade_skills_from_skills_page():
+    """Get Trade Skills from the Skills page (catches skills not in Category:Recipes like Cheesemaking)"""
+    print("Fetching Trade Skills from Skills page...")
+
+    try:
+        response = requests.get(SKILLS_URL, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        trade_skills = []
+
+        # Find the Trade Skills section - look for h2 or h3 containing "Trade Skills"
+        trade_header = None
+        for header in soup.find_all(['h2', 'h3']):
+            if 'Trade Skills' in header.get_text():
+                trade_header = header
+                break
+
+        if trade_header:
+            # Get the next sibling elements until we hit another header
+            current = trade_header.find_next_sibling()
+            while current and current.name not in ['h2', 'h3']:
+                # Look for links to skill pages
+                if current.name == 'div' or current.name == 'ul' or current.name == 'table':
+                    links = current.find_all('a')
+                    for link in links:
+                        href = link.get('href', '')
+                        title = link.get('title', '') or link.get_text(strip=True)
+                        # Only get direct skill links (not /Recipes links)
+                        if href.startswith('/wiki/') and '/Recipes' not in href:
+                            skill_name = title.replace('_', ' ')
+                            # Skip if it's a category or special page
+                            if ':' not in skill_name and skill_name:
+                                trade_skills.append(skill_name)
+                current = current.find_next_sibling()
+
+        # Remove duplicates
+        trade_skills = list(set(trade_skills))
+        print(f"Found {len(trade_skills)} Trade Skills from Skills page")
+        return trade_skills
+
+    except Exception as e:
+        print(f"Error fetching Trade Skills: {e}")
+        return []
+
+
 def get_skill_pages():
-    """Get list of all skill recipe pages from Category:Recipes"""
+    """Get list of all skill recipe pages from Category:Recipes and Trade Skills"""
     print("Fetching skill recipe pages from wiki...")
 
+    skill_pages = []
+    known_skills = set()
+
+    # First, get from Category:Recipes
     try:
         response = requests.get(CATEGORY_URL, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
-
-        # Find all links in the category page
-        skill_pages = []
 
         # Look for links in the mw-category div
         category_div = soup.find('div', {'class': 'mw-category'})
@@ -40,13 +89,32 @@ def get_skill_pages():
                         'skill': skill_name,
                         'url': WIKI_BASE + href
                     })
+                    known_skills.add(skill_name.lower())
 
-        print(f"Found {len(skill_pages)} skill recipe pages")
-        return skill_pages
+        print(f"Found {len(skill_pages)} skill recipe pages from Category:Recipes")
 
     except Exception as e:
-        print(f"Error fetching skill pages: {e}")
-        return []
+        print(f"Error fetching from Category:Recipes: {e}")
+
+    # Then, add any Trade Skills not already in the list
+    trade_skills = get_trade_skills_from_skills_page()
+    added_from_trade = 0
+    for skill_name in trade_skills:
+        if skill_name.lower() not in known_skills:
+            # Construct the recipe page URL
+            url = f"{WIKI_BASE}/wiki/{skill_name.replace(' ', '_')}/Recipes"
+            skill_pages.append({
+                'skill': skill_name,
+                'url': url
+            })
+            known_skills.add(skill_name.lower())
+            added_from_trade += 1
+
+    if added_from_trade > 0:
+        print(f"Added {added_from_trade} additional skills from Trade Skills page")
+
+    print(f"Total: {len(skill_pages)} skill recipe pages to scrape")
+    return skill_pages
 
 def parse_ingredient(ingredient_text):
     """Parse ingredient text to extract name and quantity
