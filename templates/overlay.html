@@ -734,7 +734,7 @@
             if (!response.ok) throw new Error('Server not responding');
 
             const data = await response.json();
-            allQuests = data.quests;
+            allQuests = data.data?.quests || [];
             updateRegionSelector(allQuests);
             renderFilteredQuests();
         }
@@ -843,7 +843,7 @@
             if (!response.ok) throw new Error('Server not responding');
 
             const data = await response.json();
-            allRecipes = data.recipes || [];
+            allRecipes = data.data?.recipes || [];
             renderCraftingView();
         }
 

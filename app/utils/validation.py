@@ -210,12 +210,13 @@ def validate_recipe_selections(selections: Any) -> Dict[str, int]:
 
     validated = {}
     for recipe_id, data in selections.items():
-        # Validate recipe ID format
+        # Validate recipe ID format - allow alphanumeric, spaces, hyphens, underscores
+        # Recipe IDs are formatted as "Skill_Recipe Name_index" (e.g., "Cooking_Basic Bread_0")
         recipe_id = validate_string(
             recipe_id,
             field_name="recipe_id",
             max_length=200,
-            pattern=r'^[\w\-_]+$'
+            pattern=r'^[\w\s\-\'",.()]+$'  # Allow common recipe name characters
         )
 
         # Extract and validate quantity

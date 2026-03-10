@@ -1044,9 +1044,9 @@
                 const completableData = await completableResponse.json();
                 const purchasableData = await purchasableResponse.json();
 
-                activeQuests = activeData.quests;
-                completableQuests = completableData.quests;
-                purchasableQuests = purchasableData.quests;
+                activeQuests = activeData.data.quests;
+                completableQuests = completableData.data.quests;
+                purchasableQuests = purchasableData.data.quests;
                 completableQuestSet = new Set(completableQuests.map(q => q.internal_name));
                 purchasableQuestSet = new Set(purchasableQuests.map(q => q.internal_name));
 
@@ -1066,8 +1066,8 @@
                 const completableData = await completableResponse.json();
                 const purchasableData = await purchasableResponse.json();
 
-                completableQuests = completableData.quests;
-                purchasableQuests = purchasableData.quests;
+                completableQuests = completableData.data.quests;
+                purchasableQuests = purchasableData.data.quests;
                 completableQuestSet = new Set(completableQuests.map(q => q.internal_name));
                 purchasableQuestSet = new Set(purchasableQuests.map(q => q.internal_name));
 
@@ -1107,8 +1107,8 @@
                 playerInventory = {};
                 playerInventoryDetails = {}; // Store detailed location info
 
-                if (invData.items) {
-                    for (const [itemName, itemData] of Object.entries(invData.items)) {
+                if (invData.data?.items) {
+                    for (const [itemName, itemData] of Object.entries(invData.data.items)) {
                         const totalCount = itemData.total || 0;
                         if (totalCount > 0) {
                             playerInventory[itemName] = totalCount;
@@ -1122,22 +1122,22 @@
                 }
 
                 // Store keyword mappings
-                itemKeywords = keywordsData.keywords || {};
+                itemKeywords = keywordsData.data?.keywords || {};
 
                 // Store vendor items
-                vendorItems = vendorsData.vendor_items || {};
+                vendorItems = vendorsData.data?.vendor_items || {};
 
                 // Store player skills (skill name -> effective level)
                 playerSkills = {};
-                if (skillsData.skills) {
-                    for (const [skillName, skillData] of Object.entries(skillsData.skills)) {
+                if (skillsData.data?.skills) {
+                    for (const [skillName, skillData] of Object.entries(skillsData.data.skills)) {
                         playerSkills[skillName] = skillData.effectiveLevel || 0;
                     }
                 }
 
                 // Store player favor levels (NPC name -> { level, rank })
-                playerFavor = favorData.favor || {};
-                favorLevels = favorData.favor_levels || [];
+                playerFavor = favorData.data?.favor || {};
+                favorLevels = favorData.data?.favor_levels || [];
 
                 console.log(`Loaded ${Object.keys(playerInventory).length} items from player inventory`);
                 console.log(`Loaded ${Object.keys(itemKeywords).length} keyword mappings`);
@@ -1693,7 +1693,7 @@
                 if (searchType === 'all' || searchType === 'quests') {
                     const questsResponse = await fetch(`/api/search_quests?q=${encodeURIComponent(query)}`);
                     const questsData = await questsResponse.json();
-                    const quests = questsData.quests;
+                    const quests = questsData.data?.quests || [];
 
                     if (quests.length > 0) {
                         if (searchType === 'all') {
@@ -1761,7 +1761,7 @@
             try {
                 const questsResponse = await fetch(`/api/search_quests?q=${encodeURIComponent(query)}`);
                 const questsData = await questsResponse.json();
-                let quests = questsData.quests;
+                let quests = questsData.data?.quests || [];
 
                 // Apply region filter if selected
                 if (selectedRegion) {
@@ -2143,8 +2143,8 @@
 
             try {
                 const response = await fetch(`/api/quest/${internalName}`);
-                const quest = await response.json();
-                renderQuestDetail(quest);
+                const questResponse = await response.json();
+                renderQuestDetail(questResponse.data);
             } catch (error) {
                 console.error('Error loading quest detail:', error);
                 container.innerHTML = '<p class="empty-state">Error loading quest details</p>';
@@ -3087,9 +3087,9 @@
             try {
                 const response = await fetch('/api/version');
                 const data = await response.json();
-                document.getElementById('appVersion').textContent = `v${data.version}`;
-                if (data.log_file) {
-                    document.getElementById('logFileInfo').textContent = `• Debug log: ${data.log_file}`;
+                document.getElementById('appVersion').textContent = `v${data.data?.version || data.version}`;
+                if (data.data?.log_file || data.log_file) {
+                    document.getElementById('logFileInfo').textContent = `• Debug log: ${data.data?.log_file || data.log_file}`;
                 }
             } catch (error) {
                 console.error('Failed to load version:', error);

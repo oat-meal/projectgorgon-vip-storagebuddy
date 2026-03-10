@@ -27,16 +27,18 @@ def api_response(
     Returns:
         Flask JSON response tuple (response, status_code)
 
-    Example response format:
+    Response format:
     {
         "success": true,
         "data": {...},
-        "message": "Operation completed",
+        "message": "Optional message",
         "meta": {
             "timestamp": "2026-03-10T17:30:00Z",
-            "version": "0.6.1"
+            "version": "0.6.2"
         }
     }
+
+    Frontend should access data via: response.data.quests, response.data.items, etc.
     """
     response = {
         'success': True,
