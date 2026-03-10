@@ -328,13 +328,113 @@ document.getElementById('popoutBtn').addEventListener('click', () => {
 
 // Check if this is a popped out window and adjust UI
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('popout') === 'true') {
+const isPopout = urlParams.get('popout') === 'true';
+
+if (isPopout) {
     // Hide the pop-out button in popped out window
     document.getElementById('popoutBtn').style.display = 'none';
+
+    // Show the pin button
+    document.getElementById('pinBtn').style.display = 'flex';
 
     // Adjust body for standalone window
     document.body.style.width = '100%';
     document.body.style.minHeight = '100vh';
+
+    // Initialize pin button state
+    initPinButton();
+}
+
+// Pin button functionality
+async function initPinButton() {
+    const pinBtn = document.getElementById('pinBtn');
+
+    // Get current state from storage
+    chrome.storage.local.get(['alwaysOnTop'], (result) => {
+        updatePinButton(result.alwaysOnTop || false);
+    });
+}
+
+function updatePinButton(isPinned) {
+    const pinBtn = document.getElementById('pinBtn');
+    if (isPinned) {
+        pinBtn.classList.add('pinned');
+        pinBtn.innerHTML = '<span>📌</span> Pinned';
+        pinBtn.title = 'Always-on-top enabled - Use PowerToys or window manager to pin';
+    } else {
+        pinBtn.classList.remove('pinned');
+        pinBtn.innerHTML = '<span>📌</span> Pin';
+        pinBtn.title = 'Mark as always-on-top (requires PowerToys or window manager)';
+    }
+}
+
+document.getElementById('pinBtn').addEventListener('click', async () => {
+    chrome.storage.local.get(['alwaysOnTop'], (result) => {
+        const newState = !result.alwaysOnTop;
+        chrome.storage.local.set({ alwaysOnTop: newState }, () => {
+            updatePinButton(newState);
+
+            // Show a helpful tooltip on first pin
+            if (newState) {
+                showPinHelp();
+            }
+        });
+    });
+});
+
+function showPinHelp() {
+    // Check if we've shown the help before
+    chrome.storage.local.get(['pinHelpShown'], (result) => {
+        if (!result.pinHelpShown) {
+            chrome.storage.local.set({ pinHelpShown: true });
+
+            // Create and show a help tooltip
+            const helpDiv = document.createElement('div');
+            helpDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(40, 40, 50, 0.98);
+                border: 1px solid rgba(255, 193, 7, 0.5);
+                border-radius: 8px;
+                padding: 15px;
+                max-width: 280px;
+                z-index: 1000;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            `;
+            helpDiv.innerHTML = `
+                <div style="color: #ffc107; font-weight: 600; margin-bottom: 8px;">📌 Always-on-Top</div>
+                <div style="color: #ccc; font-size: 12px; line-height: 1.5;">
+                    Chrome doesn't support native always-on-top for extension windows.<br><br>
+                    <strong>Windows:</strong> Use <a href="https://learn.microsoft.com/en-us/windows/powertoys/" target="_blank" style="color: #667eea;">PowerToys</a> "Always on Top" (Win+Ctrl+T)<br><br>
+                    <strong>Linux:</strong> Most window managers support pinning via titlebar menu or keyboard shortcut.
+                </div>
+                <button id="closePinHelp" style="
+                    margin-top: 12px;
+                    background: rgba(102, 126, 234, 0.3);
+                    border: 1px solid rgba(102, 126, 234, 0.5);
+                    border-radius: 4px;
+                    color: #a8b2ff;
+                    padding: 6px 12px;
+                    cursor: pointer;
+                    width: 100%;
+                ">Got it!</button>
+            `;
+            document.body.appendChild(helpDiv);
+
+            document.getElementById('closePinHelp').addEventListener('click', () => {
+                helpDiv.remove();
+            });
+
+            // Auto-close after 10 seconds
+            setTimeout(() => {
+                if (helpDiv.parentNode) {
+                    helpDiv.remove();
+                }
+            }, 10000);
+        }
+    });
 }
 
 // Initial load
