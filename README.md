@@ -54,47 +54,25 @@ The tracker monitors your Project Gorgon chat logs and automatically detects whe
 
 ## Installation
 
-### Option 1: Download Executable (Easiest - Recommended for Most Users)
-
-**No Python installation needed!**
+### Option 1: Download Executable (Windows)
 
 1. Go to [Releases](https://github.com/oat-meal/projectgorgon-vip-storagebuddy/releases)
-2. Download the executable for your platform:
-   - **Windows**: `StorageBuddy-Windows-x.x.x.exe`
-   - **Linux**: `StorageBuddy-Linux-x.x.x`
-3. Double-click to run!
+2. Download `StorageBuddy-Windows-x.x.x.exe`
+3. Double-click to run
 4. Your browser will open automatically to the setup wizard
-5. Follow the on-screen instructions to configure your game data paths
 
-**First-time Windows users**: You may see a "Windows protected your PC" warning. Click "More info" → "Run anyway". This is normal for unsigned executables.
+**Note**: You may see a "Windows protected your PC" warning. Click "More info" → "Run anyway". This is normal for unsigned executables.
 
-### Option 2: Run from Source (Advanced Users)
+### Option 2: Run from Source (Windows/Linux)
 
-**For developers or users who want to modify the code:**
-
-#### With Nix (Linux):
 ```bash
 git clone https://github.com/oat-meal/projectgorgon-vip-storagebuddy.git
 cd projectgorgon-vip-storagebuddy
-./start.sh
-```
-
-#### With Python (Windows/Linux/Mac):
-```bash
-git clone https://github.com/oat-meal/projectgorgon-vip-storagebuddy.git
-cd projectgorgon-vip-storagebuddy
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Windows users:
-START_QUEST_HELPER.bat
-
-# Linux/Mac users:
 python3 web_server.py
 ```
 
-The server will start and open your browser to `http://127.0.0.1:5000`
+Your browser will open to `http://127.0.0.1:5000`
 
 ## Setup
 
@@ -153,9 +131,8 @@ projectgorgon-vip-storagebuddy/
 ├── quests.json            # Game quest data
 ├── items.json             # Game item data
 ├── recipes.json           # Crafting recipe data
-├── start.sh               # Startup script
-├── update_data.sh         # Data update script
-└── shell.nix              # Nix environment
+├── start.sh               # Startup script (Linux)
+└── update_data.sh         # Data update script
 ```
 
 ## Game Data Locations
@@ -188,8 +165,8 @@ To get the latest quest and item data from the official Project Gorgon CDN:
 - Use the Search tab to find quests manually
 
 ### Server won't start?
-- Make sure you're running `./start.sh` from the project directory
-- Verify Nix is installed: `nix --version`
+- Ensure port 5000 is available
+- Check Python dependencies: `pip install -r requirements.txt`
 
 ## Contributing
 
