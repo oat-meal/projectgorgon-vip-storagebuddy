@@ -16,8 +16,83 @@ import sys
 import argparse
 import socket
 import logging
+import shutil
+import os
 from pathlib import Path
 from datetime import datetime
+
+
+def get_user_data_dir():
+    """Get the user data directory for the application"""
+    import platform
+    if platform.system() == 'Windows':
+        data_dir = Path(os.environ.get('LOCALAPPDATA', '~')) / 'ProjectGorgon-QuestHelper'
+    elif platform.system() == 'Darwin':
+        data_dir = Path('~/Library/Application Support/ProjectGorgon-QuestHelper').expanduser()
+    else:
+        data_dir = Path('~/.local/share/projectgorgon-questhelper').expanduser()
+    return data_dir
+
+
+def get_bundled_path(relative_path):
+    """Get the path to a bundled resource (works for PyInstaller and normal execution)"""
+    if getattr(sys, 'frozen', False):
+        # Running as PyInstaller bundle
+        base_path = Path(sys._MEIPASS)
+    else:
+        # Running as normal Python script
+        base_path = Path(__file__).parent
+    return base_path / relative_path
+
+
+def extract_browser_extension():
+    """Extract the browser extension to a user-accessible location"""
+    bundled_ext = get_bundled_path('browser-extension')
+
+    if not bundled_ext.exists():
+        # Not bundled (running from source or not included)
+        return None
+
+    user_data_dir = get_user_data_dir()
+    ext_dest = user_data_dir / 'browser-extension'
+
+    # Check if we need to extract (first run or update)
+    version_file = ext_dest / '.version'
+    from version import __version__
+
+    needs_extract = True
+    if version_file.exists():
+        try:
+            existing_version = version_file.read_text().strip()
+            if existing_version == __version__:
+                needs_extract = False
+        except:
+            pass
+
+    if needs_extract:
+        print(f"Extracting browser extension to: {ext_dest}")
+
+        # Remove old extension if exists
+        if ext_dest.exists():
+            shutil.rmtree(ext_dest)
+
+        # Create destination directory
+        ext_dest.mkdir(parents=True, exist_ok=True)
+
+        # Copy all files from bundled extension
+        for item in bundled_ext.iterdir():
+            src = item
+            dst = ext_dest / item.name
+            if src.is_dir():
+                shutil.copytree(src, dst)
+            else:
+                shutil.copy2(src, dst)
+
+        # Write version file
+        version_file.write_text(__version__)
+        print(f"Browser extension extracted successfully!")
+
+    return ext_dest
 
 def setup_overlay_debug_logging():
     """Setup debug logging for overlay mode"""
@@ -319,6 +394,14 @@ def main():
     if args.overlay:
         print("OVERLAY MODE")
     print("="*60)
+
+    # Extract browser extension if bundled
+    ext_path = extract_browser_extension()
+    if ext_path:
+        print(f"\nBrowser Extension available at:")
+        print(f"  {ext_path}")
+        print("  Load this folder in Chrome/Edge (developer mode) to use the overlay")
+
     print("\nStarting server...")
 
     # Import Flask app before starting threads

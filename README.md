@@ -119,10 +119,15 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed usage instructions.
 
 A companion browser extension provides a compact overlay for in-game reference:
 
-1. Load the extension from `browser-extension/` folder in Chrome/Edge (developer mode)
-2. Click the extension icon to see quest progress or crafting materials
-3. Use **Pop Out** to pin the overlay on screen while gaming
-4. Data syncs automatically with the main app
+1. **Find the extension folder:**
+   - **Executable users (Windows)**: The extension is automatically extracted to:
+     `%LOCALAPPDATA%\ProjectGorgon-QuestHelper\browser-extension\`
+   - **Executable users (Linux)**: `~/.local/share/projectgorgon-questhelper/browser-extension/`
+   - **Source users**: `browser-extension/` in the project folder
+2. Load the extension folder in Chrome/Edge (developer mode)
+3. Click the extension icon to see quest progress or crafting materials
+4. Use **Pop Out** to pin the overlay on screen while gaming
+5. Data syncs automatically with the main app
 
 ## Project Structure
 
