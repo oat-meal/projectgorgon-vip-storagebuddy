@@ -7,6 +7,148 @@
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon.png">
     <style>
+        /* Theme Definitions */
+        :root, [data-theme="sepia"] {
+            --bg-gradient-1: #c4a574;
+            --bg-gradient-2: #8b6914;
+            --bg-page: #f5f0e6;
+            --bg-card: #faf6ee;
+            --bg-card-hover: #f0ebe0;
+            --bg-item: #f0ebe0;
+            --bg-item-complete: #e8f0e0;
+            --bg-input: #faf6ee;
+            --border-color: #d4c4ae;
+            --text-primary: #4a3728;
+            --text-secondary: #6b5344;
+            --text-muted: #8b7355;
+            --accent: #8b6914;
+            --accent-hover: #7a5c12;
+            --accent-light: rgba(139, 105, 20, 0.1);
+            --success: #5d7a3d;
+            --warning: #c4712b;
+            --danger: #a83e32;
+            --info: #4a6f8a;
+            --shadow: rgba(74, 55, 40, 0.1);
+        }
+
+        [data-theme="ctp-latte"] {
+            --bg-gradient-1: #7287fd;
+            --bg-gradient-2: #8839ef;
+            --bg-page: #eff1f5;
+            --bg-card: #ffffff;
+            --bg-card-hover: #e6e9ef;
+            --bg-item: #e6e9ef;
+            --bg-item-complete: #d5f0d5;
+            --bg-input: #ffffff;
+            --border-color: #ccd0da;
+            --text-primary: #4c4f69;
+            --text-secondary: #5c5f77;
+            --text-muted: #7c7f93;
+            --accent: #1e66f5;
+            --accent-hover: #1a5ae0;
+            --accent-light: rgba(30, 102, 245, 0.1);
+            --success: #40a02b;
+            --warning: #fe640b;
+            --danger: #d20f39;
+            --info: #7287fd;
+            --shadow: rgba(76, 79, 105, 0.1);
+        }
+
+        [data-theme="ctp-mocha"] {
+            --bg-gradient-1: #89b4fa;
+            --bg-gradient-2: #cba6f7;
+            --bg-page: #1e1e2e;
+            --bg-card: #313244;
+            --bg-card-hover: #45475a;
+            --bg-item: #45475a;
+            --bg-item-complete: #2d4a2d;
+            --bg-input: #313244;
+            --border-color: #45475a;
+            --text-primary: #cdd6f4;
+            --text-secondary: #bac2de;
+            --text-muted: #a6adc8;
+            --accent: #89b4fa;
+            --accent-hover: #74a8f7;
+            --accent-light: rgba(137, 180, 250, 0.15);
+            --success: #a6e3a1;
+            --warning: #fab387;
+            --danger: #f38ba8;
+            --info: #89b4fa;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Solarized Light - Classic light theme with optimal contrast */
+        [data-theme="solarized-light"] {
+            --bg-gradient-1: #268bd2;
+            --bg-gradient-2: #2aa198;
+            --bg-page: #fdf6e3;
+            --bg-card: #eee8d5;
+            --bg-card-hover: #e4ddc8;
+            --bg-item: #fdf6e3;
+            --bg-item-complete: #d5e8d4;
+            --bg-input: #fdf6e3;
+            --border-color: #d3cbb7;
+            --text-primary: #073642;
+            --text-secondary: #586e75;
+            --text-muted: #93a1a1;
+            --accent: #268bd2;
+            --accent-hover: #1a6fa8;
+            --accent-light: rgba(38, 139, 210, 0.1);
+            --success: #859900;
+            --warning: #cb4b16;
+            --danger: #dc322f;
+            --info: #2aa198;
+            --shadow: rgba(7, 54, 66, 0.1);
+        }
+
+        /* Nord - Arctic-inspired dark theme */
+        [data-theme="nord"] {
+            --bg-gradient-1: #88c0d0;
+            --bg-gradient-2: #5e81ac;
+            --bg-page: #2e3440;
+            --bg-card: #3b4252;
+            --bg-card-hover: #434c5e;
+            --bg-item: #434c5e;
+            --bg-item-complete: #3d4a3d;
+            --bg-input: #3b4252;
+            --border-color: #4c566a;
+            --text-primary: #eceff4;
+            --text-secondary: #d8dee9;
+            --text-muted: #a3be8c;
+            --accent: #88c0d0;
+            --accent-hover: #8fbcbb;
+            --accent-light: rgba(136, 192, 208, 0.15);
+            --success: #a3be8c;
+            --warning: #ebcb8b;
+            --danger: #bf616a;
+            --info: #81a1c1;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Gruvbox - Retro earth-toned theme */
+        [data-theme="gruvbox"] {
+            --bg-gradient-1: #d79921;
+            --bg-gradient-2: #98971a;
+            --bg-page: #282828;
+            --bg-card: #3c3836;
+            --bg-card-hover: #504945;
+            --bg-item: #504945;
+            --bg-item-complete: #3d4220;
+            --bg-input: #3c3836;
+            --border-color: #665c54;
+            --text-primary: #ebdbb2;
+            --text-secondary: #d5c4a1;
+            --text-muted: #a89984;
+            --accent: #d79921;
+            --accent-hover: #fabd2f;
+            --accent-light: rgba(215, 153, 33, 0.15);
+            --success: #b8bb26;
+            --warning: #fe8019;
+            --danger: #fb4934;
+            --info: #83a598;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,9 +157,10 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
             min-height: 100vh;
             padding: 20px;
+            color: var(--text-primary);
         }
 
         .container {
@@ -26,20 +169,20 @@
         }
 
         header {
-            background: white;
+            background: var(--bg-card);
             padding: 20px 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px var(--shadow);
             margin-bottom: 20px;
         }
 
         h1 {
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 10px;
         }
 
         .subtitle {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 14px;
         }
 
@@ -50,10 +193,10 @@
         }
 
         footer {
-            background: white;
+            background: var(--bg-card);
             padding: 15px 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px var(--shadow);
             margin-top: 20px;
             text-align: center;
             display: flex;
@@ -62,13 +205,13 @@
         }
 
         .version-info {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 12px;
         }
 
         .update-btn {
             padding: 6px 12px;
-            background: #667eea;
+            background: var(--accent);
             color: white;
             border: none;
             border-radius: 4px;
@@ -80,16 +223,16 @@
         }
 
         .update-btn:hover {
-            background: #5568d3;
+            background: var(--accent-hover);
         }
 
         .update-btn:disabled {
-            background: #ccc;
+            background: var(--text-muted);
         }
 
         .overlay-btn {
             padding: 10px 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
             color: white;
             border: none;
             border-radius: 6px;
@@ -97,36 +240,84 @@
             font-size: 13px;
             font-weight: 600;
             transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 8px var(--shadow);
         }
 
         .overlay-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-            cursor: not-allowed;
+            box-shadow: 0 4px 12px var(--shadow);
         }
 
+        /* Theme Toggle Buttons */
+        .theme-toggle {
+            display: flex;
+            gap: 8px;
+            margin-left: 15px;
+        }
+
+        .theme-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-btn.active {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--text-primary);
+        }
+
+        .theme-btn[data-theme="sepia"] {
+            background: linear-gradient(135deg, #c4a574 0%, #8b6914 100%);
+        }
+
+        .theme-btn[data-theme="ctp-latte"] {
+            background: linear-gradient(135deg, #7287fd 0%, #8839ef 100%);
+        }
+
+        .theme-btn[data-theme="ctp-mocha"] {
+            background: linear-gradient(135deg, #89b4fa 0%, #cba6f7 100%);
+        }
+
+        .theme-btn[data-theme="solarized-light"] {
+            background: linear-gradient(135deg, #268bd2 0%, #2aa198 100%);
+        }
+
+        .theme-btn[data-theme="nord"] {
+            background: linear-gradient(135deg, #88c0d0 0%, #5e81ac 100%);
+        }
+
+        .theme-btn[data-theme="gruvbox"] {
+            background: linear-gradient(135deg, #d79921 0%, #98971a 100%);
+        }
 
         .sidebar {
-            background: white;
+            background: var(--bg-card);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px var(--shadow);
             height: fit-content;
         }
 
         .quest-list {
-            background: white;
+            background: var(--bg-card);
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px var(--shadow);
             min-height: 500px;
         }
 
         .search-box {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border-color);
             border-radius: 5px;
             font-size: 14px;
             margin-bottom: 15px;
@@ -135,7 +326,7 @@
 
         .search-box:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent);
         }
 
         .tab-buttons {
@@ -151,7 +342,7 @@
             padding: 8px 6px;
             border: none;
             background: #f5f5f5;
-            color: #666;
+            color: var(--text-secondary);
             border-radius: 5px;
             cursor: pointer;
             font-weight: 600;
@@ -168,7 +359,7 @@
         .quest-item {
             padding: 12px;
             margin-bottom: 8px;
-            background: #f9f9f9;
+            background: var(--bg-item);
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s;
@@ -177,7 +368,7 @@
 
         .quest-item:hover {
             background: #f0f0f0;
-            border-left-color: #667eea;
+            border-left-color: var(--accent);
         }
 
         .quest-item.active {
@@ -185,8 +376,8 @@
         }
 
         .quest-item.completable {
-            background: #e8f5e9;
-            border-left-color: #4caf50;
+            background: var(--bg-item-complete);
+            border-left-color: var(--success);
         }
 
         .quest-item.completable:hover {
@@ -195,13 +386,13 @@
 
         .quest-item.completable .quest-item-name::before {
             content: '✓ ';
-            color: #4caf50;
+            color: var(--success);
             font-weight: bold;
         }
 
         .quest-item.purchasable {
-            background: #fff3e0;
-            border-left-color: #ff9800;
+            background: var(--accent-light);
+            border-left-color: var(--warning);
         }
 
         .quest-item.purchasable:hover {
@@ -210,13 +401,13 @@
 
         .quest-item.purchasable .quest-item-name::before {
             content: '🛒 ';
-            color: #ff9800;
+            color: var(--warning);
             font-weight: bold;
         }
 
         .quest-item.craftable {
-            background: #e8f5e9;
-            border-left-color: #4caf50;
+            background: var(--bg-item-complete);
+            border-left-color: var(--success);
         }
 
         .quest-item.craftable:hover {
@@ -224,12 +415,21 @@
         }
 
         .quest-item.buyable {
-            background: #fff3e0;
-            border-left-color: #ff9800;
+            background: var(--accent-light);
+            border-left-color: var(--warning);
         }
 
         .quest-item.buyable:hover {
             background: #ffe0b2;
+        }
+
+        .quest-item.needs-favor {
+            background: #f3e5f5;
+            border-left-color: #9c27b0;
+        }
+
+        .quest-item.needs-favor:hover {
+            background: #e1bee7;
         }
 
         .quest-item.no-skill {
@@ -244,35 +444,35 @@
 
         .quest-item-name {
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
 
         .quest-item-location {
             font-size: 12px;
-            color: #999;
+            color: var(--text-muted);
         }
 
         .quest-detail-header {
             margin-bottom: 20px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
+            border-bottom: 2px solid var(--border-color);
         }
 
         .quest-detail-name {
             font-size: 24px;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 8px;
         }
 
         .quest-detail-location {
-            color: #667eea;
+            color: var(--accent);
             font-weight: 600;
             margin-bottom: 8px;
         }
 
         .quest-detail-description {
-            color: #666;
+            color: var(--text-secondary);
             line-height: 1.6;
         }
 
@@ -285,13 +485,13 @@
             align-items: center;
             padding: 15px;
             margin-bottom: 10px;
-            background: #f9f9f9;
+            background: var(--bg-item);
             border-radius: 5px;
             transition: all 0.3s;
         }
 
         .checklist-item.completed {
-            background: #e8f5e9;
+            background: var(--bg-item-complete);
         }
 
         .checkbox {
@@ -299,7 +499,7 @@
             height: 24px;
             margin-right: 15px;
             cursor: pointer;
-            accent-color: #667eea;
+            accent-color: var(--accent);
         }
 
         .item-info {
@@ -308,7 +508,7 @@
 
         .item-name {
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
 
@@ -324,7 +524,7 @@
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #999;
+            color: var(--text-muted);
         }
 
         .empty-state-icon {
@@ -366,7 +566,7 @@
         .loading {
             text-align: center;
             padding: 20px;
-            color: #999;
+            color: var(--text-muted);
         }
     </style>
 </head>
@@ -381,9 +581,19 @@
                         Auto-updating from chat logs
                     </p>
                 </div>
-                <button class="overlay-btn" onclick="openOverlay()" title="Open compact overlay window">
-                    Pop Out Overlay
-                </button>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="theme-toggle" title="Select theme">
+                        <button class="theme-btn active" data-theme="sepia" onclick="setTheme('sepia')" title="Sepia Wood"></button>
+                        <button class="theme-btn" data-theme="ctp-latte" onclick="setTheme('ctp-latte')" title="Catppuccin Latte"></button>
+                        <button class="theme-btn" data-theme="ctp-mocha" onclick="setTheme('ctp-mocha')" title="Catppuccin Mocha"></button>
+                        <button class="theme-btn" data-theme="solarized-light" onclick="setTheme('solarized-light')" title="Solarized Light"></button>
+                        <button class="theme-btn" data-theme="nord" onclick="setTheme('nord')" title="Nord"></button>
+                        <button class="theme-btn" data-theme="gruvbox" onclick="setTheme('gruvbox')" title="Gruvbox"></button>
+                    </div>
+                    <button class="overlay-btn" onclick="openOverlay()" title="Open compact overlay window">
+                        Pop Out Overlay
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -415,6 +625,10 @@
                     <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
                         <input type="radio" name="questView" value="ready" style="margin-right: 5px;" onchange="switchQuestView()">
                         Ready
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                        <input type="radio" name="questView" value="pinned" style="margin-right: 5px;" onchange="switchQuestView()">
+                        Pinned
                     </label>
                 </div>
 
@@ -478,6 +692,25 @@
     </div>
 
     <script>
+        // Theme Management
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('storagebuddy-theme', theme);
+
+            // Update active button state
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === theme);
+            });
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('storagebuddy-theme') || 'sepia';
+            setTheme(savedTheme);
+        }
+
+        // Load theme immediately to prevent flash
+        loadTheme();
+
         let currentTab = 'help';
         let currentQuestView = 'all';
         let currentRecipeView = 'all';
@@ -487,7 +720,9 @@
         let purchasableQuests = [];
         let completableQuestSet = new Set();
         let purchasableQuestSet = new Set();
-        let manualChecks = JSON.parse(localStorage.getItem('manualChecks') || '{}');
+        // Pinned quests: Set of quest internal names
+        let pinnedQuests = new Set(JSON.parse(localStorage.getItem('pinnedQuests') || '[]'));
+        const MAX_PINNED_QUESTS = 20;
         let allRecipes = [];
         // Recipe quantities: { recipeId: quantity }
         let recipeQuantities = JSON.parse(localStorage.getItem('recipeQuantities') || '{}');
@@ -500,12 +735,15 @@
         }
         let craftableRecipeSet = new Set();
         let buyableRecipeSet = new Set();
+        let needsFavorRecipeSet = new Set(); // Recipes where vendor items require more favor
         let noSkillRecipeSet = new Set(); // Recipes player doesn't have skill for
         // Lookup: item name -> recipes that produce it
         let recipesByOutput = {};
         let playerInventory = {};
         let playerInventoryDetails = {}; // Detailed storage locations
         let playerSkills = {}; // Skill name -> effective level (base + bonus)
+        let playerFavor = {}; // NPC name -> { level: "Friends", rank: 2 }
+        let favorLevels = []; // Ordered list of favor levels for comparison
         let itemKeywords = {}; // Keyword -> list of item names (e.g., "Bone" -> ["Femur", "Rib Bone", ...])
         let vendorItems = {}; // Item name -> vendor info (for checking if items can be bought)
         let debugMode = false; // Debug mode state
@@ -619,26 +857,104 @@
             let emptyStateHtml;
             if (tab === 'crafting') {
                 emptyStateHtml = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🔨</div>
-                        <p style="margin-bottom: 15px;"><strong>Materials Needed</strong></p>
-                        <div style="text-align: left; font-size: 13px; color: #666; line-height: 1.8; max-width: 280px;">
-                            <p style="margin-bottom: 10px;"><strong>How to use:</strong></p>
-                            <ol style="margin: 0; padding-left: 20px;">
+                    <div style="padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 36px; margin-bottom: 10px;">🔨</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 8px;">Materials Needed</h3>
+                            <p style="color: var(--text-secondary); font-size: 13px;">Pin recipes to build a shopping list</p>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">How to Use</h4>
+                            <ol style="margin: 0 0 0 20px; padding: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
                                 <li>Select a crafting skill from the dropdown</li>
                                 <li>Check recipes you want to craft</li>
                                 <li>Adjust quantities with +/− buttons</li>
                                 <li>View aggregated materials here</li>
                             </ol>
-                            <p style="margin-top: 12px; font-size: 12px; color: #888;">Pin up to 20 recipes. Export Character JSON to update skill levels.</p>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Recipe Color Legend</h4>
+                            <div style="font-size: 12px; line-height: 1.6;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="color: var(--text-secondary);">Ready to craft</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--accent-light); border-left: 3px solid var(--warning); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--warning); font-size: 11px;">Orange</div>
+                                    <div style="color: var(--text-secondary);">Missing materials can be purchased from vendor</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: #f3e5f5; border-left: 3px solid #9c27b0; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #9c27b0; font-size: 11px;">Purple</div>
+                                    <div style="color: var(--text-secondary);">Vendor sells item but requires more favor</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: #e8eaf6; border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="color: var(--text-secondary);">Need to gather materials</div>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item); border-left: 3px solid var(--border-color); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--text-muted); font-size: 11px; opacity: 0.7;">Gray 🔒</div>
+                                    <div style="color: var(--text-secondary);">Skill level too low</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Material Source Icons</h4>
+                            <div style="font-size: 12px; line-height: 1.8; color: var(--text-secondary);">
+                                <div style="margin-bottom: 4px;">✓ <strong>Have</strong> — In inventory/storage</div>
+                                <div style="margin-bottom: 4px;">🔨 <strong>Craft</strong> — Can craft</div>
+                                <div style="margin-bottom: 4px;">🛒 <strong>Buy</strong> — From NPC vendor</div>
+                                <div style="margin-bottom: 4px;">❤️ <strong>Need Favor</strong> — Vendor sells but requires relationship</div>
+                                <div>🔍 <strong>Gather</strong> — Farm in-game</div>
+                            </div>
                         </div>
                     </div>
                 `;
             } else {
                 emptyStateHtml = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📋</div>
-                        <p>Select a quest to view its checklist</p>
+                    <div style="padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 36px; margin-bottom: 10px;">📋</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 8px;">Quest Checklist</h3>
+                            <p style="color: var(--text-secondary); font-size: 13px;">Select a quest to view required items</p>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">How to Use</h4>
+                            <ol style="margin: 0 0 0 20px; padding: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                                <li>Click any quest from the list to view details</li>
+                                <li>Check the checkbox to pin quests for tracking</li>
+                                <li>Use filters: All, Ready, or Pinned</li>
+                                <li>Filter by region using the dropdown</li>
+                            </ol>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Quest Color Legend</h4>
+                            <div style="font-size: 12px; line-height: 1.6;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="color: var(--text-secondary);">Ready to turn in</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--accent-light); border-left: 3px solid var(--warning); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--warning); font-size: 11px;">Orange</div>
+                                    <div style="color: var(--text-secondary);">Missing items can be purchased from vendor</div>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item); border-left: 3px solid var(--border-color); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--text-muted); font-size: 11px;">Default</div>
+                                    <div style="color: var(--text-secondary);">Items still needed</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Keep Data Fresh</h4>
+                            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                                Export <strong>Character JSON</strong> from the VIP Menu to update quests and inventory.
+                            </p>
+                        </div>
                     </div>
                 `;
             }
@@ -705,7 +1021,15 @@
                 renderQuestList(activeQuests);
             } else if (questView === 'ready') {
                 loadReadyQuests();
+            } else if (questView === 'pinned') {
+                loadPinnedQuests();
             }
+        }
+
+        async function loadPinnedQuests() {
+            // Filter active quests to only show pinned ones
+            const pinnedQuestList = activeQuests.filter(q => pinnedQuests.has(q.internal_name));
+            renderQuestList(pinnedQuestList);
         }
 
         async function loadActiveQuests() {
@@ -765,17 +1089,19 @@
 
         async function loadPlayerInventory() {
             try {
-                // Load full player inventory, keywords, vendor data, and skills in parallel
-                const [invResponse, keywordsResponse, vendorsResponse, skillsResponse] = await Promise.all([
+                // Load full player inventory, keywords, vendor data, skills, and favor in parallel
+                const [invResponse, keywordsResponse, vendorsResponse, skillsResponse, favorResponse] = await Promise.all([
                     fetch('/api/inventory'),
                     fetch('/api/keywords'),
                     fetch('/api/vendors'),
-                    fetch('/api/skills')
+                    fetch('/api/skills'),
+                    fetch('/api/favor')
                 ]);
                 const invData = await invResponse.json();
                 const keywordsData = await keywordsResponse.json();
                 const vendorsData = await vendorsResponse.json();
                 const skillsData = await skillsResponse.json();
+                const favorData = await favorResponse.json();
 
                 // Build inventory map from full inventory data
                 playerInventory = {};
@@ -809,10 +1135,15 @@
                     }
                 }
 
+                // Store player favor levels (NPC name -> { level, rank })
+                playerFavor = favorData.favor || {};
+                favorLevels = favorData.favor_levels || [];
+
                 console.log(`Loaded ${Object.keys(playerInventory).length} items from player inventory`);
                 console.log(`Loaded ${Object.keys(itemKeywords).length} keyword mappings`);
                 console.log(`Loaded ${Object.keys(vendorItems).length} vendor items`);
                 console.log(`Loaded ${Object.keys(playerSkills).length} player skills`);
+                console.log(`Loaded ${Object.keys(playerFavor).length} NPC favor levels`);
             } catch (error) {
                 console.error('Error loading player inventory:', error);
             }
@@ -868,6 +1199,7 @@
         function checkRecipeCraftability() {
             craftableRecipeSet.clear();
             buyableRecipeSet.clear();
+            needsFavorRecipeSet.clear();
             noSkillRecipeSet.clear();
 
             for (const recipe of allRecipes) {
@@ -882,9 +1214,10 @@
                     continue; // Skip material checks for unskilled recipes
                 }
 
-                let hasGather = false;  // Any ingredient requires gathering
-                let hasBuy = false;     // Any ingredient requires buying
-                let allReady = true;    // All ingredients available (in storage or craftable)
+                let hasGather = false;      // Any ingredient requires gathering
+                let hasBuy = false;         // Any ingredient requires buying (with favor)
+                let hasBuyNeedsFavor = false; // Any ingredient needs more favor to buy
+                let allReady = true;        // All ingredients available (in storage or craftable)
 
                 for (const ingredient of recipe.ingredients) {
                     const itemName = ingredient.item || ingredient.name;
@@ -909,6 +1242,9 @@
                     } else if (category.source === 'buy') {
                         hasBuy = true;
                         allReady = false;
+                    } else if (category.source === 'buy_needs_favor') {
+                        hasBuyNeedsFavor = true;
+                        allReady = false;
                     } else {
                         // Must gather
                         hasGather = true;
@@ -916,17 +1252,21 @@
                     }
                 }
 
-                // Apply hierarchy: ready (green) > buyable (orange) > gather (blue/default)
+                // Apply hierarchy: ready (green) > buyable (orange) > needs favor (purple) > gather (blue/default)
                 if (allReady) {
                     craftableRecipeSet.add(recipe.id);
-                } else if (!hasGather && hasBuy) {
-                    // All missing items are buyable (none require gathering)
+                } else if (!hasGather && !hasBuyNeedsFavor && hasBuy) {
+                    // All missing items are buyable with current favor
                     buyableRecipeSet.add(recipe.id);
+                } else if (!hasGather && hasBuyNeedsFavor) {
+                    // Some items need more favor to purchase (but none need gathering)
+                    needsFavorRecipeSet.add(recipe.id);
                 }
                 // If hasGather is true, recipe stays in default state (blue)
             }
             console.log('Craftable recipes count:', craftableRecipeSet.size);
             console.log('Buyable recipes count:', buyableRecipeSet.size);
+            console.log('Needs favor recipes count:', needsFavorRecipeSet.size);
             console.log('No-skill recipes count:', noSkillRecipeSet.size);
         }
 
@@ -1015,6 +1355,35 @@
          * Categorize a material by how it can be obtained
          * Returns: { source: 'storage'|'craft'|'buy'|'gather', info: object|null }
          */
+        // Check if player has sufficient favor with a vendor to buy an item
+        // Returns { canBuy: bool, hasFavor: bool, vendors: [...], vendorsWithFavor: [...] }
+        function checkVendorFavor(itemName) {
+            const vendors = vendorItems[itemName];
+            if (!vendors || vendors.length === 0) {
+                return { canBuy: false, hasFavor: false, vendors: [], vendorsWithFavor: [] };
+            }
+
+            const vendorsWithFavor = [];
+            for (const vendor of vendors) {
+                const requiredFavor = vendor.favor || 'Neutral';
+                const requiredRank = favorLevels.indexOf(requiredFavor);
+                const playerFavorData = playerFavor[vendor.vendor];
+                const playerRank = playerFavorData ? playerFavorData.rank : -1;
+
+                // If player has sufficient favor (or if we can't determine - assume yes for Neutral)
+                if (requiredRank === -1 || playerRank >= requiredRank || requiredFavor === 'Neutral') {
+                    vendorsWithFavor.push(vendor);
+                }
+            }
+
+            return {
+                canBuy: true,
+                hasFavor: vendorsWithFavor.length > 0,
+                vendors: vendors,
+                vendorsWithFavor: vendorsWithFavor
+            };
+        }
+
         function categorizeMaterial(itemName, qtyNeeded, qtyHave) {
             const missing = qtyNeeded - qtyHave;
 
@@ -1028,9 +1397,16 @@
                 return { source: 'craft', info: craftResult.craftInfo };
             }
 
-            // Check if buyable from vendor
-            if (vendorItems[itemName]) {
-                return { source: 'buy', info: vendorItems[itemName] };
+            // Check if buyable from vendor (with favor check)
+            const favorCheck = checkVendorFavor(itemName);
+            if (favorCheck.canBuy) {
+                if (favorCheck.hasFavor) {
+                    // Player has sufficient favor with at least one vendor
+                    return { source: 'buy', info: favorCheck.vendorsWithFavor };
+                } else {
+                    // Vendor exists but player lacks favor
+                    return { source: 'buy_needs_favor', info: favorCheck.vendors };
+                }
             }
 
             // Must be gathered
@@ -1066,18 +1442,74 @@
 
             if (selectedRecipeIds.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🛒</div>
-                        <p>No recipes pinned</p>
-                        <p style="font-size: 12px; color: #888; margin-top: 8px;">
-                            Switch to "All" view and select recipes first
-                        </p>
+                    <div style="padding: 15px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 32px; margin-bottom: 10px;">📌</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 8px;">No Recipes Pinned</h3>
+                            <p style="color: var(--text-secondary); font-size: 13px;">Pin recipes to build a shopping list</p>
+                        </div>
+
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">How to Pin Recipes</h4>
+                            <ol style="margin-left: 20px; font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                                <li>Switch to <strong>All</strong> or <strong>Ready</strong> view above</li>
+                                <li>Select a crafting skill from the dropdown</li>
+                                <li>Click the checkbox next to any recipe to pin it</li>
+                                <li>Set quantity (1-999) for each pinned recipe</li>
+                            </ol>
+                        </div>
+
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Recipe Color Legend</h4>
+                            <div style="font-size: 12px; line-height: 1.6;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="color: var(--text-secondary);">Ready to craft (have all materials)</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--accent-light); border-left: 3px solid var(--warning); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--warning); font-size: 11px;">Orange</div>
+                                    <div style="color: var(--text-secondary);">Missing materials can be purchased from vendor</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 80px; padding: 6px 10px; background: #e8eaf6; border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="color: var(--text-secondary);">Need to gather/farm materials</div>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--bg-item); border-left: 3px solid var(--border-color); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--text-muted); font-size: 11px; opacity: 0.7;">Gray 🔒</div>
+                                    <div style="color: var(--text-secondary);">Skill level too low</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 `;
                 detailContainer.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📦</div>
-                        <p>Pin recipes to see materials needed</p>
+                    <div style="padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <div style="font-size: 40px; margin-bottom: 15px;">📦</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 10px;">Materials Needed</h3>
+                            <p style="color: var(--text-secondary); font-size: 13px;">Pin recipes to see aggregated materials needed</p>
+                        </div>
+
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Material Source Icons</h4>
+                            <div style="font-size: 12px; line-height: 1.8; color: var(--text-secondary);">
+                                <div style="margin-bottom: 6px;">✓ <strong>Have</strong> — Already in inventory/storage</div>
+                                <div style="margin-bottom: 6px;">🔨 <strong>Craft</strong> — Can craft using your materials</div>
+                                <div style="margin-bottom: 6px;">🛒 <strong>Buy</strong> — Purchase from NPC vendor</div>
+                                <div>🔍 <strong>Gather</strong> — Loot, harvest, or farm in-game</div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Keep Data Fresh</h4>
+                            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px;">
+                                Export from the VIP Menu in-game:
+                            </p>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-left: 10px; line-height: 1.6;">
+                                <div><strong>Storage JSON</strong> — Updates inventory and storage</div>
+                                <div><strong>Character JSON</strong> — Updates skill levels</div>
+                            </div>
+                        </div>
                     </div>
                 `;
                 return;
@@ -1164,9 +1596,9 @@
             }
 
             let listHtml = `
-                <div style="padding: 10px; background: #fff3e0; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-weight: bold; color: #e65100; margin-bottom: 6px;">🛒 Pinned</div>
-                    <div style="font-size: 13px; color: #424242;">
+                <div style="padding: 10px; background: var(--accent-light); border-radius: 8px; margin-bottom: 12px;">
+                    <div style="font-weight: bold; color: var(--warning); margin-bottom: 6px;">🛒 Pinned</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">
                         ${items.length} item${items.length !== 1 ? 's' : ''} to buy • Total: <strong>${totalCost.toLocaleString()}g</strong>
                     </div>
                 </div>
@@ -1188,7 +1620,7 @@
                         <div class="quest-item buyable" style="cursor: default;">
                             <div style="flex: 1;">
                                 <div style="font-weight: 600;">${item.name}</div>
-                                <div style="font-size: 11px; color: #666; margin-top: 2px;">
+                                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
                                     Buy ${missing} × ${vendor?.price || 0}g = ${itemCost.toLocaleString()}g
                                 </div>
                                 <div style="font-size: 10px; color: #888; margin-top: 2px;">
@@ -1222,13 +1654,13 @@
                 const itemCost = missing * (vendor?.price || 0);
 
                 detailHtml += `
-                    <div class="checklist-item" style="background: #fff3e0;">
+                    <div class="checklist-item" style="background: var(--accent-light);">
                         <div class="item-info">
                             <span class="item-name" style="font-weight: 600;">${item.name}</span>
-                            <span class="item-count" style="color: #e65100;">Buy ${missing}</span>
+                            <span class="item-count" style="color: var(--warning);">Buy ${missing}</span>
                         </div>
                         <div class="item-locations">
-                            <span class="vendor-hint" style="color: #e65100;">
+                            <span class="vendor-hint" style="color: var(--warning);">
                                 🛒 ${vendor?.vendor || 'Unknown'} (${vendor?.location || 'Unknown'})
                             </span>
                         </div>
@@ -1265,7 +1697,7 @@
 
                     if (quests.length > 0) {
                         if (searchType === 'all') {
-                            html += '<h3 style="color: #667eea; margin-bottom: 10px; font-size: 16px;">Quests</h3>';
+                            html += '<h3 style="color: var(--accent); margin-bottom: 10px; font-size: 16px;">Quests</h3>';
                         }
                         html += quests.map(quest => {
                         const isCompletable = completableQuestSet.has(quest.internal_name);
@@ -1300,7 +1732,7 @@
                             html += '<div style="margin: 20px 0; border-top: 1px solid #e0e0e0;"></div>';
                         }
                         if (searchType === 'all') {
-                            html += '<h3 style="color: #667eea; margin-bottom: 10px; font-size: 16px;">Recipes</h3>';
+                            html += '<h3 style="color: var(--accent); margin-bottom: 10px; font-size: 16px;">Recipes</h3>';
                         }
                         html += matchingRecipes.map(recipe => `
                             <div class="quest-item" onclick="showRecipeDetail('${recipe.id}')">
@@ -1406,9 +1838,9 @@
                 });
 
                 let html = `
-                    <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="background: var(--bg-item-complete); border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">🔍 Search Results</div>
-                        <div style="font-size: 13px; color: #424242; line-height: 1.5;">
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                             Found ${matchingRecipes.length} recipe${matchingRecipes.length !== 1 ? 's' : ''} matching "${query}"
                         </div>
                     </div>
@@ -1418,7 +1850,7 @@
                     const recipes = recipesBySkill[skill];
                     html += `
                         <div style="margin-bottom: 20px;">
-                            <div style="font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 16px;">${skill} (${recipes.length})</div>
+                            <div style="font-weight: bold; color: var(--accent); margin-bottom: 10px; font-size: 16px;">${skill} (${recipes.length})</div>
                     `;
 
                     for (const recipe of recipes) {
@@ -1455,20 +1887,98 @@
 
             const detailContainer = document.getElementById('questDetail');
 
+            // Check recipe status
+            const isCraftable = craftableRecipeSet.has(recipe.id);
+            const isBuyable = buyableRecipeSet.has(recipe.id);
+            const needsFavor = needsFavorRecipeSet.has(recipe.id);
+            const hasNoSkill = noSkillRecipeSet.has(recipe.id);
+
+            let statusBadge = '';
+            if (hasNoSkill) {
+                const recipeLevel = recipe.level || 0;
+                const playerLevel = playerSkills[recipe.skill] || 0;
+                statusBadge = `<span style="background: #9e9e9e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🔒 Need ${recipe.skill} ${recipeLevel} (have ${playerLevel})</span>`;
+            } else if (isCraftable) {
+                statusBadge = `<span style="background: #4caf50; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">✓ Ready to craft</span>`;
+            } else if (isBuyable) {
+                statusBadge = `<span style="background: #ff9800; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🛒 Can buy materials</span>`;
+            } else if (needsFavor) {
+                statusBadge = `<span style="background: #9c27b0; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">❤️ Need more favor</span>`;
+            }
+
             let html = `
                 <div class="quest-detail-header">
-                    <div class="quest-detail-name">${recipe.name}</div>
-                    <div class="quest-detail-location">${recipe.skill}</div>
+                    <div class="quest-detail-name">${recipe.name}${statusBadge}</div>
+                    <div class="quest-detail-location">${recipe.skill} Level ${recipe.level || 0}</div>
                 </div>
                 <div class="checklist-items">
             `;
 
             for (const ingredient of recipe.ingredients) {
+                const itemName = ingredient.item || ingredient.name;
+                const needed = ingredient.quantity;
+                const ingredientInfo = getIngredientCount(itemName);
+                const have = ingredientInfo.count;
+                const missing = Math.max(0, needed - have);
+                const category = categorizeMaterial(itemName, needed, have);
+
+                // Determine retrieval method and color
+                let retrievalMethod = '';
+                let methodColor = '#667eea';
+
+                if (category.source === 'storage') {
+                    retrievalMethod = '✓ Have materials';
+                    methodColor = '#4caf50';
+                } else if (category.source === 'craft') {
+                    const craftInfo = category.info;
+                    retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
+                    if (craftInfo.craftsNeeded > 1) {
+                        retrievalMethod += ` x${craftInfo.craftsNeeded}`;
+                    }
+                    methodColor = '#4caf50';
+                } else if (category.source === 'buy') {
+                    const vendors = category.info;
+                    const firstVendor = vendors[0];
+                    const price = firstVendor.price || 0;
+                    const totalCost = price * missing;
+                    retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                    if (price > 0) {
+                        retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
+                    }
+                    methodColor = '#ff9800';
+                } else if (category.source === 'buy_needs_favor') {
+                    const vendors = category.info;
+                    const firstVendor = vendors[0];
+                    const requiredFavor = firstVendor.favor || 'Unknown';
+                    retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
+                    methodColor = '#9c27b0';
+                } else {
+                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(itemName)}`;
+                    retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${itemName}">📖 Wiki</a>`;
+                    methodColor = '#667eea';
+                }
+
+                // Location info for items in storage
+                let locationInfo = '';
+                if (have > 0 && ingredientInfo.locations) {
+                    const locParts = [];
+                    for (const [loc, count] of Object.entries(ingredientInfo.locations)) {
+                        locParts.push(`${loc}: ${count}`);
+                    }
+                    if (locParts.length > 0) {
+                        locationInfo = `<div style="font-size: 11px; color: #888; margin-top: 2px;">${locParts.join(', ')}</div>`;
+                    }
+                }
+
                 html += `
                     <div class="checklist-item">
                         <div class="item-info" style="flex: 1;">
                             <div class="item-name">${ingredient.name}</div>
-                            <div class="item-progress">Needed: ${ingredient.quantity}</div>
+                            <div class="item-progress">
+                                Have: ${have} / Need: ${needed}${missing > 0 ? ` | <span style="color: #f44336;">Missing: ${missing}</span>` : ''}
+                            </div>
+                            ${locationInfo}
+                            ${missing > 0 ? `<div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">${retrievalMethod}</div>` : ''}
                         </div>
                     </div>
                 `;
@@ -1489,7 +1999,54 @@
             }
 
             if (filteredQuests.length === 0) {
-                container.innerHTML = '<p class="empty-state">No quests found</p>';
+                // Show helpful guidance when no pinned quests
+                if (currentQuestView === 'pinned') {
+                    container.innerHTML = `
+                        <div style="padding: 15px;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <div style="font-size: 32px; margin-bottom: 10px;">📌</div>
+                                <h3 style="color: var(--text-primary); margin-bottom: 8px;">No Quests Pinned</h3>
+                                <p style="color: var(--text-secondary); font-size: 13px;">Pin quests to track them here and in the overlay</p>
+                            </div>
+
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                                <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">How to Pin Quests</h4>
+                                <ol style="margin-left: 20px; font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                                    <li>Switch to <strong>All</strong> or <strong>Ready</strong> view above</li>
+                                    <li>Click the checkbox next to any quest to pin it</li>
+                                    <li>Pin up to 20 quests for easy tracking</li>
+                                </ol>
+                            </div>
+
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                                <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Quest Color Legend</h4>
+                                <div style="font-size: 12px; line-height: 1.6;">
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <div style="min-width: 80px; padding: 6px 10px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                        <div style="color: var(--text-secondary);">Ready to turn in (have all items)</div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <div style="min-width: 80px; padding: 6px 10px; background: var(--accent-light); border-left: 3px solid var(--warning); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--warning); font-size: 11px;">Orange</div>
+                                        <div style="color: var(--text-secondary);">Missing items can be purchased from vendor</div>
+                                    </div>
+                                    <div style="display: flex; align-items: center;">
+                                        <div style="min-width: 80px; padding: 6px 10px; background: var(--bg-item); border-left: 3px solid var(--border-color); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--text-muted); font-size: 11px;">Default</div>
+                                        <div style="color: var(--text-secondary);">Items still needed (farm/gather)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                                <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Keep Data Fresh</h4>
+                                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                                    Export <strong>Character JSON</strong> from the VIP Menu in-game to update your active quests and inventory.
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = '<p class="empty-state">No quests found</p>';
+                }
                 return;
             }
 
@@ -1499,7 +2056,7 @@
                 tabNotice = `
                     <div style="background: #f3e5f5; border: 2px solid #9c27b0; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <div style="font-weight: bold; color: #6a1b9a; margin-bottom: 6px; font-size: 14px;">📋 Items not showing?</div>
-                        <div style="font-size: 13px; color: #424242; line-height: 1.5;">
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                             Generate a fresh <strong>Character Report</strong> in-game to update inventory detection.
                         </div>
                     </div>
@@ -1510,6 +2067,7 @@
                 const isCompletable = completableQuestSet.has(quest.internal_name);
                 const isPurchasable = purchasableQuestSet.has(quest.internal_name);
                 const isActive = selectedQuest === quest.internal_name;
+                const isPinned = pinnedQuests.has(quest.internal_name);
                 const classes = ['quest-item'];
                 if (isActive) classes.push('active');
                 // Completable takes priority over purchasable
@@ -1520,10 +2078,16 @@
                 }
 
                 return `
-                    <div class="${classes.join(' ')}"
+                    <div class="${classes.join(' ')}" style="display: flex; align-items: center; cursor: pointer; ${isPinned ? 'box-shadow: inset 0 0 0 2px #333;' : ''}"
                          onclick="selectQuest('${quest.internal_name}')">
-                        <div class="quest-item-name">${quest.name}</div>
-                        <div class="quest-item-location">${quest.location}</div>
+                        <input type="checkbox"
+                               ${isPinned ? 'checked' : ''}
+                               style="margin-right: 10px; cursor: pointer;"
+                               onclick="event.stopPropagation(); toggleQuestPin('${quest.internal_name}')">
+                        <div style="flex: 1;">
+                            <div class="quest-item-name">${quest.name}</div>
+                            <div class="quest-item-location">${quest.location}</div>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1546,10 +2110,31 @@
                         }
                     });
                     renderQuestList(readyQuests);
+                } else if (currentQuestView === 'pinned') {
+                    // Re-render pinned quests list
+                    const pinnedQuestList = activeQuests.filter(q => pinnedQuests.has(q.internal_name));
+                    renderQuestList(pinnedQuestList);
                 }
             }
 
             await loadQuestDetail(internalName);
+        }
+
+        function toggleQuestPin(internalName) {
+            if (pinnedQuests.has(internalName)) {
+                pinnedQuests.delete(internalName);
+            } else {
+                // Check pin limit before adding
+                if (pinnedQuests.size >= MAX_PINNED_QUESTS) {
+                    alert(`Maximum ${MAX_PINNED_QUESTS} quests can be pinned at once.`);
+                    return;
+                }
+                pinnedQuests.add(internalName);
+            }
+
+            localStorage.setItem('pinnedQuests', JSON.stringify([...pinnedQuests]));
+            // Re-render current view
+            switchQuestView();
         }
 
         async function loadQuestDetail(internalName) {
@@ -1582,11 +2167,8 @@
             }
 
             const checklistHtml = quest.items.map(item => {
-                const checkKey = `${selectedQuest}_${item.internal_name}`;
-                const manualCheck = manualChecks[checkKey] || 0;
-                const totalCollected = item.collected + manualCheck;
+                const totalCollected = item.collected;
                 const completed = totalCollected >= item.required;
-                const progress = Math.min(100, (totalCollected / item.required) * 100);
 
                 // Build location info with individual storage locations
                 let locationInfo = '';
@@ -1595,7 +2177,7 @@
                     const total = item.in_inventory + inBank;
 
                     if (total > 0) {
-                        locationInfo = `<div style="font-size: 13px; color: #667eea; margin-top: 4px;">`;
+                        locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">`;
                         locationInfo += `📦 Inventory: ${item.in_inventory}`;
 
                         // Show individual storage locations
@@ -1631,7 +2213,7 @@
                     // Use vendor price if available, otherwise use item value
                     const price = item.vendor_price || item.price || 0;
                     const costForItem = price * itemsNeeded;
-                    vendorInfo = `<div style="font-size: 12px; color: #ff9800; margin-top: 4px;">`;
+                    vendorInfo = `<div style="font-size: 12px; color: var(--warning); margin-top: 4px;">`;
                     vendorInfo += `🛒 Can buy from: ${item.possible_vendors.join(', ')}`;
                     if (price > 0) {
                         vendorInfo += ` (${itemsNeeded}x ${price.toFixed(0)} = ${costForItem.toFixed(0)} councils)`;
@@ -1642,15 +2224,15 @@
                 // Show item description if available
                 let descriptionInfo = '';
                 if (item.description) {
-                    descriptionInfo = `<div style="font-size: 11px; color: #666; margin-top: 4px; font-style: italic;">${item.description}</div>`;
+                    descriptionInfo = `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; font-style: italic;">${item.description}</div>`;
                 }
 
                 // Show gather info with wiki link for items that can't be bought
                 let gatherInfo = '';
                 if (!completed && (!item.possible_vendors || item.possible_vendors.length === 0) && totalCollected < item.required) {
                     const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.display_name)}`;
-                    gatherInfo = `<div style="font-size: 12px; color: #667eea; margin-top: 4px;">`;
-                    gatherInfo += `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: #667eea; text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.display_name}">📖 Wiki</a>`;
+                    gatherInfo = `<div style="font-size: 12px; color: var(--accent); margin-top: 4px;">`;
+                    gatherInfo += `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.display_name}">📖 Wiki</a>`;
                     gatherInfo += `</div>`;
                 }
 
@@ -1661,27 +2243,23 @@
 
                 let progressParts = [];
                 if (inInventory > 0) {
-                    progressParts.push(`<span style="color: #4caf50; font-weight: 600;">${Math.min(inInventory, required)} ready</span>`);
+                    progressParts.push(`<span style="color: var(--success); font-weight: 600;">${Math.min(inInventory, required)} ready</span>`);
                 }
                 if (inStorage > 0 && inInventory < required) {
                     const storageNeeded = Math.min(inStorage, required - inInventory);
-                    progressParts.push(`<span style="color: #ff9800; font-weight: 600;">${storageNeeded} in storage</span>`);
+                    progressParts.push(`<span style="color: var(--warning); font-weight: 600;">${storageNeeded} in storage</span>`);
                 }
                 if (inInventory + inStorage < required) {
                     const stillNeed = required - inInventory - inStorage;
-                    progressParts.push(`<span style="color: #999;">${stillNeed} needed</span>`);
+                    progressParts.push(`<span style="color: var(--text-muted);">${stillNeed} needed</span>`);
                 }
 
                 const progressText = progressParts.length > 0
-                    ? progressParts.join(' + ') + ` <span style="color: #666;">/ ${required}</span>`
-                    : `<span style="color: #999;">0 / ${required}</span>`;
+                    ? progressParts.join(' + ') + ` <span style="color: var(--text-secondary);">/ ${required}</span>`
+                    : `<span style="color: var(--text-muted);">0 / ${required}</span>`;
 
                 return `
                     <div class="checklist-item ${completed ? 'completed' : ''}">
-                        <input type="checkbox"
-                               class="checkbox"
-                               ${completed ? 'checked' : ''}
-                               onchange="toggleManualCheck('${item.internal_name}', ${item.required - item.collected})">
                         <div class="item-info">
                             <div class="item-name">${item.display_name}</div>
                             ${descriptionInfo}
@@ -1701,7 +2279,7 @@
             let costSummary = '';
             if (quest.total_cost > 0) {
                 costSummary = `
-                    <div style="background: #fff3e0; padding: 12px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #ff9800;">
+                    <div style="background: var(--accent-light); padding: 12px; border-radius: 5px; margin: 15px 0; border-left: 4px solid var(--warning);">
                         <strong>💰 Total cost to buy missing items:</strong> ${quest.total_cost.toFixed(0)} councils
                     </div>
                 `;
@@ -1719,19 +2297,6 @@
                 </div>
                 <button class="refresh-btn" onclick="refreshCurrentQuest()">Refresh</button>
             `;
-        }
-
-        function toggleManualCheck(itemInternalName, remaining) {
-            const checkKey = `${selectedQuest}_${itemInternalName}`;
-
-            if (manualChecks[checkKey]) {
-                delete manualChecks[checkKey];
-            } else {
-                manualChecks[checkKey] = remaining;
-            }
-
-            localStorage.setItem('manualChecks', JSON.stringify(manualChecks));
-            refreshCurrentQuest();
         }
 
         async function refreshCurrentQuest() {
@@ -1831,9 +2396,9 @@
             }
 
             let html = `
-                <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="background: var(--bg-item-complete); border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">🔨 Crafting List</div>
-                    <div style="font-size: 13px; color: #424242; line-height: 1.5;">
+                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                         Pin recipes to track materials needed. Totals are aggregated automatically.
                     </div>
                 </div>
@@ -1845,13 +2410,14 @@
 
                 html += `
                     <div style="margin-bottom: 20px;">
-                        <div style="font-weight: bold; color: #667eea; margin-bottom: 10px; font-size: 16px;">${skill} (${recipes.length} recipes)</div>
+                        <div style="font-weight: bold; color: var(--accent); margin-bottom: 10px; font-size: 16px;">${skill} (${recipes.length} recipes)</div>
                 `;
 
                 for (const recipe of recipes) {
                     const isSelected = !!recipeQuantities[recipe.id];
                     const isCraftable = craftableRecipeSet.has(recipe.id);
                     const isBuyable = buyableRecipeSet.has(recipe.id);
+                    const needsFavor = needsFavorRecipeSet.has(recipe.id);
                     const hasNoSkill = noSkillRecipeSet.has(recipe.id);
 
                     // Get skill level info
@@ -1864,6 +2430,7 @@
                     if (hasNoSkill) classes.push('no-skill');
                     else if (isCraftable) classes.push('craftable');
                     else if (isBuyable) classes.push('buyable');
+                    else if (needsFavor) classes.push('needs-favor');
 
                     // Build skill badge
                     let skillBadge = '';
@@ -1950,18 +2517,22 @@
 
             listContainer.innerHTML = `
                 <div style="padding: 10px;">
-                    <h3 style="color: #667eea; margin-bottom: 15px;">Color Legend</h3>
+                    <h3 style="color: var(--accent); margin-bottom: 15px;">Color Legend</h3>
                     <div style="font-size: 13px; line-height: 1.6;">
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="min-width: 120px; padding: 8px 12px; background: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #2e7d32;">Green</div>
+                            <div style="min-width: 120px; padding: 8px 12px; background: var(--bg-item-complete); border-left: 4px solid #4caf50; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #2e7d32;">Green</div>
                             <div>Ready (have materials or can craft sub-components)</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="min-width: 120px; padding: 8px 12px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #e65100;">Orange</div>
+                            <div style="min-width: 120px; padding: 8px 12px; background: var(--accent-light); border-left: 4px solid var(--warning); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--warning);">Orange</div>
                             <div>Can buy all missing items from vendors</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="min-width: 120px; padding: 8px 12px; background: #e8eaf6; border-left: 4px solid #667eea; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #667eea;">Blue</div>
+                            <div style="min-width: 120px; padding: 8px 12px; background: #f3e5f5; border-left: 4px solid #9c27b0; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #9c27b0;">Purple</div>
+                            <div>Vendor sells item but requires more favor</div>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="min-width: 120px; padding: 8px 12px; background: #e8eaf6; border-left: 4px solid var(--accent); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--accent);">Blue</div>
                             <div>Need to gather/farm items (not vendor-purchasable)</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -1972,24 +2543,25 @@
 
                     <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
 
-                    <h3 style="color: #667eea; margin-bottom: 15px;">Material Sources</h3>
+                    <h3 style="color: var(--accent); margin-bottom: 15px;">Material Sources</h3>
                     <div style="font-size: 13px; line-height: 1.8; text-align: left;">
                         <p style="margin-bottom: 10px;"><strong>Icons show how to obtain each material:</strong></p>
                         <div style="padding-left: 10px; margin-bottom: 8px;">
                             <div style="margin-bottom: 8px;">&#10003; <strong>Have</strong> - Already in your inventory or storage (from exported JSON)</div>
                             <div style="margin-bottom: 8px;">&#128296; <strong>Craft</strong> - Can be crafted using materials you have, based on your skill levels</div>
-                            <div style="margin-bottom: 8px;">&#128722; <strong>Buy</strong> - Available from an NPC vendor (check favor requirements)</div>
+                            <div style="margin-bottom: 8px;">&#128722; <strong>Buy</strong> - Available from an NPC vendor (you have sufficient favor)</div>
+                            <div style="margin-bottom: 8px;">❤️ <strong>Need Favor</strong> - Vendor sells item but requires higher relationship level</div>
                             <div style="margin-bottom: 8px;">&#128269; <strong>Gather</strong> - Must be looted, harvested, or obtained through gameplay (click 📖 Wiki link for drop info)</div>
                         </div>
                     </div>
 
                     <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
 
-                    <h3 style="color: #667eea; margin-bottom: 15px;">Keeping Data Fresh</h3>
+                    <h3 style="color: var(--accent); margin-bottom: 15px;">Keeping Data Fresh</h3>
                     <div style="font-size: 13px; line-height: 1.6; color: #555;">
                         <p style="margin-bottom: 8px;">Open the <strong>VIP Menu</strong> in-game and export your <strong>Storage</strong> and <strong>Character</strong> JSON files to update your data.</p>
-                        <p style="margin-bottom: 8px; color: #666; font-size: 12px;"><strong>Storage JSON</strong> — Updates inventory, storage chests, and saddlebag contents</p>
-                        <p style="margin-bottom: 8px; color: #666; font-size: 12px;"><strong>Character JSON</strong> — Updates active quests and crafting skill levels</p>
+                        <p style="margin-bottom: 8px; color: var(--text-secondary); font-size: 12px;"><strong>Storage JSON</strong> — Updates inventory, storage chests, and saddlebag contents</p>
+                        <p style="margin-bottom: 8px; color: var(--text-secondary); font-size: 12px;"><strong>Character JSON</strong> — Updates active quests and crafting skill levels</p>
                         <p style="color: #888; font-size: 12px;">StorageBuddy reads your export files to track items and determine which recipes you can craft.</p>
                     </div>
                 </div>
@@ -1997,11 +2569,11 @@
 
             detailContainer.innerHTML = `
                 <div style="padding: 20px;">
-                    <h2 style="color: #667eea; margin-bottom: 25px;">Welcome to StorageBuddy</h2>
+                    <h2 style="color: var(--accent); margin-bottom: 25px;">Welcome to StorageBuddy</h2>
 
                     <!-- Getting Started -->
                     <div style="margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 8px; border: 1px solid #667eea30;">
-                        <h3 style="color: #667eea; margin-bottom: 12px; font-size: 16px;">Getting Started</h3>
+                        <h3 style="color: var(--accent); margin-bottom: 12px; font-size: 16px;">Getting Started</h3>
                         <div style="font-size: 14px; line-height: 1.7; color: #555;">
                             <p style="margin-bottom: 12px;">StorageBuddy helps you track quest items and crafting materials across your inventory, storage chests, and saddlebags.</p>
 
@@ -2016,7 +2588,7 @@
                             <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                                 <div style="flex: 1; min-width: 200px;">
                                     <p style="margin-bottom: 6px; font-weight: 600;">First time setup:</p>
-                                    <ol style="margin: 0 0 0 15px; padding: 0; color: #666;">
+                                    <ol style="margin: 0 0 0 15px; padding: 0; color: var(--text-secondary);">
                                         <li>Log into Project Gorgon</li>
                                         <li>Open the <strong>VIP Menu</strong></li>
                                         <li>Export <strong>Storage JSON</strong> and <strong>Character JSON</strong></li>
@@ -2025,7 +2597,7 @@
                                 </div>
                                 <div style="flex: 1; min-width: 200px;">
                                     <p style="margin-bottom: 6px; font-weight: 600;">To keep data current:</p>
-                                    <p style="margin: 0; color: #666;">Re-export from the VIP Menu after looting, crafting, or banking.</p>
+                                    <p style="margin: 0; color: var(--text-secondary);">Re-export from the VIP Menu after looting, crafting, or banking.</p>
                                 </div>
                             </div>
                         </div>
@@ -2033,16 +2605,21 @@
 
                     <!-- Quests Tab Section -->
                     <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                        <h3 style="color: #333; margin-bottom: 12px; font-size: 16px;">📋 Quests Tab</h3>
+                        <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 16px;">📋 Quests Tab</h3>
                         <div style="font-size: 14px; line-height: 1.7; color: #555;">
                             <p style="margin-bottom: 10px;">View your active quests that need item collection.</p>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
                                 <p style="margin-bottom: 6px;"><strong>Filters:</strong></p>
-                                <ul style="margin-left: 15px; color: #666;">
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
                                     <li><strong>All</strong> — Show all active quests</li>
                                     <li><strong>Ready</strong> — Only show quests you can complete now</li>
+                                    <li><strong>Pinned</strong> — View only your pinned quests (up to 20)</li>
                                 </ul>
+                            </div>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Pin quests:</strong> Click the checkbox next to any quest to pin it for quick access</p>
                             </div>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
@@ -2051,10 +2628,11 @@
 
                             <div style="margin-left: 15px;">
                                 <p style="margin-bottom: 6px;"><strong>Quest details show:</strong></p>
-                                <ul style="margin-left: 15px; color: #666;">
-                                    <li>Progress bars for each required item</li>
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
+                                    <li>Color-coded progress: <span style="color: var(--success);">ready</span>, <span style="color: var(--warning);">in storage</span>, <span style="color: var(--text-muted);">needed</span></li>
                                     <li>Where items are stored (inventory, bank, saddlebag)</li>
                                     <li>Vendor info if items can be purchased</li>
+                                    <li>Wiki links for items that need to be gathered</li>
                                 </ul>
                             </div>
                         </div>
@@ -2062,13 +2640,13 @@
 
                     <!-- Crafting Tab Section -->
                     <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                        <h3 style="color: #333; margin-bottom: 12px; font-size: 16px;">🔨 Crafting Tab</h3>
+                        <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 16px;">🔨 Crafting Tab</h3>
                         <div style="font-size: 14px; line-height: 1.7; color: #555;">
                             <p style="margin-bottom: 10px;">Track materials needed for crafting projects (up to 20 pinned recipes).</p>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
                                 <p style="margin-bottom: 6px;"><strong>Filters:</strong></p>
-                                <ul style="margin-left: 15px; color: #666;">
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
                                     <li><strong>All</strong> — Show all recipes</li>
                                     <li><strong>Ready</strong> — Recipes you can craft now (includes craftable sub-components)</li>
                                     <li><strong>Pinned</strong> — View only your selected recipes</li>
@@ -2081,7 +2659,7 @@
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
                                 <p style="margin-bottom: 6px;"><strong>Skill Level Tracking:</strong></p>
-                                <ul style="margin-left: 15px; color: #666;">
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
                                     <li>Recipes show level requirements (e.g., "Lv15")</li>
                                     <li>Recipes above your skill level show 🔒 and are grayed out</li>
                                     <li>Your character's skills are read from Character JSON export</li>
@@ -2091,7 +2669,7 @@
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
                                 <p style="margin-bottom: 6px;"><strong>To track materials:</strong></p>
-                                <ol style="margin-left: 15px; color: #666;">
+                                <ol style="margin-left: 15px; color: var(--text-secondary);">
                                     <li>Click recipe checkboxes to pin them (max 20)</li>
                                     <li>Use +/− or type a number to set quantity (1-999)</li>
                                     <li>Materials are totaled across all pinned recipes</li>
@@ -2104,8 +2682,8 @@
                     </div>
 
                     <!-- Vendor Tip -->
-                    <div style="margin-bottom: 30px; padding: 15px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 0 8px 8px 0;">
-                        <p style="font-weight: 600; color: #e65100; margin-bottom: 6px;">Vendor Tip</p>
+                    <div style="margin-bottom: 30px; padding: 15px; background: var(--accent-light); border-left: 4px solid var(--warning); border-radius: 0 8px 8px 0;">
+                        <p style="font-weight: 600; color: var(--warning); margin-bottom: 6px;">Vendor Tip</p>
                         <p style="font-size: 14px; color: #555; margin: 0;">Can't find items at vendors? <strong>Uncheck "Hide Unusable"</strong> in the vendor window — this filter often hides quest items like seeds and ingredients.</p>
                     </div>
 
@@ -2117,7 +2695,7 @@
 
                             <div style="margin-left: 15px; margin-bottom: 15px;">
                                 <p style="margin-bottom: 6px;"><strong>How to use:</strong></p>
-                                <ol style="margin-left: 15px; color: #666;">
+                                <ol style="margin-left: 15px; color: var(--text-secondary);">
                                     <li>Click the <strong>"Pop Out Overlay"</strong> button in the top-right of this page</li>
                                     <li>A compact window opens with all quests and crafting info</li>
                                     <li>Position it over your game window</li>
@@ -2127,10 +2705,11 @@
 
                             <div style="margin-left: 15px; margin-bottom: 15px;">
                                 <p style="margin-bottom: 6px;"><strong>Overlay Features:</strong></p>
-                                <ul style="margin-left: 15px; color: #666;">
-                                    <li><strong>Quests tab</strong> — Active quests with progress and item locations</li>
-                                    <li><strong>Crafting tab</strong> — Pinned recipes with All/Ready/Pinned filters</li>
-                                    <li><strong>Region filter</strong> — Filter quests by turn-in location</li>
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
+                                    <li><strong>Quests tab</strong> — All/Ready/Pinned filters with region dropdown</li>
+                                    <li><strong>Crafting tab</strong> — Pinned recipes with Pinned/Ready filters</li>
+                                    <li><strong>Theme sync</strong> — Automatically matches your selected theme</li>
+                                    <li><strong>Pinned sync</strong> — Pinned quests/recipes sync from main page</li>
                                     <li><strong>Auto-refresh</strong> — Updates every 3 seconds</li>
                                 </ul>
                             </div>
@@ -2140,8 +2719,8 @@
                                 <p style="margin: 0 0 8px 0; color: #555; font-size: 13px;">
                                     To keep the overlay visible over your game:
                                 </p>
-                                <ul style="margin: 0 0 8px 15px; padding: 0; color: #666; font-size: 13px;">
-                                    <li><strong>Windows:</strong> <a href="https://learn.microsoft.com/en-us/windows/powertoys/always-on-top" target="_blank" style="color: #667eea;">PowerToys Always on Top</a> (Win+Ctrl+T)</li>
+                                <ul style="margin: 0 0 8px 15px; padding: 0; color: var(--text-secondary); font-size: 13px;">
+                                    <li><strong>Windows:</strong> <a href="https://learn.microsoft.com/en-us/windows/powertoys/always-on-top" target="_blank" style="color: var(--accent);">PowerToys Always on Top</a> (Win+Ctrl+T)</li>
                                     <li><strong>Linux:</strong> Most window managers support pinning windows (right-click title bar)</li>
                                 </ul>
                             </div>
@@ -2150,8 +2729,8 @@
 
                     <!-- Quick Tips -->
                     <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #333; margin-bottom: 10px; font-size: 14px;">Quick Tips</h3>
-                        <ul style="font-size: 13px; line-height: 1.8; color: #666; margin: 0; padding-left: 20px;">
+                        <h3 style="color: var(--text-primary); margin-bottom: 10px; font-size: 14px;">Quick Tips</h3>
+                        <ul style="font-size: 13px; line-height: 1.8; color: var(--text-secondary); margin: 0; padding-left: 20px;">
                             <li>Use the search box to find specific quests or recipes</li>
                             <li>Check "Ready" filters to see what you can complete or craft right now</li>
                             <li>Re-export <strong>Storage</strong> and <strong>Character</strong> JSON from VIP Menu to update inventory and skills</li>
@@ -2162,16 +2741,16 @@
                     </div>
 
                     <!-- Debug Mode Section -->
-                    <div style="padding: 15px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px;">
-                        <h3 style="color: #666; margin-bottom: 10px; font-size: 14px;">Troubleshooting</h3>
-                        <div style="font-size: 13px; line-height: 1.7; color: #666;">
+                    <div style="padding: 15px; background: #fafafa; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <h3 style="color: var(--text-secondary); margin-bottom: 10px; font-size: 14px;">Troubleshooting</h3>
+                        <div style="font-size: 13px; line-height: 1.7; color: var(--text-secondary);">
                             <p style="margin-bottom: 8px;"><strong>Enable Debug</strong> (footer button) activates diagnostic features:</p>
                             <ul style="margin: 0 0 10px 15px; padding: 0;">
                                 <li>Logs app activity to browser console (F12 → Console)</li>
                                 <li>Shows the "Update Game Data" button to refresh quest/item/recipe data</li>
                             </ul>
                             <p style="margin: 0 0 8px 0; color: #888; font-size: 12px;">Share console output when reporting issues.</p>
-                            <p style="margin: 0 0 8px 0; color: #888; font-size: 12px;"><strong>Note:</strong> Quest, item, and recipe data is sourced from the <a href="https://wiki.projectgorgon.com" target="_blank" style="color: #667eea;">Project Gorgon Wiki</a>.</p>
+                            <p style="margin: 0 0 8px 0; color: #888; font-size: 12px;"><strong>Note:</strong> Quest, item, and recipe data is sourced from the <a href="https://wiki.projectgorgon.com" target="_blank" style="color: var(--accent);">Project Gorgon Wiki</a>.</p>
                             <p style="margin: 0; color: #888; font-size: 12px;"><strong>Please use "Update Game Data" sparingly</strong> — it scrapes the wiki and should only be used when data is outdated or missing.</p>
                         </div>
                     </div>
@@ -2185,18 +2764,58 @@
 
             if (selectedRecipeIds.length === 0) {
                 detailContainer.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🔨</div>
-                        <p style="margin-bottom: 15px;"><strong>Materials Needed</strong></p>
-                        <div style="text-align: left; font-size: 13px; color: #666; line-height: 1.8; max-width: 280px;">
-                            <p style="margin-bottom: 10px;"><strong>How to use:</strong></p>
-                            <ol style="margin: 0; padding-left: 20px;">
+                    <div style="padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 36px; margin-bottom: 10px;">🔨</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 8px;">Materials Needed</h3>
+                            <p style="color: var(--text-secondary); font-size: 13px;">Pin recipes to build a shopping list</p>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">How to Use</h4>
+                            <ol style="margin: 0 0 0 20px; padding: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
                                 <li>Select a crafting skill from the dropdown</li>
                                 <li>Check recipes you want to craft</li>
                                 <li>Adjust quantities with +/− buttons</li>
                                 <li>View aggregated materials here</li>
                             </ol>
-                            <p style="margin-top: 12px; font-size: 12px; color: #888;">Pin up to 20 recipes. Export Character JSON to update skill levels.</p>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Recipe Color Legend</h4>
+                            <div style="font-size: 12px; line-height: 1.6;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="color: var(--text-secondary);">Ready to craft</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--accent-light); border-left: 3px solid var(--warning); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--warning); font-size: 11px;">Orange</div>
+                                    <div style="color: var(--text-secondary);">Missing materials can be purchased from vendor</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: #f3e5f5; border-left: 3px solid #9c27b0; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #9c27b0; font-size: 11px;">Purple</div>
+                                    <div style="color: var(--text-secondary);">Vendor sells item but requires more favor</div>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: #e8eaf6; border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="color: var(--text-secondary);">Need to gather materials</div>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item); border-left: 3px solid var(--border-color); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--text-muted); font-size: 11px; opacity: 0.7;">Gray 🔒</div>
+                                    <div style="color: var(--text-secondary);">Skill level too low</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Material Source Icons</h4>
+                            <div style="font-size: 12px; line-height: 1.8; color: var(--text-secondary);">
+                                <div style="margin-bottom: 4px;">✓ <strong>Have</strong> — In inventory/storage</div>
+                                <div style="margin-bottom: 4px;">🔨 <strong>Craft</strong> — Can craft</div>
+                                <div style="margin-bottom: 4px;">🛒 <strong>Buy</strong> — From NPC vendor</div>
+                                <div style="margin-bottom: 4px;">❤️ <strong>Need Favor</strong> — Vendor sells but requires relationship</div>
+                                <div>🔍 <strong>Gather</strong> — Farm in-game</div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -2251,13 +2870,13 @@
                         bgColor = '#ffebee'; // Light red for missing skill
                         skillBadge = `<span style="color: #d32f2f; font-weight: 500;" title="Need ${recipeSkill} ${recipeLevel}, you have ${playerLevel}">🔒 Need Lv${recipeLevel} (You: ${playerLevel})</span>`;
                     } else {
-                        skillBadge = `<span style="color: #4caf50;">✓ Lv${recipeLevel}</span>`;
+                        skillBadge = `<span style="color: var(--success);">✓ Lv${recipeLevel}</span>`;
                     }
 
                     recipesInfo += `<div style="margin-bottom: 8px; padding: 8px; background: ${bgColor}; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <div style="font-weight: 500; color: #333;">${recipe.name}</div>
-                            <div style="font-size: 13px; color: #666; margin-top: 2px;">${recipe.skill} • ${skillBadge}</div>
+                            <div style="font-weight: 500; color: var(--text-primary);">${recipe.name}</div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${recipe.skill} • ${skillBadge}</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <button onclick="updateRecipeQuantity('${escapedId}', -1)" style="width: 28px; height: 28px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-size: 16px;">−</button>
@@ -2311,7 +2930,7 @@
                 // Build location info similar to quest page format
                 let locationInfo = '';
                 if (totalOwned > 0) {
-                    locationInfo = `<div style="font-size: 13px; color: #667eea; margin-top: 4px;">`;
+                    locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">`;
                     if (inInventory > 0) {
                         locationInfo += `📦 Inventory: ${inInventory}`;
                     }
@@ -2361,10 +2980,17 @@
                         retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
                     }
                     methodColor = '#ff9800'; // Orange
+                } else if (category.source === 'buy_needs_favor') {
+                    // Item can be bought but requires more favor
+                    const vendors = category.info;
+                    const firstVendor = vendors[0];
+                    const requiredFavor = firstVendor.favor || 'Unknown';
+                    retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
+                    methodColor = '#9c27b0'; // Purple
                 } else {
                     // Must be gathered - add wiki link
                     const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(material.name)}`;
-                    retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: #667eea; text-decoration: underline; margin-left: 6px;" title="Search wiki for ${material.name}">📖 Wiki</a>`;
+                    retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${material.name}">📖 Wiki</a>`;
                     methodColor = '#667eea'; // Blue for gather
                 }
 

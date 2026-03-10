@@ -5,6 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StorageBuddy Overlay</title>
     <style>
+        /* Theme Definitions - synced with main page */
+        :root, [data-theme="sepia"] {
+            --bg-gradient-1: #c4a574;
+            --bg-gradient-2: #8b6914;
+            --bg-page: #3d3528;
+            --bg-card: #4a4035;
+            --bg-card-hover: #5a5045;
+            --bg-item: #5a5045;
+            --bg-item-complete: #3d4a35;
+            --border-color: #6b5d4a;
+            --text-primary: #f5f0e6;
+            --text-secondary: #d4c4ae;
+            --text-muted: #a89878;
+            --accent: #d4a84a;
+            --success: #8daa6d;
+            --warning: #d4924a;
+            --danger: #c86a5a;
+            --info: #7a9aaa;
+        }
+
+        [data-theme="ctp-latte"] {
+            --bg-gradient-1: #7287fd;
+            --bg-gradient-2: #8839ef;
+            --bg-page: #dce0e8;
+            --bg-card: #e6e9ef;
+            --bg-card-hover: #ccd0da;
+            --bg-item: #ccd0da;
+            --bg-item-complete: #c5e0c5;
+            --border-color: #bcc0cc;
+            --text-primary: #4c4f69;
+            --text-secondary: #5c5f77;
+            --text-muted: #7c7f93;
+            --accent: #1e66f5;
+            --success: #40a02b;
+            --warning: #fe640b;
+            --danger: #d20f39;
+            --info: #7287fd;
+        }
+
+        [data-theme="ctp-mocha"] {
+            --bg-gradient-1: #89b4fa;
+            --bg-gradient-2: #cba6f7;
+            --bg-page: #1e1e2e;
+            --bg-card: #313244;
+            --bg-card-hover: #45475a;
+            --bg-item: #45475a;
+            --bg-item-complete: #2d4a2d;
+            --border-color: #45475a;
+            --text-primary: #cdd6f4;
+            --text-secondary: #bac2de;
+            --text-muted: #a6adc8;
+            --accent: #89b4fa;
+            --success: #a6e3a1;
+            --warning: #fab387;
+            --danger: #f38ba8;
+            --info: #89b4fa;
+        }
+
+        /* Solarized Light - Classic light theme with optimal contrast */
+        [data-theme="solarized-light"] {
+            --bg-gradient-1: #268bd2;
+            --bg-gradient-2: #2aa198;
+            --bg-page: #eee8d5;
+            --bg-card: #fdf6e3;
+            --bg-card-hover: #e4ddc8;
+            --bg-item: #eee8d5;
+            --bg-item-complete: #d5e8d4;
+            --border-color: #d3cbb7;
+            --text-primary: #073642;
+            --text-secondary: #586e75;
+            --text-muted: #93a1a1;
+            --accent: #268bd2;
+            --success: #859900;
+            --warning: #cb4b16;
+            --danger: #dc322f;
+            --info: #2aa198;
+        }
+
+        /* Nord - Arctic-inspired dark theme */
+        [data-theme="nord"] {
+            --bg-gradient-1: #88c0d0;
+            --bg-gradient-2: #5e81ac;
+            --bg-page: #2e3440;
+            --bg-card: #3b4252;
+            --bg-card-hover: #434c5e;
+            --bg-item: #434c5e;
+            --bg-item-complete: #3d4a3d;
+            --border-color: #4c566a;
+            --text-primary: #eceff4;
+            --text-secondary: #d8dee9;
+            --text-muted: #a3be8c;
+            --accent: #88c0d0;
+            --success: #a3be8c;
+            --warning: #ebcb8b;
+            --danger: #bf616a;
+            --info: #81a1c1;
+        }
+
+        /* Gruvbox - Retro earth-toned theme */
+        [data-theme="gruvbox"] {
+            --bg-gradient-1: #d79921;
+            --bg-gradient-2: #98971a;
+            --bg-page: #282828;
+            --bg-card: #3c3836;
+            --bg-card-hover: #504945;
+            --bg-item: #504945;
+            --bg-item-complete: #3d4220;
+            --border-color: #665c54;
+            --text-primary: #ebdbb2;
+            --text-secondary: #d5c4a1;
+            --text-muted: #a89984;
+            --accent: #d79921;
+            --success: #b8bb26;
+            --warning: #fe8019;
+            --danger: #fb4934;
+            --info: #83a598;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -18,8 +136,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: rgb(20, 20, 30);
-            color: #ffffff;
+            background: var(--bg-page);
+            color: var(--text-primary);
             padding: 0;
             min-width: 320px;
             min-height: 400px;
@@ -28,7 +146,7 @@
         }
 
         .container {
-            background: rgb(20, 20, 30);
+            background: var(--bg-page);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -37,7 +155,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
             padding: 12px 15px;
             display: flex;
             align-items: center;
@@ -104,7 +222,7 @@
 
         .tab-btn.active {
             color: #a8b2ff;
-            border-bottom-color: #667eea;
+            border-bottom-color: var(--accent);
         }
 
         .controls {
@@ -179,23 +297,23 @@
             background: rgba(255, 255, 255, 0.03);
             border-radius: 6px;
             padding: 10px;
-            border-left: 3px solid #667eea;
+            border-left: 3px solid var(--accent);
         }
 
         .quest-group.ready {
-            border-left-color: #4caf50;
+            border-left-color: var(--success);
             background: rgba(76, 175, 80, 0.1);
         }
 
         .quest-group.buyable {
-            border-left-color: #ff9800;
+            border-left-color: var(--warning);
             background: rgba(255, 152, 0, 0.1);
         }
 
         .quest-name {
             font-size: 13px;
             font-weight: 600;
-            color: #e0e0e0;
+            color: var(--text-secondary);
             margin-bottom: 8px;
         }
 
@@ -243,14 +361,14 @@
         .item-details {
             width: 100%;
             font-size: 10px;
-            color: #667eea;
+            color: var(--accent);
             margin-top: 4px;
             padding-top: 4px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .vendor-info {
-            color: #ff9800;
+            color: var(--warning);
             font-size: 10px;
         }
 
@@ -260,16 +378,16 @@
             background: rgba(255, 255, 255, 0.03);
             border-radius: 6px;
             padding: 10px;
-            border-left: 3px solid #667eea;
+            border-left: 3px solid var(--accent);
         }
 
         .recipe-group.ready {
-            border-left-color: #4caf50;
+            border-left-color: var(--success);
             background: rgba(76, 175, 80, 0.1);
         }
 
         .recipe-group.buyable {
-            border-left-color: #ff9800;
+            border-left-color: var(--warning);
             background: rgba(255, 152, 0, 0.1);
         }
 
@@ -283,12 +401,12 @@
         .recipe-name {
             font-size: 13px;
             font-weight: 600;
-            color: #e0e0e0;
+            color: var(--text-secondary);
         }
 
         .recipe-qty {
             font-size: 11px;
-            color: #667eea;
+            color: var(--accent);
             background: rgba(102, 126, 234, 0.2);
             padding: 2px 8px;
             border-radius: 10px;
@@ -305,11 +423,11 @@
             background: rgba(255, 255, 255, 0.03);
             border-radius: 6px;
             padding: 10px;
-            border-left: 3px solid #667eea;
+            border-left: 3px solid var(--accent);
         }
 
         .shopping-item.buyable {
-            border-left-color: #ff9800;
+            border-left-color: var(--warning);
             background: rgba(255, 152, 0, 0.1);
         }
 
@@ -323,7 +441,7 @@
         .shopping-header .item-name {
             font-size: 13px;
             font-weight: 600;
-            color: #e0e0e0;
+            color: var(--text-secondary);
         }
 
         .shopping-header .item-progress {
@@ -349,7 +467,7 @@
             border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
-            color: #ff9800;
+            color: var(--warning);
         }
 
         .shopping-total {
@@ -389,7 +507,7 @@
         }
 
         .open-app-link {
-            color: #667eea;
+            color: var(--accent);
             text-decoration: none;
             cursor: pointer;
         }
@@ -415,8 +533,9 @@
 
         <div class="controls" id="questControls">
             <select class="view-selector" id="viewSelector">
-                <option value="all">All Quests</option>
-                <option value="ready">Have Materials</option>
+                <option value="all">All</option>
+                <option value="ready">Ready</option>
+                <option value="pinned">Pinned</option>
             </select>
             <select class="region-selector" id="regionSelector">
                 <option value="">All Regions</option>
@@ -425,9 +544,8 @@
 
         <div class="controls" id="craftingControls" style="display: none;">
             <select class="view-selector" id="craftingViewSelector">
-                <option value="all">All Pinned</option>
-                <option value="ready">Have Materials</option>
-                <option value="shopping">Shopping Cart</option>
+                <option value="pinned">Pinned</option>
+                <option value="ready">Ready</option>
             </select>
         </div>
 
@@ -446,6 +564,40 @@
     </div>
 
     <script>
+        // Theme Management - synced with main page
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('storagebuddy-theme') || 'sepia';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+
+        // Check for theme changes periodically (sync with main window)
+        function checkThemeSync() {
+            const savedTheme = localStorage.getItem('storagebuddy-theme') || 'sepia';
+            if (document.documentElement.getAttribute('data-theme') !== savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        }
+
+        // Load theme immediately
+        loadTheme();
+
+        // Check for theme sync every second
+        setInterval(checkThemeSync, 1000);
+
+        // Sync pinned quests from main window
+        function syncPinnedQuests() {
+            const savedPinned = JSON.parse(localStorage.getItem('pinnedQuests') || '[]');
+            const newPinned = new Set(savedPinned);
+            // Check if pinned quests changed
+            if (newPinned.size !== pinnedQuests.size || [...newPinned].some(q => !pinnedQuests.has(q))) {
+                pinnedQuests = newPinned;
+                if (currentTab === 'quests' && currentView === 'pinned') {
+                    renderFilteredQuests();
+                }
+            }
+        }
+        setInterval(syncPinnedQuests, 1000);
+
         let currentTab = 'quests';
         let currentView = 'all';
         let currentRegion = '';
@@ -454,6 +606,8 @@
         let isConnected = true;
         let allQuests = [];
         let allRecipes = [];
+        // Pinned quests - synced from main window
+        let pinnedQuests = new Set(JSON.parse(localStorage.getItem('pinnedQuests') || '[]'));
 
         // Load saved preferences from localStorage
         const savedPrefs = JSON.parse(localStorage.getItem('overlayPrefs') || '{}');
@@ -574,8 +728,8 @@
         }
 
         async function loadQuestData() {
-            const viewParam = currentView === 'ready' ? 'completable' : 'active';
-            const response = await fetch(`/api/overlay_data?view=${viewParam}`);
+            // Always fetch active quests, filter client-side based on view
+            const response = await fetch(`/api/overlay_data?view=active`);
 
             if (!response.ok) throw new Error('Server not responding');
 
@@ -589,14 +743,36 @@
             const content = document.getElementById('content');
             let quests = allQuests;
 
+            // Filter by view type
+            if (currentView === 'pinned') {
+                quests = quests.filter(q => pinnedQuests.has(q.internal_name));
+            } else if (currentView === 'ready') {
+                // Ready = completable (have all items) OR purchasable (can buy missing items)
+                quests = quests.filter(q => {
+                    const isCompletable = q.items.every(item => item.have >= item.need);
+                    const isPurchasable = !isCompletable && q.items.every(item =>
+                        item.have >= item.need || item.vendor_info
+                    );
+                    return isCompletable || isPurchasable;
+                });
+            }
+
+            // Filter by region
             if (currentRegion) {
                 quests = quests.filter(q => q.location === currentRegion);
             }
 
             if (quests.length === 0) {
-                const emptyMessage = currentRegion
-                    ? `No quests in ${currentRegion}`
-                    : (currentView === 'ready' ? 'No quests ready to complete' : 'No active quests with items');
+                let emptyMessage;
+                if (currentView === 'pinned') {
+                    emptyMessage = 'No pinned quests. Pin quests from the main app.';
+                } else if (currentView === 'ready') {
+                    emptyMessage = 'No quests ready to complete';
+                } else if (currentRegion) {
+                    emptyMessage = `No quests in ${currentRegion}`;
+                } else {
+                    emptyMessage = 'No active quests with items';
+                }
                 content.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📋</div>
@@ -688,8 +864,8 @@
                 return;
             }
 
-            if (craftingView === 'shopping') {
-                renderShoppingCart(content);
+            if (craftingView === 'pinned') {
+                renderPinnedRecipes(content);
             } else if (craftingView === 'ready') {
                 renderReadyRecipes(content);
             } else {
@@ -771,7 +947,7 @@
                         <div class="empty-state-icon">📦</div>
                         <p>No recipes ready to craft</p>
                         <p style="font-size: 11px; margin-top: 8px; color: rgba(255,255,255,0.4);">
-                            Gather more materials or check the Shopping Cart
+                            Gather more materials to craft these recipes
                         </p>
                     </div>
                 `;

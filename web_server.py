@@ -562,6 +562,7 @@ def overlay_data():
 
             # Simplify data for overlay - only include quest name, location and items with progress
             simplified_quest = {
+                'internal_name': quest_internal,
                 'name': quest.name,
                 'location': quest.displayed_location or 'Unknown',
                 'items': []
@@ -965,6 +966,48 @@ def get_player_skills():
     except Exception as e:
         logger.error(f"Error loading player skills: {e}")
         return jsonify({'error': str(e), 'skills': {}}), 500
+
+
+@app.route('/api/favor')
+@require_configured
+def get_player_favor():
+    """Get character NPC favor levels from the latest Character JSON export"""
+    # Favor level order (index = rank, higher = better)
+    FAVOR_LEVELS = ["Neutral", "Comfortable", "Friends", "Close Friends", "Best Friends", "Like Family", "Soul Mates"]
+
+    try:
+        # Find the most recent character file
+        reports_dir = config.get_reports_dir()
+        report_files = list(reports_dir.glob('Character_*.json'))
+        if not report_files:
+            return jsonify({'error': 'No character data found', 'favor': {}, 'favor_levels': FAVOR_LEVELS}), 200
+
+        latest_char_file = max(report_files, key=lambda p: p.stat().st_mtime)
+
+        with open(latest_char_file, 'r') as f:
+            char_data = json.load(f)
+
+        # Extract NPC favor levels
+        raw_npcs = char_data.get('NPCs', {})
+        favor = {}
+        for npc_name, npc_data in raw_npcs.items():
+            favor_level = npc_data.get('FavorLevel')
+            if favor_level:
+                favor[npc_name] = {
+                    'level': favor_level,
+                    'rank': FAVOR_LEVELS.index(favor_level) if favor_level in FAVOR_LEVELS else -1
+                }
+
+        return jsonify({
+            'favor': favor,
+            'favor_levels': FAVOR_LEVELS,
+            'character': char_data.get('Character', 'Unknown'),
+            'source_file': latest_char_file.name,
+            'timestamp': char_data.get('Timestamp', '')
+        })
+    except Exception as e:
+        logger.error(f"Error loading player favor: {e}")
+        return jsonify({'error': str(e), 'favor': {}, 'favor_levels': FAVOR_LEVELS}), 500
 
 
 @app.route('/api/items')
