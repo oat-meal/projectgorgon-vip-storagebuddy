@@ -375,33 +375,6 @@
         .popout-btn:hover {
             background: rgba(102, 126, 234, 0.5);
         }
-
-        .pin-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            color: rgba(255, 255, 255, 0.7);
-            padding: 4px 8px;
-            font-size: 10px;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .pin-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .pin-btn.pinned {
-            background: rgba(255, 193, 7, 0.3);
-            border-color: rgba(255, 193, 7, 0.6);
-            color: #ffc107;
-        }
-
-        .pin-btn.pinned:hover {
-            background: rgba(255, 193, 7, 0.4);
-        }
     </style>
 </head>
 <body>
@@ -409,9 +382,6 @@
         <div class="header">
             <span class="header-icon">📦</span>
             <span class="header-title">StorageBuddy</span>
-            <button class="pin-btn" id="pinBtn" title="Keep window on top">
-                <span>📌</span> Pin
-            </button>
             <button class="popout-btn" id="popoutBtn" title="Pop out to separate window">
                 <span>⧉</span> Pop Out
             </button>
