@@ -209,7 +209,7 @@ def index():
     if not config.get_status()['configured']:
         from flask import redirect
         return redirect('/setup')
-    return render_template('index.html')
+    return render_template('index.html', version=__version__)
 
 
 @app.route('/setup')
@@ -221,7 +221,7 @@ def setup():
 @app.route('/overlay')
 def overlay():
     """Overlay mode for in-game display"""
-    return render_template('overlay.html')
+    return render_template('overlay.html', version=__version__)
 
 
 @app.route('/api/active_quests')
@@ -613,6 +613,21 @@ def shopping_list():
             else:
                 recipe_quantities[recipe_id] = data
 
+        # Load player skills from Character JSON
+        player_skills = {}
+        reports_dir = config.get_reports_dir()
+        if reports_dir:
+            report_files = list(reports_dir.glob('Character_*.json'))
+            if report_files:
+                latest_char_file = max(report_files, key=lambda p: p.stat().st_mtime)
+                with open(latest_char_file, 'r') as f:
+                    char_data = json.load(f)
+                raw_skills = char_data.get('Skills', {})
+                for skill_name, skill_data in raw_skills.items():
+                    level = skill_data.get('Level', 0)
+                    bonus = skill_data.get('BonusLevels', 0)
+                    player_skills[skill_name] = level + bonus  # Effective level
+
         # Load recipes
         recipes_file = get_bundled_path('recipes.json')
         if not recipes_file.exists():
@@ -628,6 +643,20 @@ def shopping_list():
             recipe_id = f"{recipe.get('skill', 'Unknown')}_{recipe.get('name', 'Unknown')}_{idx}"
             recipe_lookup[recipe_id] = recipe
 
+        # Build recipes-by-output lookup for craftability checks
+        # Key: output item name, Value: list of recipes that produce it
+        recipes_by_output = {}
+        for recipe in all_recipes:
+            for result in recipe.get('results', []):
+                output_name = result.get('item', '')
+                if output_name:
+                    if output_name not in recipes_by_output:
+                        recipes_by_output[output_name] = []
+                    recipes_by_output[output_name].append({
+                        'recipe': recipe,
+                        'output_qty': result.get('quantity', 1)
+                    })
+
         # Get player inventory with full location details
         player_inventory = {}
         inventory_details = {}
@@ -639,7 +668,7 @@ def shopping_list():
                     player_inventory[name] = data['total']
                     inventory_details[name] = data
 
-        # Load vendor data - build item->vendor lookup
+        # Load vendor data - build item->vendor lookup with full details
         vendor_items = {}
         vendor_file = get_bundled_path('vendor_inventory.json')
         if vendor_file.exists():
@@ -650,9 +679,110 @@ def shopping_list():
                 for vendor_name, vendor_info in vendors_dict.items():
                     if isinstance(vendor_info, dict) and 'items' in vendor_info:
                         location = vendor_info.get('location', '')
-                        for item_name in vendor_info.get('items', {}):
+                        for item_name, item_data in vendor_info.get('items', {}).items():
                             if item_name not in vendor_items:
-                                vendor_items[item_name] = f"{vendor_name} ({location})"
+                                vendor_items[item_name] = []
+                            vendor_items[item_name].append({
+                                'vendor': vendor_name,
+                                'location': location,
+                                'favor': item_data.get('favor', 'Unknown') if isinstance(item_data, dict) else 'Unknown',
+                                'price': item_data.get('price', 0) if isinstance(item_data, dict) else 0
+                            })
+
+        def can_craft_item(item_name, qty_needed, available_inventory, skills, depth=0, visited=None):
+            """
+            Recursively check if an item can be crafted with available inventory and skills.
+            Returns (can_craft, crafting_info) where crafting_info contains recipe details.
+            Max depth of 3 to prevent performance issues.
+            """
+            if visited is None:
+                visited = set()
+
+            # Prevent infinite recursion (cycle detection)
+            if item_name in visited or depth > 3:
+                return False, None
+
+            visited.add(item_name)
+
+            # Check if any recipe can produce this item
+            if item_name not in recipes_by_output:
+                return False, None
+
+            for recipe_info in recipes_by_output[item_name]:
+                recipe = recipe_info['recipe']
+                output_qty = recipe_info['output_qty']
+
+                # Check skill requirement for this recipe
+                recipe_skill = recipe.get('skill', '')
+                recipe_level = recipe.get('level', 0)
+                player_level = skills.get(recipe_skill, 0)
+                if player_level < recipe_level:
+                    continue  # Skip recipes we can't craft due to skill
+
+                # How many times do we need to run this recipe?
+                crafts_needed = (qty_needed + output_qty - 1) // output_qty
+
+                # Check if we have all ingredients (or can craft them)
+                can_make = True
+                sub_crafts = []
+
+                for ingredient in recipe.get('ingredients', []):
+                    ing_name = ingredient.get('item') or ingredient.get('name', '')
+                    ing_qty = ingredient.get('quantity', 1) * crafts_needed
+                    ing_have = available_inventory.get(ing_name, 0)
+
+                    if ing_have >= ing_qty:
+                        continue  # Have enough
+
+                    # Try to craft the missing amount
+                    missing = ing_qty - ing_have
+                    sub_can_craft, sub_info = can_craft_item(
+                        ing_name, missing, available_inventory, skills, depth + 1, visited.copy()
+                    )
+
+                    if sub_can_craft:
+                        sub_crafts.append({
+                            'item': ing_name,
+                            'quantity': missing,
+                            'recipe': sub_info
+                        })
+                    else:
+                        can_make = False
+                        break
+
+                if can_make:
+                    return True, {
+                        'recipe_name': recipe.get('name'),
+                        'skill': recipe.get('skill'),
+                        'level': recipe.get('level', 0),
+                        'crafts_needed': crafts_needed,
+                        'sub_crafts': sub_crafts
+                    }
+
+            return False, None
+
+        def categorize_material(mat_name, mat_qty, mat_have, available_inventory, skills):
+            """
+            Categorize a material by how it can be obtained.
+            Returns: 'storage' | 'craft' | 'buy' | 'gather'
+            Also returns additional info (craft recipe, vendor info).
+            """
+            missing = mat_qty - mat_have
+
+            if missing <= 0:
+                return 'storage', None
+
+            # Check if craftable with current inventory and skills
+            can_craft, craft_info = can_craft_item(mat_name, missing, available_inventory, skills)
+            if can_craft:
+                return 'craft', craft_info
+
+            # Check if buyable from vendor
+            if mat_name in vendor_items:
+                return 'buy', vendor_items[mat_name]
+
+            # Must be gathered
+            return 'gather', None
 
         # Build shopping list
         result_recipes = []
@@ -661,14 +791,27 @@ def shopping_list():
             if not recipe:
                 continue
 
+            recipe_skill = recipe.get('skill', 'Unknown')
+            recipe_level = recipe.get('level', 0)
+            player_skill_level = player_skills.get(recipe_skill, 0)
+            has_skill = player_skill_level >= recipe_level
+
             recipe_result = {
                 'id': recipe_id,
                 'name': recipe.get('name', 'Unknown'),
-                'skill': recipe.get('skill', 'Unknown'),
-                'level': recipe.get('level', 0),
+                'skill': recipe_skill,
+                'level': recipe_level,
+                'playerSkillLevel': player_skill_level,
+                'hasSkill': has_skill,
+                'skillGap': recipe_level - player_skill_level if not has_skill else 0,
                 'quantity': quantity,
-                'materials': []
+                'materials': [],
+                'status': 'ready'  # Will be updated based on materials
             }
+
+            has_gather = False
+            has_buy = False
+            has_craft = False
 
             for ingredient in recipe.get('ingredients', []):
                 mat_name = ingredient.get('item') or ingredient.get('name', 'Unknown')
@@ -687,20 +830,51 @@ def shopping_list():
                             in_storage += v
                             storage_locations[k] = v
 
+                # Categorize this material
+                source, source_info = categorize_material(mat_name, mat_qty, mat_have, player_inventory, player_skills)
+
                 mat_result = {
                     'name': mat_name,
                     'need': mat_qty,
                     'have': min(mat_have, mat_qty),
+                    'missing': max(0, mat_qty - mat_have),
                     'in_inventory': in_inventory,
                     'in_storage': in_storage,
-                    'storage_locations': storage_locations
+                    'storage_locations': storage_locations,
+                    'source': source  # 'storage', 'craft', 'buy', or 'gather'
                 }
 
-                # Add vendor info if available
-                if mat_name in vendor_items and mat_have < mat_qty:
-                    mat_result['vendor_info'] = vendor_items[mat_name]
+                # Track what sources are needed
+                if source == 'gather':
+                    has_gather = True
+                elif source == 'buy':
+                    has_buy = True
+                    mat_result['vendors'] = source_info
+                    if source_info:
+                        v = source_info[0]
+                        mat_result['vendor_info'] = f"{v['vendor']} ({v['location']}) - {v['favor']}, {v['price']}g"
+                elif source == 'craft':
+                    has_craft = True
+                    mat_result['craft_info'] = source_info
+
+                # Also add vendor info for items that could be bought (even if craftable)
+                if mat_name in vendor_items and mat_have < mat_qty and source != 'buy':
+                    mat_result['vendors'] = vendor_items[mat_name]
 
                 recipe_result['materials'].append(mat_result)
+
+            # Determine overall recipe status based on hierarchy:
+            # no_skill (gray) > gather (blue) > buyable (orange) > ready/craftable (green)
+            if not has_skill:
+                recipe_result['status'] = 'no_skill'
+            elif has_gather:
+                recipe_result['status'] = 'gather'
+            elif has_buy:
+                recipe_result['status'] = 'buyable'
+            elif has_craft:
+                recipe_result['status'] = 'craftable'
+            else:
+                recipe_result['status'] = 'ready'
 
             result_recipes.append(recipe_result)
 
@@ -750,6 +924,47 @@ def get_player_inventory():
     except Exception as e:
         logger.error(f"Error loading player inventory: {e}")
         return jsonify({'error': str(e), 'items': {}}), 500
+
+
+@app.route('/api/skills')
+@require_configured
+def get_player_skills():
+    """Get character skills from the latest Character JSON export"""
+    try:
+        # Find the most recent character file
+        reports_dir = config.get_reports_dir()
+        report_files = list(reports_dir.glob('Character_*.json'))
+        if not report_files:
+            return jsonify({'error': 'No character data found', 'skills': {}}), 200
+
+        latest_char_file = max(report_files, key=lambda p: p.stat().st_mtime)
+
+        with open(latest_char_file, 'r') as f:
+            char_data = json.load(f)
+
+        # Extract skills with effective level (Level + BonusLevels)
+        raw_skills = char_data.get('Skills', {})
+        skills = {}
+        for skill_name, skill_data in raw_skills.items():
+            level = skill_data.get('Level', 0)
+            bonus = skill_data.get('BonusLevels', 0)
+            skills[skill_name] = {
+                'level': level,
+                'bonusLevels': bonus,
+                'effectiveLevel': level + bonus,
+                'xpToNext': skill_data.get('XpTowardNextLevel', 0),
+                'xpNeeded': skill_data.get('XpNeededForNextLevel', 0)
+            }
+
+        return jsonify({
+            'skills': skills,
+            'character': char_data.get('Character', 'Unknown'),
+            'source_file': latest_char_file.name,
+            'timestamp': char_data.get('Timestamp', '')
+        })
+    except Exception as e:
+        logger.error(f"Error loading player skills: {e}")
+        return jsonify({'error': str(e), 'skills': {}}), 500
 
 
 @app.route('/api/items')

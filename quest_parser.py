@@ -59,8 +59,9 @@ class QuestDatabase:
 
     def load_data(self):
         """Load quests and items from JSON files"""
-        # Load items with prices
+        # Load items with prices and descriptions
         self.item_prices: Dict[str, float] = {}  # InternalName -> Price
+        self.item_descriptions: Dict[str, str] = {}  # InternalName -> Description
         self.item_keywords: Dict[str, List[str]] = {}  # Keyword -> List of item display names
         with open(self.items_file, 'r') as f:
             items_data = json.load(f)
@@ -70,6 +71,7 @@ class QuestDatabase:
                     display_name = item_info['Name']
                     self.items[internal_name] = display_name
                     self.item_prices[internal_name] = item_info.get('Value', 0)
+                    self.item_descriptions[internal_name] = item_info.get('Description', '')
 
                     # Build keyword index
                     for keyword in item_info.get('Keywords', []):
@@ -121,6 +123,10 @@ class QuestDatabase:
     def get_item_price(self, internal_name: str) -> float:
         """Get item price (vendor value)"""
         return self.item_prices.get(internal_name, 0)
+
+    def get_item_description(self, internal_name: str) -> str:
+        """Get item description"""
+        return self.item_descriptions.get(internal_name, '')
 
     def get_collect_objectives(self, quest: Quest) -> List[QuestObjective]:
         """Get all 'Collect' type objectives from a quest"""
@@ -242,9 +248,11 @@ class QuestTracker:
         for obj in collect_objectives:
             item_display_name = self.quest_db.get_item_display_name(obj.item_name)
             item_price = self.quest_db.get_item_price(obj.item_name)
+            item_description = self.quest_db.get_item_description(obj.item_name)
             checklist['items'].append({
                 'internal_name': obj.item_name,
                 'display_name': item_display_name,
+                'description': item_description,
                 'required': obj.number,
                 'collected': 0,
                 'completed': False,

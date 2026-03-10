@@ -5,12 +5,14 @@ const API_URL = 'http://127.0.0.1:5000';
 let currentTab = 'quests';
 let currentView = 'all';
 let currentRegion = '';
+let craftingView = 'all'; // 'all', 'ready', or 'shopping'
 let lastUpdateTime = Date.now();
 let isConnected = false;
 let allQuests = []; // Cache quests for filtering
+let allRecipes = []; // Cache recipes for crafting views
 
 // Load saved preferences
-chrome.storage.local.get(['tab', 'view', 'region'], (result) => {
+chrome.storage.local.get(['tab', 'view', 'region', 'craftingView'], (result) => {
     if (result.tab) {
         currentTab = result.tab;
         switchTab(currentTab);
@@ -21,6 +23,10 @@ chrome.storage.local.get(['tab', 'view', 'region'], (result) => {
     }
     if (result.region) {
         currentRegion = result.region;
+    }
+    if (result.craftingView) {
+        craftingView = result.craftingView;
+        document.getElementById('craftingViewSelector').value = craftingView;
     }
 });
 
@@ -60,6 +66,13 @@ document.getElementById('regionSelector').addEventListener('change', (e) => {
     currentRegion = e.target.value;
     chrome.storage.local.set({ region: currentRegion });
     renderFilteredQuests();
+});
+
+// Crafting view selector change
+document.getElementById('craftingViewSelector').addEventListener('change', (e) => {
+    craftingView = e.target.value;
+    chrome.storage.local.set({ craftingView });
+    renderCraftingView();
 });
 
 function updateRegionSelector(quests) {
@@ -228,13 +241,23 @@ async function loadCraftingData(content) {
 
     const data = await response.json();
 
-    if (!data.recipes || data.recipes.length === 0) {
+    // Cache recipes for view switching
+    allRecipes = data.recipes || [];
+
+    // Render based on current view
+    renderCraftingView();
+}
+
+function renderCraftingView() {
+    const content = document.getElementById('content');
+
+    if (allRecipes.length === 0) {
         content.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">🔨</div>
-                <p>No recipes selected</p>
+                <p>No recipes pinned</p>
                 <p style="font-size: 11px; margin-top: 8px; color: rgba(255,255,255,0.4);">
-                    Select recipes in StorageBuddy to see your shopping list here
+                    Pin recipes in StorageBuddy to see them here
                 </p>
             </div>
         `;
@@ -242,9 +265,19 @@ async function loadCraftingData(content) {
         return;
     }
 
-    // Render recipes and their materials
+    if (craftingView === 'shopping') {
+        renderShoppingCart(content);
+    } else if (craftingView === 'ready') {
+        renderReadyRecipes(content);
+    } else {
+        renderPinnedRecipes(content);
+    }
+}
+
+function renderPinnedRecipes(content) {
+    // Render recipes and their materials (original view)
     let totalMaterials = 0;
-    const recipesHtml = data.recipes.map(recipe => {
+    const recipesHtml = allRecipes.map(recipe => {
         const materialsHtml = recipe.materials.map(mat => {
             const isCompleted = mat.have >= mat.need;
             const itemClass = isCompleted ? 'item completed' : 'item';
@@ -309,7 +342,143 @@ async function loadCraftingData(content) {
     }).join('');
 
     content.innerHTML = recipesHtml;
-    document.getElementById('itemCount').textContent = `${data.recipes.length} recipe${data.recipes.length !== 1 ? 's' : ''}, ${totalMaterials} materials`;
+    document.getElementById('itemCount').textContent = `${allRecipes.length} recipe${allRecipes.length !== 1 ? 's' : ''}, ${totalMaterials} materials`;
+}
+
+function renderReadyRecipes(content) {
+    // Filter to recipes where all materials are available
+    const readyRecipes = allRecipes.filter(recipe =>
+        recipe.materials.every(mat => mat.have >= mat.need)
+    );
+
+    if (readyRecipes.length === 0) {
+        content.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <p>No recipes ready to craft</p>
+                <p style="font-size: 11px; margin-top: 8px; color: rgba(255,255,255,0.4);">
+                    Gather more materials or check the Shopping Cart
+                </p>
+            </div>
+        `;
+        document.getElementById('itemCount').textContent = '0 recipes ready';
+        return;
+    }
+
+    // Render ready recipes (simplified view - all materials are complete)
+    const recipesHtml = readyRecipes.map(recipe => {
+        const materialsHtml = recipe.materials.map(mat => {
+            return `
+                <div class="item completed">
+                    <span class="item-name">${escapeHtml(mat.name)}</span>
+                    <span class="item-progress">${mat.have}/${mat.need}</span>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="recipe-group ready">
+                <div class="recipe-header">
+                    <span class="recipe-name">${escapeHtml(recipe.name)}</span>
+                    <span class="recipe-qty">×${recipe.quantity}</span>
+                </div>
+                <div class="recipe-skill">${escapeHtml(recipe.skill)} • Level ${recipe.level}</div>
+                <div class="item-list" style="margin-top: 8px;">${materialsHtml}</div>
+            </div>
+        `;
+    }).join('');
+
+    content.innerHTML = recipesHtml;
+    document.getElementById('itemCount').textContent = `${readyRecipes.length} recipe${readyRecipes.length !== 1 ? 's' : ''} ready`;
+}
+
+function renderShoppingCart(content) {
+    // Get all vendor-purchasable items needed across pinned recipes
+    const shoppingItems = {};
+
+    for (const recipe of allRecipes) {
+        for (const mat of recipe.materials) {
+            const missing = mat.need - mat.have;
+            // Only include items that are missing AND have vendors
+            if (missing <= 0 || !mat.vendors || mat.vendors.length === 0) continue;
+
+            if (!shoppingItems[mat.name]) {
+                shoppingItems[mat.name] = {
+                    name: mat.name,
+                    totalNeed: 0,
+                    totalHave: 0,
+                    vendors: mat.vendors,
+                    recipes: []
+                };
+            }
+
+            shoppingItems[mat.name].totalNeed += mat.need;
+            shoppingItems[mat.name].totalHave += mat.have;
+            shoppingItems[mat.name].recipes.push(`${recipe.name} (×${recipe.quantity})`);
+        }
+    }
+
+    const items = Object.values(shoppingItems);
+
+    if (items.length === 0) {
+        content.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🛒</div>
+                <p>Shopping cart is empty</p>
+                <p style="font-size: 11px; margin-top: 8px; color: rgba(255,255,255,0.4);">
+                    No vendor-purchasable materials needed
+                </p>
+            </div>
+        `;
+        document.getElementById('itemCount').textContent = '0 items to buy';
+        return;
+    }
+
+    // Sort by vendor location for efficient shopping trips
+    items.sort((a, b) => {
+        const aLoc = a.vendors[0]?.location || '';
+        const bLoc = b.vendors[0]?.location || '';
+        if (aLoc !== bLoc) return aLoc.localeCompare(bLoc);
+        return a.name.localeCompare(b.name);
+    });
+
+    // Calculate total cost
+    let totalCost = 0;
+    items.forEach(item => {
+        const missing = item.totalNeed - item.totalHave;
+        const price = item.vendors[0]?.price || 0;
+        totalCost += missing * price;
+    });
+
+    const itemsHtml = items.map(item => {
+        const missing = item.totalNeed - item.totalHave;
+        const vendor = item.vendors[0];
+        const itemCost = missing * (vendor?.price || 0);
+
+        return `
+            <div class="shopping-item buyable">
+                <div class="shopping-header">
+                    <span class="item-name">${escapeHtml(item.name)}</span>
+                    <span class="item-progress">Buy ${missing}</span>
+                </div>
+                <div class="vendor-info">
+                    🛒 ${escapeHtml(vendor.vendor)} (${escapeHtml(vendor.location)})<br>
+                    💰 ${vendor.price}g each = ${itemCost}g total<br>
+                    ⭐ Requires: ${escapeHtml(vendor.favor)} favor
+                </div>
+                <div class="item-recipes">For: ${item.recipes.join(', ')}</div>
+            </div>
+        `;
+    }).join('');
+
+    content.innerHTML = `
+        <div class="shopping-summary">
+            <span>Total: ${items.length} item${items.length !== 1 ? 's' : ''}</span>
+            <span class="shopping-total">💰 ${totalCost}g</span>
+        </div>
+        ${itemsHtml}
+    `;
+    document.getElementById('itemCount').textContent = `${items.length} item${items.length !== 1 ? 's' : ''} to buy`;
 }
 
 function escapeHtml(text) {

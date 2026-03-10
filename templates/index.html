@@ -85,6 +85,24 @@
 
         .update-btn:disabled {
             background: #ccc;
+        }
+
+        .overlay-btn {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .overlay-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
             cursor: not-allowed;
         }
 
@@ -163,8 +181,7 @@
         }
 
         .quest-item.active {
-            background: #e8eaf6;
-            border-left-color: #667eea;
+            box-shadow: inset 0 0 0 2px #333;
         }
 
         .quest-item.completable {
@@ -213,6 +230,16 @@
 
         .quest-item.buyable:hover {
             background: #ffe0b2;
+        }
+
+        .quest-item.no-skill {
+            background: #f5f5f5;
+            border-left-color: #9e9e9e;
+            opacity: 0.7;
+        }
+
+        .quest-item.no-skill:hover {
+            background: #eeeeee;
         }
 
         .quest-item-name {
@@ -285,24 +312,13 @@
             margin-bottom: 4px;
         }
 
-        .item-progress {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .progress-bar {
-            width: 100px;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
+        .item-progress-text {
+            font-size: 15px;
+            font-weight: 500;
+            min-width: 160px;
+            text-align: right;
             margin-left: 15px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #667eea;
-            transition: width 0.3s;
+            white-space: nowrap;
         }
 
         .empty-state {
@@ -357,11 +373,18 @@
 <body>
     <div class="container">
         <header>
-            <h1>Project Gorgon VIP StorageBuddy</h1>
-            <p class="subtitle">
-                <span class="status-indicator"></span>
-                Auto-updating from chat logs
-            </p>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1>Project Gorgon VIP StorageBuddy <span style="font-size: 12px; font-weight: 500; color: #fff; background: rgba(102, 126, 234, 0.8); padding: 4px 10px; border-radius: 12px; margin-left: 10px; vertical-align: middle;">v{{ version }}</span></h1>
+                    <p class="subtitle">
+                        <span class="status-indicator"></span>
+                        Auto-updating from chat logs
+                    </p>
+                </div>
+                <button class="overlay-btn" onclick="openOverlay()" title="Open compact overlay window">
+                    Pop Out Overlay
+                </button>
+            </div>
         </header>
 
         <div class="main-content">
@@ -391,7 +414,7 @@
                     </label>
                     <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
                         <input type="radio" name="questView" value="ready" style="margin-right: 5px;" onchange="switchQuestView()">
-                        Have Materials
+                        Ready
                     </label>
                 </div>
 
@@ -402,7 +425,11 @@
                     </label>
                     <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
                         <input type="radio" name="recipeView" value="craftable" style="margin-right: 5px;" onchange="switchRecipeView()">
-                        Have Materials
+                        Ready
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                        <input type="radio" name="recipeView" value="shopping" style="margin-right: 5px;" onchange="switchRecipeView()">
+                        Pinned
                     </label>
                 </div>
 
@@ -473,8 +500,12 @@
         }
         let craftableRecipeSet = new Set();
         let buyableRecipeSet = new Set();
+        let noSkillRecipeSet = new Set(); // Recipes player doesn't have skill for
+        // Lookup: item name -> recipes that produce it
+        let recipesByOutput = {};
         let playerInventory = {};
         let playerInventoryDetails = {}; // Detailed storage locations
+        let playerSkills = {}; // Skill name -> effective level (base + bonus)
         let itemKeywords = {}; // Keyword -> list of item names (e.g., "Bone" -> ["Femur", "Rib Bone", ...])
         let vendorItems = {}; // Item name -> vendor info (for checking if items can be bought)
         let debugMode = false; // Debug mode state
@@ -585,15 +616,33 @@
             selectedQuest = null;
 
             // Reset quest detail panel to empty state with appropriate message
-            const emptyIcon = tab === 'crafting' ? '🔨' : '📋';
-            const emptyMessage = tab === 'crafting' ? 'Select recipes to view shopping list' : 'Select a quest to view its checklist';
-
-            document.getElementById('questDetail').innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">${emptyIcon}</div>
-                    <p>${emptyMessage}</p>
-                </div>
-            `;
+            let emptyStateHtml;
+            if (tab === 'crafting') {
+                emptyStateHtml = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔨</div>
+                        <p style="margin-bottom: 15px;"><strong>Materials Needed</strong></p>
+                        <div style="text-align: left; font-size: 13px; color: #666; line-height: 1.8; max-width: 280px;">
+                            <p style="margin-bottom: 10px;"><strong>How to use:</strong></p>
+                            <ol style="margin: 0; padding-left: 20px;">
+                                <li>Select a crafting skill from the dropdown</li>
+                                <li>Check recipes you want to craft</li>
+                                <li>Adjust quantities with +/− buttons</li>
+                                <li>View aggregated materials here</li>
+                            </ol>
+                            <p style="margin-top: 12px; font-size: 12px; color: #888;">Pin up to 20 recipes. Export Character JSON to update skill levels.</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                emptyStateHtml = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>Select a quest to view its checklist</p>
+                    </div>
+                `;
+            }
+            document.getElementById('questDetail').innerHTML = emptyStateHtml;
 
             // Update button styles - find button by matching tab name
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -716,15 +765,17 @@
 
         async function loadPlayerInventory() {
             try {
-                // Load full player inventory, keywords, and vendor data in parallel
-                const [invResponse, keywordsResponse, vendorsResponse] = await Promise.all([
+                // Load full player inventory, keywords, vendor data, and skills in parallel
+                const [invResponse, keywordsResponse, vendorsResponse, skillsResponse] = await Promise.all([
                     fetch('/api/inventory'),
                     fetch('/api/keywords'),
-                    fetch('/api/vendors')
+                    fetch('/api/vendors'),
+                    fetch('/api/skills')
                 ]);
                 const invData = await invResponse.json();
                 const keywordsData = await keywordsResponse.json();
                 const vendorsData = await vendorsResponse.json();
+                const skillsData = await skillsResponse.json();
 
                 // Build inventory map from full inventory data
                 playerInventory = {};
@@ -750,9 +801,18 @@
                 // Store vendor items
                 vendorItems = vendorsData.vendor_items || {};
 
+                // Store player skills (skill name -> effective level)
+                playerSkills = {};
+                if (skillsData.skills) {
+                    for (const [skillName, skillData] of Object.entries(skillsData.skills)) {
+                        playerSkills[skillName] = skillData.effectiveLevel || 0;
+                    }
+                }
+
                 console.log(`Loaded ${Object.keys(playerInventory).length} items from player inventory`);
                 console.log(`Loaded ${Object.keys(itemKeywords).length} keyword mappings`);
                 console.log(`Loaded ${Object.keys(vendorItems).length} vendor items`);
+                console.log(`Loaded ${Object.keys(playerSkills).length} player skills`);
             } catch (error) {
                 console.error('Error loading player inventory:', error);
             }
@@ -808,54 +868,385 @@
         function checkRecipeCraftability() {
             craftableRecipeSet.clear();
             buyableRecipeSet.clear();
+            noSkillRecipeSet.clear();
 
             for (const recipe of allRecipes) {
-                let canCraft = true;
-                let allMissingBuyable = true;
-                let hasMissingIngredients = false;
+                // First check skill requirement
+                const recipeSkill = recipe.skill || '';
+                const recipeLevel = recipe.level || 0;
+                const playerLevel = playerSkills[recipeSkill] || 0;
+
+                if (playerLevel < recipeLevel) {
+                    // Player doesn't have required skill level
+                    noSkillRecipeSet.add(recipe.id);
+                    continue; // Skip material checks for unskilled recipes
+                }
+
+                let hasGather = false;  // Any ingredient requires gathering
+                let hasBuy = false;     // Any ingredient requires buying
+                let allReady = true;    // All ingredients available (in storage or craftable)
 
                 for (const ingredient of recipe.ingredients) {
                     const itemName = ingredient.item || ingredient.name;
                     const needed = ingredient.quantity;
                     const ingredientInfo = getIngredientCount(itemName);
+                    const have = ingredientInfo.count;
 
-                    if (ingredientInfo.count < needed) {
-                        canCraft = false;
-                        hasMissingIngredients = true;
-                        // Check if this missing ingredient can be bought from a vendor
-                        if (!vendorItems[itemName]) {
-                            allMissingBuyable = false;
-                        }
+                    if (have >= needed) {
+                        continue; // Have enough in storage
+                    }
+
+                    // Missing items - categorize them
+                    const missing = needed - have;
+                    const category = categorizeMaterial(itemName, needed, have);
+
+                    if (category.source === 'storage') {
+                        // Already have (shouldn't reach here but handle it)
+                        continue;
+                    } else if (category.source === 'craft') {
+                        // Can craft with available materials - still "ready"
+                        continue;
+                    } else if (category.source === 'buy') {
+                        hasBuy = true;
+                        allReady = false;
+                    } else {
+                        // Must gather
+                        hasGather = true;
+                        allReady = false;
                     }
                 }
 
-                if (canCraft) {
+                // Apply hierarchy: ready (green) > buyable (orange) > gather (blue/default)
+                if (allReady) {
                     craftableRecipeSet.add(recipe.id);
-                } else if (hasMissingIngredients && allMissingBuyable) {
-                    // Only mark as buyable if ALL missing ingredients are sold by vendors
+                } else if (!hasGather && hasBuy) {
+                    // All missing items are buyable (none require gathering)
                     buyableRecipeSet.add(recipe.id);
                 }
+                // If hasGather is true, recipe stays in default state (blue)
             }
             console.log('Craftable recipes count:', craftableRecipeSet.size);
+            console.log('Buyable recipes count:', buyableRecipeSet.size);
+            console.log('No-skill recipes count:', noSkillRecipeSet.size);
+        }
+
+        /**
+         * Check if an item can be crafted with available inventory and skills (recursive, with depth limit)
+         * Returns { canCraft: boolean, craftInfo: object | null }
+         */
+        function canCraftItem(itemName, qtyNeeded, depth = 0, visited = null) {
+            if (visited === null) visited = new Set();
+
+            // Prevent infinite recursion and limit depth
+            if (visited.has(itemName) || depth > 3) {
+                return { canCraft: false, craftInfo: null };
+            }
+            visited.add(itemName);
+
+            // Check if any recipe can produce this item
+            const recipes = recipesByOutput[itemName];
+            if (!recipes || recipes.length === 0) {
+                return { canCraft: false, craftInfo: null };
+            }
+
+            for (const recipeInfo of recipes) {
+                const recipe = recipeInfo.recipe;
+                const outputQty = recipeInfo.outputQty;
+
+                // Check skill requirement for this recipe
+                const recipeSkill = recipe.skill || '';
+                const recipeLevel = recipe.level || 0;
+                const playerLevel = playerSkills[recipeSkill] || 0;
+                if (playerLevel < recipeLevel) {
+                    continue; // Skip recipes we can't craft due to skill
+                }
+
+                // How many times do we need to run this recipe?
+                const craftsNeeded = Math.ceil(qtyNeeded / outputQty);
+
+                // Check if we have all ingredients (or can craft them)
+                let canMake = true;
+                const subCrafts = [];
+
+                for (const ingredient of (recipe.ingredients || [])) {
+                    const ingName = ingredient.item || ingredient.name || '';
+                    const ingQty = (ingredient.quantity || 1) * craftsNeeded;
+                    const ingInfo = getIngredientCount(ingName);
+                    const ingHave = ingInfo.count;
+
+                    if (ingHave >= ingQty) {
+                        continue; // Have enough
+                    }
+
+                    // Try to craft the missing amount
+                    const missing = ingQty - ingHave;
+                    const subResult = canCraftItem(ingName, missing, depth + 1, new Set(visited));
+
+                    if (subResult.canCraft) {
+                        subCrafts.push({
+                            item: ingName,
+                            quantity: missing,
+                            craftInfo: subResult.craftInfo
+                        });
+                    } else {
+                        canMake = false;
+                        break;
+                    }
+                }
+
+                if (canMake) {
+                    return {
+                        canCraft: true,
+                        craftInfo: {
+                            recipeName: recipe.name,
+                            skill: recipe.skill,
+                            level: recipe.level || 0,
+                            craftsNeeded: craftsNeeded,
+                            subCrafts: subCrafts
+                        }
+                    };
+                }
+            }
+
+            return { canCraft: false, craftInfo: null };
+        }
+
+        /**
+         * Categorize a material by how it can be obtained
+         * Returns: { source: 'storage'|'craft'|'buy'|'gather', info: object|null }
+         */
+        function categorizeMaterial(itemName, qtyNeeded, qtyHave) {
+            const missing = qtyNeeded - qtyHave;
+
+            if (missing <= 0) {
+                return { source: 'storage', info: null };
+            }
+
+            // Check if craftable with current inventory
+            const craftResult = canCraftItem(itemName, missing);
+            if (craftResult.canCraft) {
+                return { source: 'craft', info: craftResult.craftInfo };
+            }
+
+            // Check if buyable from vendor
+            if (vendorItems[itemName]) {
+                return { source: 'buy', info: vendorItems[itemName] };
+            }
+
+            // Must be gathered
+            return { source: 'gather', info: null };
         }
 
         function switchRecipeView() {
             const recipeView = document.querySelector('input[name="recipeView"]:checked').value;
             currentRecipeView = recipeView;
 
-            // Clear selected recipes when changing filter
-            recipeQuantities = {};
-            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+            if (recipeView === 'shopping') {
+                // Pinned view - show only pinned recipes
+                renderShoppingCartView();
+            } else {
+                // All or Ready view - show recipes with pins preserved
+                renderCraftingList();
+                // Update materials panel to show pinned recipe materials
+                updateShoppingList();
+            }
+        }
 
-            renderCraftingList();
+        async function renderShoppingCartView() {
+            const container = document.getElementById('questListContainer');
+            const detailContainer = document.getElementById('questDetail');
 
-            // Clear the shopping list display
-            document.getElementById('questDetail').innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">🔨</div>
-                    <p>Select recipes to view shopping list</p>
+            // Restore pinned recipes from localStorage
+            const savedRecipes = localStorage.getItem('recipeQuantities');
+            if (savedRecipes) {
+                recipeQuantities = JSON.parse(savedRecipes);
+            }
+
+            const selectedRecipeIds = Object.keys(recipeQuantities);
+
+            if (selectedRecipeIds.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🛒</div>
+                        <p>No recipes pinned</p>
+                        <p style="font-size: 12px; color: #888; margin-top: 8px;">
+                            Switch to "All" view and select recipes first
+                        </p>
+                    </div>
+                `;
+                detailContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <p>Pin recipes to see materials needed</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get recipe details
+            const selectedRecipes = allRecipes.filter(r => selectedRecipeIds.includes(r.id));
+
+            // Collect all vendor-purchasable missing ingredients
+            const shoppingItems = {};
+            let totalCost = 0;
+
+            for (const recipe of selectedRecipes) {
+                const qty = recipeQuantities[recipe.id]?.quantity || 1;
+                for (const ing of recipe.ingredients) {
+                    const itemName = ing.item || ing.name;
+                    const needed = (ing.quantity || 1) * qty;
+                    const have = playerInventory[itemName] || 0;
+                    const missing = Math.max(0, needed - have);
+
+                    // Only include items that are missing AND sold by vendors
+                    if (missing <= 0 || !vendorItems[itemName]) continue;
+
+                    const vendors = vendorItems[itemName];
+
+                    if (!shoppingItems[itemName]) {
+                        shoppingItems[itemName] = {
+                            name: itemName,
+                            totalNeed: 0,
+                            totalHave: have,
+                            vendors: vendors,
+                            recipes: [],
+                            storageLocations: playerInventoryDetails[itemName]?.storage || {}
+                        };
+                    }
+
+                    shoppingItems[itemName].totalNeed += needed;
+                    shoppingItems[itemName].recipes.push(`${recipe.name} (×${qty})`);
+                }
+            }
+
+            const items = Object.values(shoppingItems);
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <p>No vendor items needed!</p>
+                        <p style="font-size: 12px; color: #888; margin-top: 8px;">
+                            All vendor-purchasable materials are collected
+                        </p>
+                    </div>
+                `;
+                detailContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎉</div>
+                        <p>No vendor items needed</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by vendor location for efficient shopping
+            items.sort((a, b) => {
+                const aLoc = a.vendors[0]?.location || '';
+                const bLoc = b.vendors[0]?.location || '';
+                if (aLoc !== bLoc) return aLoc.localeCompare(bLoc);
+                return a.name.localeCompare(b.name);
+            });
+
+            // Calculate totals
+            items.forEach(item => {
+                const missing = item.totalNeed - item.totalHave;
+                const price = item.vendors[0]?.price || 0;
+                totalCost += missing * price;
+            });
+
+            // Render list by location
+            const itemsByLocation = {};
+            for (const item of items) {
+                const loc = item.vendors[0]?.location || 'Unknown';
+                if (!itemsByLocation[loc]) itemsByLocation[loc] = [];
+                itemsByLocation[loc].push(item);
+            }
+
+            let listHtml = `
+                <div style="padding: 10px; background: #fff3e0; border-radius: 8px; margin-bottom: 12px;">
+                    <div style="font-weight: bold; color: #e65100; margin-bottom: 6px;">🛒 Pinned</div>
+                    <div style="font-size: 13px; color: #424242;">
+                        ${items.length} item${items.length !== 1 ? 's' : ''} to buy • Total: <strong>${totalCost.toLocaleString()}g</strong>
+                    </div>
                 </div>
             `;
+
+            for (const [location, locationItems] of Object.entries(itemsByLocation).sort()) {
+                listHtml += `
+                    <div class="skill-group">
+                        <div class="skill-header">📍 ${location} (${locationItems.length})</div>
+                        <div class="skill-recipes">
+                `;
+
+                for (const item of locationItems) {
+                    const missing = item.totalNeed - item.totalHave;
+                    const vendor = item.vendors[0];
+                    const itemCost = missing * (vendor?.price || 0);
+
+                    listHtml += `
+                        <div class="quest-item buyable" style="cursor: default;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600;">${item.name}</div>
+                                <div style="font-size: 11px; color: #666; margin-top: 2px;">
+                                    Buy ${missing} × ${vendor?.price || 0}g = ${itemCost.toLocaleString()}g
+                                </div>
+                                <div style="font-size: 10px; color: #888; margin-top: 2px;">
+                                    From: ${vendor?.vendor || 'Unknown'} • ${vendor?.favor || 'Unknown'} favor
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                listHtml += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = listHtml;
+
+            // Show detailed shopping cart in detail panel
+            let detailHtml = `
+                <div class="quest-detail-header">
+                    <div class="quest-detail-name">Pinned</div>
+                    <div class="quest-detail-description">${items.length} item${items.length !== 1 ? 's' : ''} • Total: ${totalCost.toLocaleString()}g</div>
+                </div>
+                <div class="checklist-items">
+            `;
+
+            for (const item of items) {
+                const missing = item.totalNeed - item.totalHave;
+                const vendor = item.vendors[0];
+                const itemCost = missing * (vendor?.price || 0);
+
+                detailHtml += `
+                    <div class="checklist-item" style="background: #fff3e0;">
+                        <div class="item-info">
+                            <span class="item-name" style="font-weight: 600;">${item.name}</span>
+                            <span class="item-count" style="color: #e65100;">Buy ${missing}</span>
+                        </div>
+                        <div class="item-locations">
+                            <span class="vendor-hint" style="color: #e65100;">
+                                🛒 ${vendor?.vendor || 'Unknown'} (${vendor?.location || 'Unknown'})
+                            </span>
+                        </div>
+                        <div class="item-locations">
+                            💰 ${vendor?.price || 0}g each = ${itemCost.toLocaleString()}g total
+                        </div>
+                        <div class="item-locations">
+                            ⭐ Requires: ${vendor?.favor || 'Unknown'} favor
+                        </div>
+                        <div class="item-locations" style="font-size: 11px; color: #888;">
+                            For: ${item.recipes.join(', ')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            detailHtml += `</div>`;
+            detailContainer.innerHTML = detailHtml;
         }
 
         async function searchQuests(query) {
@@ -1032,9 +1423,9 @@
 
                     for (const recipe of recipes) {
                         const isSelected = !!recipeQuantities[recipe.id];
-                        const bgColor = isSelected ? '#e8eaf6' : '#f9f9f9';
+                        const selectionStyle = isSelected ? 'box-shadow: inset 0 0 0 2px #333;' : '';
                         html += `
-                            <div class="quest-item" style="background: ${bgColor}; display: flex; align-items: center; cursor: pointer;"
+                            <div class="quest-item" style="display: flex; align-items: center; cursor: pointer; ${selectionStyle}"
                                  onclick="toggleRecipeSelection('${recipe.id}')">
                                 <input type="checkbox"
                                        ${isSelected ? 'checked' : ''}
@@ -1248,6 +1639,43 @@
                     vendorInfo += `</div>`;
                 }
 
+                // Show item description if available
+                let descriptionInfo = '';
+                if (item.description) {
+                    descriptionInfo = `<div style="font-size: 11px; color: #666; margin-top: 4px; font-style: italic;">${item.description}</div>`;
+                }
+
+                // Show gather info with wiki link for items that can't be bought
+                let gatherInfo = '';
+                if (!completed && (!item.possible_vendors || item.possible_vendors.length === 0) && totalCollected < item.required) {
+                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.display_name)}`;
+                    gatherInfo = `<div style="font-size: 12px; color: #667eea; margin-top: 4px;">`;
+                    gatherInfo += `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: #667eea; text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.display_name}">📖 Wiki</a>`;
+                    gatherInfo += `</div>`;
+                }
+
+                // Build color-coded progress text
+                const inInventory = item.in_inventory || 0;
+                const inStorage = item.in_storage || 0;
+                const required = item.required;
+
+                let progressParts = [];
+                if (inInventory > 0) {
+                    progressParts.push(`<span style="color: #4caf50; font-weight: 600;">${Math.min(inInventory, required)} ready</span>`);
+                }
+                if (inStorage > 0 && inInventory < required) {
+                    const storageNeeded = Math.min(inStorage, required - inInventory);
+                    progressParts.push(`<span style="color: #ff9800; font-weight: 600;">${storageNeeded} in storage</span>`);
+                }
+                if (inInventory + inStorage < required) {
+                    const stillNeed = required - inInventory - inStorage;
+                    progressParts.push(`<span style="color: #999;">${stillNeed} needed</span>`);
+                }
+
+                const progressText = progressParts.length > 0
+                    ? progressParts.join(' + ') + ` <span style="color: #666;">/ ${required}</span>`
+                    : `<span style="color: #999;">0 / ${required}</span>`;
+
                 return `
                     <div class="checklist-item ${completed ? 'completed' : ''}">
                         <input type="checkbox"
@@ -1256,16 +1684,14 @@
                                onchange="toggleManualCheck('${item.internal_name}', ${item.required - item.collected})">
                         <div class="item-info">
                             <div class="item-name">${item.display_name}</div>
-                            <div class="item-progress">
-                                ${totalCollected} / ${item.required}
-                                ${item.collected > 0 ? `(${item.collected} from logs)` : ''}
-                            </div>
+                            ${descriptionInfo}
                             ${keywordInfo}
                             ${locationInfo}
                             ${vendorInfo}
+                            ${gatherInfo}
                         </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        <div class="item-progress-text">
+                            ${progressText}
                         </div>
                     </div>
                 `;
@@ -1329,6 +1755,24 @@
                     }
                 });
 
+                // Build recipes-by-output lookup for craftability checks
+                recipesByOutput = {};
+                for (const recipe of allRecipes) {
+                    for (const result of (recipe.results || [])) {
+                        const outputName = result.item || '';
+                        if (outputName) {
+                            if (!recipesByOutput[outputName]) {
+                                recipesByOutput[outputName] = [];
+                            }
+                            recipesByOutput[outputName].push({
+                                recipe: recipe,
+                                outputQty: result.quantity || 1
+                            });
+                        }
+                    }
+                }
+                console.log('Built recipesByOutput lookup:', Object.keys(recipesByOutput).length, 'craftable items');
+
                 // Load inventory and check craftability
                 await loadPlayerInventory();
                 checkRecipeCraftability();
@@ -1390,7 +1834,7 @@
                 <div style="background: #e8f5e9; border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">🔨 Crafting List</div>
                     <div style="font-size: 13px; color: #424242; line-height: 1.5;">
-                        Select recipes to create shopping list. Materials will be aggregated automatically.
+                        Pin recipes to track materials needed. Totals are aggregated automatically.
                     </div>
                 </div>
             `;
@@ -1408,21 +1852,36 @@
                     const isSelected = !!recipeQuantities[recipe.id];
                     const isCraftable = craftableRecipeSet.has(recipe.id);
                     const isBuyable = buyableRecipeSet.has(recipe.id);
+                    const hasNoSkill = noSkillRecipeSet.has(recipe.id);
+
+                    // Get skill level info
+                    const recipeSkill = recipe.skill || '';
+                    const recipeLevel = recipe.level || 0;
+                    const playerLevel = playerSkills[recipeSkill] || 0;
 
                     // Build CSS classes
                     const classes = ['quest-item'];
-                    if (isCraftable) classes.push('craftable');
+                    if (hasNoSkill) classes.push('no-skill');
+                    else if (isCraftable) classes.push('craftable');
                     else if (isBuyable) classes.push('buyable');
 
+                    // Build skill badge
+                    let skillBadge = '';
+                    if (hasNoSkill) {
+                        skillBadge = `<span style="font-size: 11px; color: #9e9e9e; margin-left: 8px;" title="Need ${recipe.skill} ${recipeLevel}, have ${playerLevel}">🔒 Lv${recipeLevel}</span>`;
+                    } else {
+                        skillBadge = `<span style="font-size: 11px; color: #757575; margin-left: 8px;">Lv${recipeLevel}</span>`;
+                    }
+
                     html += `
-                        <div class="${classes.join(' ')}" style="display: flex; align-items: center; cursor: pointer; ${isSelected ? 'background: #e8eaf6;' : ''}"
+                        <div class="${classes.join(' ')}" style="display: flex; align-items: center; cursor: pointer; ${isSelected ? 'box-shadow: inset 0 0 0 2px #333;' : ''}"
                              onclick="toggleRecipeSelection('${recipe.id}')">
                             <input type="checkbox"
                                    ${isSelected ? 'checked' : ''}
                                    style="margin-right: 10px; cursor: pointer;"
                                    onclick="event.stopPropagation(); toggleRecipeSelection('${recipe.id}')">
                             <div style="flex: 1;">
-                                <div class="quest-item-name">${recipe.name}</div>
+                                <div class="quest-item-name">${recipe.name}${skillBadge}</div>
                                 <div class="quest-item-location">${recipe.ingredients.length} ingredients</div>
                             </div>
                         </div>
@@ -1435,10 +1894,17 @@
             container.innerHTML = html;
         }
 
+        const MAX_PINNED_RECIPES = 20;
+
         async function toggleRecipeSelection(recipeId) {
             if (recipeQuantities[recipeId]) {
                 delete recipeQuantities[recipeId];
             } else {
+                // Check pin limit before adding
+                if (Object.keys(recipeQuantities).length >= MAX_PINNED_RECIPES) {
+                    alert(`Maximum ${MAX_PINNED_RECIPES} recipes can be pinned at once.`);
+                    return;
+                }
                 recipeQuantities[recipeId] = 1;
             }
 
@@ -1486,17 +1952,34 @@
                 <div style="padding: 10px;">
                     <h3 style="color: #667eea; margin-bottom: 15px;">Color Legend</h3>
                     <div style="font-size: 13px; line-height: 1.6;">
-                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                            <div style="width: 24px; height: 24px; background: #e8f5e9; border-left: 4px solid #4caf50; margin-right: 10px;"></div>
-                            <div><strong>Green</strong> = Have all materials</div>
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="min-width: 120px; padding: 8px 12px; background: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #2e7d32;">Green</div>
+                            <div>Ready (have materials or can craft sub-components)</div>
                         </div>
-                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                            <div style="width: 24px; height: 24px; background: #fff3e0; border-left: 4px solid #ff9800; margin-right: 10px;"></div>
-                            <div><strong>Orange</strong> = Can buy missing items</div>
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="min-width: 120px; padding: 8px 12px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #e65100;">Orange</div>
+                            <div>Can buy all missing items from vendors</div>
                         </div>
-                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                            <div style="width: 24px; height: 24px; background: white; border-left: 4px solid #667eea; margin-right: 10px;"></div>
-                            <div><strong>Default</strong> = Need to gather items</div>
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="min-width: 120px; padding: 8px 12px; background: #e8eaf6; border-left: 4px solid #667eea; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #667eea;">Blue</div>
+                            <div>Need to gather/farm items (not vendor-purchasable)</div>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="min-width: 120px; padding: 8px 12px; background: #f5f5f5; border-left: 4px solid #9e9e9e; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #757575; opacity: 0.7;">Gray 🔒</div>
+                            <div>Skill level too low (shows required vs current level)</div>
+                        </div>
+                    </div>
+
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Material Sources</h3>
+                    <div style="font-size: 13px; line-height: 1.8; text-align: left;">
+                        <p style="margin-bottom: 10px;"><strong>Icons show how to obtain each material:</strong></p>
+                        <div style="padding-left: 10px; margin-bottom: 8px;">
+                            <div style="margin-bottom: 8px;">&#10003; <strong>Have</strong> - Already in your inventory or storage (from exported JSON)</div>
+                            <div style="margin-bottom: 8px;">&#128296; <strong>Craft</strong> - Can be crafted using materials you have, based on your skill levels</div>
+                            <div style="margin-bottom: 8px;">&#128722; <strong>Buy</strong> - Available from an NPC vendor (check favor requirements)</div>
+                            <div style="margin-bottom: 8px;">&#128269; <strong>Gather</strong> - Must be looted, harvested, or obtained through gameplay (click 📖 Wiki link for drop info)</div>
                         </div>
                     </div>
 
@@ -1505,7 +1988,9 @@
                     <h3 style="color: #667eea; margin-bottom: 15px;">Keeping Data Fresh</h3>
                     <div style="font-size: 13px; line-height: 1.6; color: #555;">
                         <p style="margin-bottom: 8px;">Open the <strong>VIP Menu</strong> in-game and export your <strong>Storage</strong> and <strong>Character</strong> JSON files to update your data.</p>
-                        <p style="color: #888; font-size: 12px;">StorageBuddy reads your character export files to track items across inventory, storage, and saddlebags.</p>
+                        <p style="margin-bottom: 8px; color: #666; font-size: 12px;"><strong>Storage JSON</strong> — Updates inventory, storage chests, and saddlebag contents</p>
+                        <p style="margin-bottom: 8px; color: #666; font-size: 12px;"><strong>Character JSON</strong> — Updates active quests and crafting skill levels</p>
+                        <p style="color: #888; font-size: 12px;">StorageBuddy reads your export files to track items and determine which recipes you can craft.</p>
                     </div>
                 </div>
             `;
@@ -1556,7 +2041,7 @@
                                 <p style="margin-bottom: 6px;"><strong>Filters:</strong></p>
                                 <ul style="margin-left: 15px; color: #666;">
                                     <li><strong>All</strong> — Show all active quests</li>
-                                    <li><strong>Have Materials</strong> — Only show quests you can complete now</li>
+                                    <li><strong>Ready</strong> — Only show quests you can complete now</li>
                                 </ul>
                             </div>
 
@@ -1579,13 +2064,14 @@
                     <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
                         <h3 style="color: #333; margin-bottom: 12px; font-size: 16px;">🔨 Crafting Tab</h3>
                         <div style="font-size: 14px; line-height: 1.7; color: #555;">
-                            <p style="margin-bottom: 10px;">Build shopping lists for crafting projects.</p>
+                            <p style="margin-bottom: 10px;">Track materials needed for crafting projects (up to 20 pinned recipes).</p>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
                                 <p style="margin-bottom: 6px;"><strong>Filters:</strong></p>
                                 <ul style="margin-left: 15px; color: #666;">
                                     <li><strong>All</strong> — Show all recipes</li>
-                                    <li><strong>Have Materials</strong> — Only show recipes you can craft now</li>
+                                    <li><strong>Ready</strong> — Recipes you can craft now (includes craftable sub-components)</li>
+                                    <li><strong>Pinned</strong> — View only your selected recipes</li>
                                 </ul>
                             </div>
 
@@ -1594,16 +2080,26 @@
                             </div>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
-                                <p style="margin-bottom: 6px;"><strong>To build a shopping list:</strong></p>
+                                <p style="margin-bottom: 6px;"><strong>Skill Level Tracking:</strong></p>
+                                <ul style="margin-left: 15px; color: #666;">
+                                    <li>Recipes show level requirements (e.g., "Lv15")</li>
+                                    <li>Recipes above your skill level show 🔒 and are grayed out</li>
+                                    <li>Your character's skills are read from Character JSON export</li>
+                                    <li>Sub-component craftability also checks your skill levels</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>To track materials:</strong></p>
                                 <ol style="margin-left: 15px; color: #666;">
-                                    <li>Click recipe checkboxes to add them</li>
+                                    <li>Click recipe checkboxes to pin them (max 20)</li>
                                     <li>Use +/− or type a number to set quantity (1-999)</li>
-                                    <li>Materials are totaled across all selected recipes</li>
-                                    <li>Vendor info shows where to buy materials</li>
+                                    <li>Materials are totaled across all pinned recipes</li>
+                                    <li>Each material shows its source: storage, craft, buy, or gather</li>
                                 </ol>
                             </div>
 
-                            <p style="color: #888; font-size: 13px; margin-top: 10px;">Selections are saved automatically.</p>
+                            <p style="color: #888; font-size: 13px; margin-top: 10px;">Selections are saved automatically. Craftable sub-components are detected recursively (3 levels deep) and respect your skill levels.</p>
                         </div>
                     </div>
 
@@ -1613,49 +2109,41 @@
                         <p style="font-size: 14px; color: #555; margin: 0;">Can't find items at vendors? <strong>Uncheck "Hide Unusable"</strong> in the vendor window — this filter often hides quest items like seeds and ingredients.</p>
                     </div>
 
-                    <!-- Browser Extension Section -->
+                    <!-- Pop-Out Overlay Section -->
                     <div style="margin-bottom: 30px; padding: 20px; background: #e3f2fd; border-radius: 8px;">
-                        <h3 style="color: #1565c0; margin-bottom: 12px; font-size: 16px;">Browser Extension & In-Game Overlay</h3>
+                        <h3 style="color: #1565c0; margin-bottom: 12px; font-size: 16px;">⧉ Pop-Out Overlay (In-Game Use)</h3>
                         <div style="font-size: 14px; line-height: 1.7; color: #555;">
-                            <p style="margin-bottom: 10px;">Track quests and crafting while playing!</p>
-
-                            <div style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
-                                <p style="margin: 0 0 8px 0; font-weight: 600; color: #856404;">Extension Location (Executable Users)</p>
-                                <p style="margin: 0; color: #666; font-size: 13px;">
-                                    The extension is automatically extracted on first run to:<br>
-                                    <strong>Windows:</strong> <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">%LOCALAPPDATA%&#92;ProjectGorgon-QuestHelper&#92;browser-extension&#92;</code><br>
-                                    <strong>Linux:</strong> <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">~/.local/share/projectgorgon-questhelper/browser-extension/</code>
-                                </p>
-                            </div>
+                            <p style="margin-bottom: 10px;">Track quests and crafting while playing with a compact overlay window!</p>
 
                             <div style="margin-left: 15px; margin-bottom: 15px;">
-                                <p style="margin-bottom: 6px;"><strong>Installation:</strong></p>
+                                <p style="margin-bottom: 6px;"><strong>How to use:</strong></p>
                                 <ol style="margin-left: 15px; color: #666;">
-                                    <li>Open Chrome/Edge → Extensions → Enable "Developer mode"</li>
-                                    <li>Click "Load unpacked" → Select the <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">browser-extension</code> folder (see location above)</li>
-                                    <li>Pin the extension to your toolbar for easy access</li>
+                                    <li>Click the <strong>"Pop Out Overlay"</strong> button in the top-right of this page</li>
+                                    <li>A compact window opens with all quests and crafting info</li>
+                                    <li>Position it over your game window</li>
+                                    <li>Use an always-on-top tool to keep it visible while playing</li>
                                 </ol>
                             </div>
 
                             <div style="margin-left: 15px; margin-bottom: 15px;">
-                                <p style="margin-bottom: 6px;"><strong>Features:</strong></p>
+                                <p style="margin-bottom: 6px;"><strong>Overlay Features:</strong></p>
                                 <ul style="margin-left: 15px; color: #666;">
-                                    <li><strong>Quests tab</strong> — View active quests with progress and item locations</li>
-                                    <li><strong>Crafting tab</strong> — See your shopping list (synced from this app)</li>
-                                    <li><strong>Zoom controls</strong> — Adjust text size for readability</li>
+                                    <li><strong>Quests tab</strong> — Active quests with progress and item locations</li>
+                                    <li><strong>Crafting tab</strong> — Pinned recipes with All/Ready/Pinned filters</li>
+                                    <li><strong>Region filter</strong> — Filter quests by turn-in location</li>
                                     <li><strong>Auto-refresh</strong> — Updates every 3 seconds</li>
                                 </ul>
                             </div>
 
                             <div style="background: #fff; padding: 12px; border-radius: 6px; border-left: 4px solid #1565c0;">
-                                <p style="margin: 0 0 8px 0; font-weight: 600; color: #1565c0;">⧉ Pop-Out for In-Game Overlay</p>
+                                <p style="margin: 0 0 8px 0; font-weight: 600; color: #1565c0;">Always-On-Top Tips</p>
                                 <p style="margin: 0 0 8px 0; color: #555; font-size: 13px;">
-                                    Click the <strong>"Pop Out"</strong> button in the extension header to open a separate window.
-                                    Position it over your game and use an always-on-top feature or plugin to keep it visible while you play.
+                                    To keep the overlay visible over your game:
                                 </p>
-                                <p style="margin: 0; color: #888; font-size: 12px;">
-                                    <strong>Windows 11 + Chrome:</strong> <a href="https://learn.microsoft.com/en-us/windows/powertoys/always-on-top" target="_blank" style="color: #667eea;">PowerToys Always on Top</a> (Win+Ctrl+T) confirmed working.
-                                </p>
+                                <ul style="margin: 0 0 8px 15px; padding: 0; color: #666; font-size: 13px;">
+                                    <li><strong>Windows:</strong> <a href="https://learn.microsoft.com/en-us/windows/powertoys/always-on-top" target="_blank" style="color: #667eea;">PowerToys Always on Top</a> (Win+Ctrl+T)</li>
+                                    <li><strong>Linux:</strong> Most window managers support pinning windows (right-click title bar)</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -1665,8 +2153,11 @@
                         <h3 style="color: #333; margin-bottom: 10px; font-size: 14px;">Quick Tips</h3>
                         <ul style="font-size: 13px; line-height: 1.8; color: #666; margin: 0; padding-left: 20px;">
                             <li>Use the search box to find specific quests or recipes</li>
-                            <li>Check "Have Materials" filters to see what you can do right now</li>
-                            <li>Re-export from VIP Menu after looting to update inventory</li>
+                            <li>Check "Ready" filters to see what you can complete or craft right now</li>
+                            <li>Re-export <strong>Storage</strong> and <strong>Character</strong> JSON from VIP Menu to update inventory and skills</li>
+                            <li>Use "Pop Out Overlay" button for a compact in-game tracker</li>
+                            <li>Pin up to 20 recipes to track materials needed</li>
+                            <li>Grayed recipes (🔒) require higher skill levels — export Character JSON to update your skills</li>
                         </ul>
                     </div>
 
@@ -1696,7 +2187,17 @@
                 detailContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">🔨</div>
-                        <p>Select recipes to view shopping list</p>
+                        <p style="margin-bottom: 15px;"><strong>Materials Needed</strong></p>
+                        <div style="text-align: left; font-size: 13px; color: #666; line-height: 1.8; max-width: 280px;">
+                            <p style="margin-bottom: 10px;"><strong>How to use:</strong></p>
+                            <ol style="margin: 0; padding-left: 20px;">
+                                <li>Select a crafting skill from the dropdown</li>
+                                <li>Check recipes you want to craft</li>
+                                <li>Adjust quantities with +/− buttons</li>
+                                <li>View aggregated materials here</li>
+                            </ol>
+                            <p style="margin-top: 12px; font-size: 12px; color: #888;">Pin up to 20 recipes. Export Character JSON to update skill levels.</p>
+                        </div>
                     </div>
                 `;
                 return;
@@ -1736,10 +2237,27 @@
                 if (recipe) {
                     // Escape recipeId for use in onclick handlers
                     const escapedId = recipeId.replace(/'/g, "\\'");
-                    recipesInfo += `<div style="margin-bottom: 8px; padding: 8px; background: #f5f5f5; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+
+                    // Check skill requirement
+                    const recipeSkill = recipe.skill || '';
+                    const recipeLevel = recipe.level || 0;
+                    const playerLevel = playerSkills[recipeSkill] || 0;
+                    const hasSkill = playerLevel >= recipeLevel;
+
+                    // Determine background color based on skill
+                    let bgColor = '#f5f5f5'; // Default
+                    let skillBadge = '';
+                    if (!hasSkill) {
+                        bgColor = '#ffebee'; // Light red for missing skill
+                        skillBadge = `<span style="color: #d32f2f; font-weight: 500;" title="Need ${recipeSkill} ${recipeLevel}, you have ${playerLevel}">🔒 Need Lv${recipeLevel} (You: ${playerLevel})</span>`;
+                    } else {
+                        skillBadge = `<span style="color: #4caf50;">✓ Lv${recipeLevel}</span>`;
+                    }
+
+                    recipesInfo += `<div style="margin-bottom: 8px; padding: 8px; background: ${bgColor}; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <div style="font-weight: 500; color: #333;">${recipe.name}</div>
-                            <div style="font-size: 13px; color: #666; margin-top: 2px;">${recipe.skill} • Level ${recipe.level}</div>
+                            <div style="font-size: 13px; color: #666; margin-top: 2px;">${recipe.skill} • ${skillBadge}</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <button onclick="updateRecipeQuantity('${escapedId}', -1)" style="width: 28px; height: 28px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-size: 16px;">−</button>
@@ -1755,7 +2273,7 @@
 
             let html = `
                 <div class="quest-detail-header">
-                    <div class="quest-detail-name">Shopping List</div>
+                    <div class="quest-detail-name">Materials Needed</div>
                     <div class="quest-detail-description">${selectedRecipeIds.length} recipe${selectedRecipeIds.length !== 1 ? 's' : ''}, ${totalCrafts} craft${totalCrafts !== 1 ? 's' : ''}</div>
                 </div>
                 ${recipesInfo}
@@ -1816,16 +2334,25 @@
                     locationInfo += `</div>`;
                 }
 
-                // Determine retrieval method
+                // Determine retrieval method using enhanced categorization
+                const category = categorizeMaterial(material.name, needed, totalOwned);
                 let retrievalMethod = '';
                 let methodColor = '#999';
 
-                if (totalOwned >= needed) {
+                if (category.source === 'storage') {
                     retrievalMethod = '✓ Have materials';
                     methodColor = '#4caf50';
-                } else if (vendorItems[material.name]) {
+                } else if (category.source === 'craft') {
+                    // Item can be crafted with available materials
+                    const craftInfo = category.info;
+                    retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
+                    if (craftInfo.craftsNeeded > 1) {
+                        retrievalMethod += ` x${craftInfo.craftsNeeded}`;
+                    }
+                    methodColor = '#4caf50'; // Green - ready to make
+                } else if (category.source === 'buy') {
                     // Item can be bought from vendor - show vendor info with price
-                    const vendors = vendorItems[material.name];
+                    const vendors = category.info;
                     const firstVendor = vendors[0];
                     const price = firstVendor.price || 0;
                     const totalCost = price * missing;
@@ -1833,10 +2360,12 @@
                     if (price > 0) {
                         retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
                     }
-                    methodColor = '#ff9800';
+                    methodColor = '#ff9800'; // Orange
                 } else {
-                    retrievalMethod = '🔍 Farm/Gather';
-                    methodColor = '#999';
+                    // Must be gathered - add wiki link
+                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(material.name)}`;
+                    retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: #667eea; text-decoration: underline; margin-left: 6px;" title="Search wiki for ${material.name}">📖 Wiki</a>`;
+                    methodColor = '#667eea'; // Blue for gather
                 }
 
                 // Show matched items for keyword-based ingredients
@@ -1903,6 +2432,29 @@
                 debugLog('Failed to sync recipe selections:', error);
             }
         }
+
+        // Open overlay window
+        let overlayWindow = null;
+
+        function openOverlay() {
+            const width = 360;
+            const height = 550;
+            const left = window.screenX + window.outerWidth - width - 50;
+            const top = window.screenY + 50;
+
+            overlayWindow = window.open(
+                '/overlay',
+                'StorageBuddy Overlay',
+                `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,location=no,menubar=no,toolbar=no,status=no`
+            );
+        }
+
+        // Close overlay when main window closes
+        window.addEventListener('beforeunload', function() {
+            if (overlayWindow && !overlayWindow.closed) {
+                overlayWindow.close();
+            }
+        });
 
         // Load version on page load
         async function loadVersion() {

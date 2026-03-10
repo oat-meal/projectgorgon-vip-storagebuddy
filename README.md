@@ -7,8 +7,11 @@ A local web-based quest helper for Project Gorgon that helps you track quest obj
 ### Quest Tracking
 - **Active Quest Tracking** - Automatically detects active quests from exported Character JSON
 - **Inventory Detection** - Monitors chat logs and exported Storage/Character JSON to track collected items
+- **Color-Coded Progress** - Shows items ready to turn in (green), in storage (orange), or still needed (gray)
+- **Item Descriptions** - Displays item descriptions from game data for context
 - **Storage Location Tracking** - Shows where items are stored (Inventory, Bank, Saddlebag, Dream World Chest)
 - **Vendor Information** - Displays confirmed vendors and favor requirements for purchasable items
+- **Wiki Links** - Quick links to Project Gorgon Wiki for items that need to be farmed/gathered
 - **Completable Quest Detection** - Highlights quests you can complete with current inventory
 - **Buyable Quest Filter** - Shows quests where all missing items can be purchased
 - **Keyword-based Items** - Supports quests requiring item categories (e.g., "Poetry", "SnailShell")
@@ -16,16 +19,22 @@ A local web-based quest helper for Project Gorgon that helps you track quest obj
 
 ### Crafting
 - **Recipe Browser** - Browse all crafting recipes by skill
-- **Shopping List** - Select recipes and see aggregated material requirements
+- **Skill Level Tracking** - Recipes show level requirements; grayed-out recipes require higher skill
+- **Smart Craftability** - Color-coded recipes: green (ready), orange (buyable), blue (gather), gray (need skill)
+- **Pinned Recipes** - Pin up to 20 recipes and see aggregated material requirements
+- **Recursive Sub-components** - Automatically detects craftable sub-items (3 levels deep)
 - **Inventory Integration** - Shows what materials you have and where they're stored
-- **Quantity Selection** - Set how many of each recipe you want to craft
-- **Persistent Selections** - Shopping list persists when switching tabs
+- **Material Sources** - Each ingredient shows its source: storage, craft, buy, or gather with wiki links
+- **Quantity Selection** - Set how many of each recipe you want to craft (1-999)
+- **Persistent Selections** - Pinned recipes persist when switching tabs and filters
 
-### Browser Extension
-- **Compact Overlay** - View quest progress and shopping lists in a browser popup
-- **Pop-Out Window** - Pin overlay on screen while gaming for quick reference
+### Pop-Out Overlay
+- **Compact Window** - View quest progress and crafting materials in a separate window
+- **Pin on Screen** - Keep visible over your game for quick reference
 - **Auto-Refresh** - Updates every 3 seconds
-- **Quests & Crafting Tabs** - Switch between quest progress and crafting materials
+- **Auto-Close** - Overlay closes automatically when main window closes
+- **Quests & Crafting Tabs** - Switch between quest progress and pinned materials
+- **Region Filter** - Filter quests by turn-in location
 
 ### General
 - **Auto-refresh** - Updates quest progress every 5 seconds
@@ -92,9 +101,10 @@ The server will start and open your browser to `http://127.0.0.1:5000`
    - Go to V.I.P. section
    - Enable "Chat Logs"
 
-2. **Export Character and Storage JSON** (for auto-detecting active quests and inventory):
+2. **Export Character and Storage JSON** (for inventory, quests, and skill levels):
    - Open the **VIP Menu** in-game
-   - Export **Storage JSON** and **Character JSON**
+   - Export **Storage JSON** (updates inventory and storage locations)
+   - Export **Character JSON** (updates active quests and crafting skill levels)
    - This creates files in `~/Documents/Project Gorgon Data/Reports/`
 
 ## Usage
@@ -112,22 +122,20 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed usage instructions.
 ### Features by Tab
 
 - **Quests** - Shows active quests from your character data, filterable by region
-- **Crafting** - Browse recipes by skill, build shopping lists with quantity selection
-- **Help** - Built-in documentation and setup instructions
+- **Crafting** - Browse recipes by skill, see skill requirements, build shopping lists with color-coded status
+- **Help** - Built-in documentation, color legend, and setup instructions
 
-### Browser Extension
+### Pop-Out Overlay
 
-A companion browser extension provides a compact overlay for in-game reference:
+Use the built-in overlay for in-game reference:
 
-1. **Find the extension folder:**
-   - **Executable users (Windows)**: The extension is automatically extracted to:
-     `%LOCALAPPDATA%\ProjectGorgon-QuestHelper\browser-extension\`
-   - **Executable users (Linux)**: `~/.local/share/projectgorgon-questhelper/browser-extension/`
-   - **Source users**: `browser-extension/` in the project folder
-2. Load the extension folder in Chrome/Edge (developer mode)
-3. Click the extension icon to see quest progress or crafting materials
-4. Use **Pop Out** to pin the overlay on screen while gaming
-5. Data syncs automatically with the main app
+1. Click **"Pop Out Overlay"** button in the top-right of the main page
+2. A compact window opens with quest progress and crafting materials
+3. Position it over your game window
+4. Use an always-on-top tool to keep it visible:
+   - **Windows**: [PowerToys Always on Top](https://learn.microsoft.com/en-us/windows/powertoys/always-on-top) (Win+Ctrl+T)
+   - **Linux**: Right-click title bar → "Always on Top"
+5. Data syncs automatically every 3 seconds
 
 ## Project Structure
 

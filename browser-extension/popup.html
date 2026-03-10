@@ -297,6 +297,63 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
+        /* Shopping list styles */
+        .shopping-item {
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .shopping-item.buyable {
+            border-left-color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .shopping-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .shopping-header .item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .shopping-header .item-progress {
+            font-size: 11px;
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .item-recipes {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .shopping-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            background: rgba(255, 152, 0, 0.2);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff9800;
+        }
+
+        .shopping-total {
+            color: #ffcc00;
+        }
+
         /* Empty/Error states */
         .empty-state {
             text-align: center;
@@ -393,7 +450,11 @@
         </div>
 
         <div class="controls" id="craftingControls" style="display: none;">
-            <span style="font-size: 11px; color: rgba(255,255,255,0.6);">Shopping list from StorageBuddy</span>
+            <select class="view-selector" id="craftingViewSelector">
+                <option value="all">All Pinned</option>
+                <option value="ready">Have Materials</option>
+                <option value="shopping">Shopping Cart</option>
+            </select>
         </div>
 
         <div class="content" id="content">
