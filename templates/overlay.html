@@ -270,6 +270,21 @@
             color: var(--favor);
         }
 
+        .source-info {
+            color: var(--accent);
+            font-size: 10px;
+        }
+
+        .wiki-link {
+            color: var(--accent);
+            text-decoration: underline;
+            margin-left: 4px;
+        }
+
+        .wiki-link:hover {
+            color: var(--warning);
+        }
+
         .craft-info {
             color: #17a2b8;
             font-size: 10px;
@@ -749,7 +764,8 @@
         document.getElementById('craftingViewSelector').addEventListener('change', (e) => {
             craftingView = e.target.value;
             savePrefs();
-            renderCraftingView();
+            // Must reload data since pinned and ready use different API endpoints
+            loadCraftingData();
         });
 
         // Character view selector change
@@ -940,10 +956,14 @@
                             : `${recipe.skill} ${recipe.level} (need +${recipe.skill_gap})`;
                         detailsHtml += `<div class="${skillClass}">🔨 ${escapeHtml(recipe.name)} - ${skillInfo}</div>`;
                     }
-                    // Show vendor info if buyable and not completed
-                    if (item.vendor_info && !isCompleted) {
+                    // Always show source - where to get more of this item
+                    if (item.vendor_info) {
                         const vendorClass = item.needs_favor ? 'vendor-info needs-favor' : 'vendor-info';
                         detailsHtml += `<div class="${vendorClass}">🛒 ${escapeHtml(item.vendor_info)}</div>`;
+                    } else if (!item.is_craftable) {
+                        // Not craftable, not buyable - must be gathered, show wiki link
+                        const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
+                        detailsHtml += `<div class="source-info">🔍 Gather <a href="${wikiUrl}" target="_blank" class="wiki-link">📖 Wiki</a></div>`;
                     }
 
                     return `
@@ -968,29 +988,75 @@
         }
 
         async function loadCraftingData() {
-            const response = await fetch('/api/shopping_list');
+            // Use different endpoints for pinned vs ready views
+            const endpoint = craftingView === 'ready' ? '/api/ready_recipes' : '/api/shopping_list';
+            const response = await fetch(endpoint);
 
             if (!response.ok) throw new Error('Server not responding');
 
             const data = await response.json();
-            allRecipes = data.data?.recipes || [];
+            allRecipes = data.recipes || data.data?.recipes || [];
+
+            // For pinned view: if server returns empty but we have pins in localStorage,
+            // sync localStorage to server (handles server restart scenario)
+            if (craftingView === 'pinned' && allRecipes.length === 0) {
+                const localPins = JSON.parse(localStorage.getItem('recipeQuantities') || '{}');
+                if (Object.keys(localPins).length > 0) {
+                    console.log('Server has no pins, syncing from localStorage...');
+                    await syncLocalPinsToServer(localPins);
+                    // Reload data after sync
+                    const retryResponse = await fetch('/api/shopping_list');
+                    if (retryResponse.ok) {
+                        const retryData = await retryResponse.json();
+                        allRecipes = retryData.recipes || retryData.data?.recipes || [];
+                    }
+                }
+            }
+
             renderCraftingView();
+        }
+
+        /**
+         * Sync localStorage pinned recipes to server.
+         * Used when overlay detects server has no pins but localStorage does.
+         */
+        async function syncLocalPinsToServer(localPins) {
+            try {
+                // Build recipe data in the format the server expects
+                const recipes = {};
+                for (const [recipeId, qty] of Object.entries(localPins)) {
+                    // qty might be a number or an object with quantity property
+                    const quantity = typeof qty === 'object' ? (qty.quantity || 1) : (qty || 1);
+                    recipes[recipeId] = quantity;
+                }
+
+                await fetch('/api/shopping_list', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ recipes })
+                });
+                console.log('Synced', Object.keys(recipes).length, 'pins to server');
+            } catch (error) {
+                console.error('Failed to sync pins to server:', error);
+            }
         }
 
         function renderCraftingView() {
             const content = document.getElementById('content');
 
             if (allRecipes.length === 0) {
+                const emptyMessage = craftingView === 'ready'
+                    ? { icon: '📦', title: 'No recipes ready to craft', hint: 'Gather more materials to craft recipes' }
+                    : { icon: '🔨', title: 'No recipes pinned', hint: 'Pin recipes in the main app to see them here' };
+
                 content.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">🔨</div>
-                        <p>No recipes pinned</p>
-                        <p class="empty-state-hint">
-                            Pin recipes in the main app to see them here
-                        </p>
+                        <div class="empty-state-icon">${emptyMessage.icon}</div>
+                        <p>${emptyMessage.title}</p>
+                        <p class="empty-state-hint">${emptyMessage.hint}</p>
                     </div>
                 `;
-                document.getElementById('itemCount').textContent = '0 recipes';
+                document.getElementById('itemCount').textContent = craftingView === 'ready' ? '0 recipes ready' : '0 recipes';
                 return;
             }
 
@@ -1004,87 +1070,143 @@
         }
 
         function renderPinnedRecipes(content) {
-            let totalMaterials = 0;
-            const recipesHtml = allRecipes.map(recipe => {
-                const materialsHtml = recipe.materials.map(mat => {
-                    const isCompleted = mat.have >= mat.need;
-                    const itemClass = isCompleted ? 'item completed' : 'item';
-                    totalMaterials++;
+            // Aggregate all materials across all pinned recipes
+            const aggregatedMaterials = {};
 
-                    let detailsHtml = '';
-                    const total = (mat.in_inventory || 0) + (mat.in_storage || 0);
-                    if (total > 0) {
-                        let locationParts = [];
-                        if (mat.in_inventory) locationParts.push(`📦 Inventory: ${mat.in_inventory}`);
-                        if (mat.storage_locations) {
-                            for (const [location, count] of Object.entries(mat.storage_locations)) {
-                                let icon = '🏦';
-                                let shortName = location;
-                                if (location.toLowerCase().includes('saddlebag')) {
-                                    icon = '🎒';
-                                    shortName = 'Saddlebag';
-                                }
-                                locationParts.push(`${icon} ${shortName}: ${count}`);
+            for (const recipe of allRecipes) {
+                for (const mat of recipe.materials) {
+                    if (!aggregatedMaterials[mat.name]) {
+                        aggregatedMaterials[mat.name] = {
+                            name: mat.name,
+                            need: 0,
+                            have: 0,
+                            in_inventory: mat.in_inventory || 0,
+                            in_storage: mat.in_storage || 0,
+                            storage_locations: mat.storage_locations || {},
+                            vendor_info: mat.vendor_info,
+                            needs_favor: mat.needs_favor,
+                            recipes: []
+                        };
+                    }
+                    aggregatedMaterials[mat.name].need += mat.need;
+                    // have is capped at need per-recipe, so we use max of storage totals
+                    const totalHave = (mat.in_inventory || 0) + (mat.in_storage || 0);
+                    aggregatedMaterials[mat.name].have = totalHave;
+                    aggregatedMaterials[mat.name].recipes.push(`${recipe.name} (×${recipe.quantity})`);
+                }
+            }
+
+            // Sort: incomplete items first, then by name
+            const materials = Object.values(aggregatedMaterials).sort((a, b) => {
+                const aComplete = a.have >= a.need;
+                const bComplete = b.have >= b.need;
+                if (aComplete !== bComplete) return aComplete ? 1 : -1;
+                return a.name.localeCompare(b.name);
+            });
+
+            const materialsHtml = materials.map(mat => {
+                const isCompleted = mat.have >= mat.need;
+                const itemClass = isCompleted ? 'item completed' : 'item';
+
+                let detailsHtml = '';
+                const total = mat.in_inventory + mat.in_storage;
+                if (total > 0) {
+                    let locationParts = [];
+                    if (mat.in_inventory) locationParts.push(`📦 Inventory: ${mat.in_inventory}`);
+                    if (mat.storage_locations && Object.keys(mat.storage_locations).length > 0) {
+                        for (const [location, count] of Object.entries(mat.storage_locations)) {
+                            let icon = '🏦';
+                            let shortName = location;
+                            if (location.toLowerCase().includes('saddlebag')) {
+                                icon = '🎒';
+                                shortName = 'Saddlebag';
+                            } else if (location.toLowerCase().includes('dream')) {
+                                icon = '💤';
+                            } else if (location.toLowerCase().includes('community')) {
+                                icon = '🏠';
                             }
-                        } else if (mat.in_storage) {
-                            locationParts.push(`🏦 Storage: ${mat.in_storage}`);
+                            locationParts.push(`${icon} ${shortName}: ${count}`);
                         }
-                        if (locationParts.length > 0) {
-                            detailsHtml += `<div class="item-details">${locationParts.join(' • ')}</div>`;
-                        }
+                    } else if (mat.in_storage) {
+                        locationParts.push(`🏦 Storage: ${mat.in_storage}`);
                     }
-                    if (mat.vendor_info && !isCompleted) {
-                        const vendorClass = mat.needs_favor ? 'vendor-info needs-favor' : 'vendor-info';
-                        detailsHtml += `<div class="${vendorClass}">🛒 ${escapeHtml(mat.vendor_info)}</div>`;
+                    if (locationParts.length > 0) {
+                        detailsHtml += `<div class="item-details">${locationParts.join(' • ')}</div>`;
                     }
+                }
 
-                    return `
-                        <div class="${itemClass}">
-                            <span class="item-name">${escapeHtml(mat.name)}</span>
-                            <span class="item-progress">${mat.have}/${mat.need}</span>
-                            ${detailsHtml}
-                        </div>
-                    `;
-                }).join('');
+                // Always show source - where to get more of this item
+                if (mat.vendor_info) {
+                    const vendorClass = mat.needs_favor ? 'vendor-info needs-favor' : 'vendor-info';
+                    detailsHtml += `<div class="${vendorClass}">🛒 ${escapeHtml(mat.vendor_info)}</div>`;
+                } else {
+                    // No vendor - must be gathered/farmed, show wiki link
+                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(mat.name)}`;
+                    detailsHtml += `<div class="source-info">🔍 Gather <a href="${wikiUrl}" target="_blank" class="wiki-link">📖 Wiki</a></div>`;
+                }
 
-                const isReady = recipe.materials.every(mat => mat.have >= mat.need);
-                // Buyable = has vendor AND player has favor
-                const isBuyable = !isReady && recipe.materials.some(mat => mat.vendor_info && !mat.needs_favor);
-                // Needs favor = has vendor but player lacks favor
-                const needsFavor = !isReady && !isBuyable && recipe.materials.some(mat => mat.needs_favor);
-                let recipeClass = 'recipe-group';
-                if (isReady) recipeClass = 'recipe-group ready';
-                else if (isBuyable) recipeClass = 'recipe-group buyable';
-                else if (needsFavor) recipeClass = 'recipe-group needs-favor';
+                // Show which recipes need this material
+                detailsHtml += `<div class="item-recipes">For: ${mat.recipes.join(', ')}</div>`;
 
                 return `
-                    <div class="${recipeClass}">
-                        <div class="recipe-header">
-                            <span class="recipe-name">${escapeHtml(recipe.name)}</span>
-                            <span class="recipe-qty">×${recipe.quantity}</span>
-                        </div>
-                        <div class="recipe-skill">${escapeHtml(recipe.skill)} • Level ${recipe.level}</div>
-                        <div class="item-list" style="margin-top: 8px;">${materialsHtml}</div>
+                    <div class="${itemClass}">
+                        <span class="item-name">${escapeHtml(mat.name)}</span>
+                        <span class="item-progress">${Math.min(mat.have, mat.need)}/${mat.need}</span>
+                        ${detailsHtml}
                     </div>
                 `;
             }).join('');
 
-            content.innerHTML = recipesHtml;
-            document.getElementById('itemCount').textContent = `${allRecipes.length} recipe${allRecipes.length !== 1 ? 's' : ''}, ${totalMaterials} materials`;
+            // Header showing recipe count
+            const headerHtml = `
+                <div class="section-header">
+                    All Pinned Recipe Materials
+                    <span class="section-count">${materials.length} unique across ${allRecipes.length} recipes</span>
+                </div>
+            `;
+
+            content.innerHTML = headerHtml + `<div class="item-list">${materialsHtml}</div>`;
+            document.getElementById('itemCount').textContent = `${allRecipes.length} recipe${allRecipes.length !== 1 ? 's' : ''}, ${materials.length} materials`;
         }
 
         function renderReadyRecipes(content) {
-            const readyRecipes = allRecipes.filter(recipe =>
-                recipe.materials.every(mat => mat.have >= mat.need)
+            // For Ready view, aggregate all materials across all ready recipes
+            const aggregatedMaterials = {};
+
+            for (const recipe of allRecipes) {
+                for (const mat of recipe.materials) {
+                    if (!aggregatedMaterials[mat.name]) {
+                        aggregatedMaterials[mat.name] = {
+                            name: mat.name,
+                            need: 0,
+                            have: 0,
+                            in_inventory: mat.in_inventory || 0,
+                            in_storage: mat.in_storage || 0,
+                            storage_locations: mat.storage_locations || {},
+                            vendor_info: mat.vendor_info,
+                            needs_favor: mat.needs_favor,
+                            recipes: []
+                        };
+                    }
+                    aggregatedMaterials[mat.name].need += mat.need;
+                    const totalHave = (mat.in_inventory || 0) + (mat.in_storage || 0);
+                    aggregatedMaterials[mat.name].have = totalHave;
+                    aggregatedMaterials[mat.name].recipes.push(`${recipe.name} (×${recipe.quantity})`);
+                }
+            }
+
+            // Sort alphabetically for ready view
+            const materials = Object.values(aggregatedMaterials).sort((a, b) =>
+                a.name.localeCompare(b.name)
             );
 
-            if (readyRecipes.length === 0) {
+            if (materials.length === 0) {
                 content.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📦</div>
                         <p>No recipes ready to craft</p>
                         <p class="empty-state-hint">
-                            Gather more materials to craft these recipes
+                            Gather more materials to craft recipes
                         </p>
                     </div>
                 `;
@@ -1092,54 +1214,65 @@
                 return;
             }
 
-            const recipesHtml = readyRecipes.map(recipe => {
-                const materialsHtml = recipe.materials.map(mat => {
-                    // Show storage locations for ready items too
-                    let detailsHtml = '';
-                    const total = (mat.in_inventory || 0) + (mat.in_storage || 0);
-                    if (total > 0) {
-                        let locationParts = [];
-                        if (mat.in_inventory) locationParts.push(`📦 Inventory: ${mat.in_inventory}`);
-                        if (mat.storage_locations) {
-                            for (const [location, count] of Object.entries(mat.storage_locations)) {
-                                let icon = '🏦';
-                                let shortName = location;
-                                if (location.toLowerCase().includes('saddlebag')) {
-                                    icon = '🎒';
-                                    shortName = 'Saddlebag';
-                                }
-                                locationParts.push(`${icon} ${shortName}: ${count}`);
+            const materialsHtml = materials.map(mat => {
+                let detailsHtml = '';
+                const total = mat.in_inventory + mat.in_storage;
+                if (total > 0) {
+                    let locationParts = [];
+                    if (mat.in_inventory) locationParts.push(`📦 Inventory: ${mat.in_inventory}`);
+                    if (mat.storage_locations && Object.keys(mat.storage_locations).length > 0) {
+                        for (const [location, count] of Object.entries(mat.storage_locations)) {
+                            let icon = '🏦';
+                            let shortName = location;
+                            if (location.toLowerCase().includes('saddlebag')) {
+                                icon = '🎒';
+                                shortName = 'Saddlebag';
+                            } else if (location.toLowerCase().includes('dream')) {
+                                icon = '💤';
+                            } else if (location.toLowerCase().includes('community')) {
+                                icon = '🏠';
                             }
-                        } else if (mat.in_storage) {
-                            locationParts.push(`🏦 Storage: ${mat.in_storage}`);
+                            locationParts.push(`${icon} ${shortName}: ${count}`);
                         }
-                        if (locationParts.length > 0) {
-                            detailsHtml = `<div class="item-details">${locationParts.join(' • ')}</div>`;
-                        }
+                    } else if (mat.in_storage) {
+                        locationParts.push(`🏦 Storage: ${mat.in_storage}`);
                     }
-                    return `
-                        <div class="item completed">
-                            <span class="item-name">${escapeHtml(mat.name)}</span>
-                            <span class="item-progress">${mat.have}/${mat.need}</span>
-                            ${detailsHtml}
-                        </div>
-                    `;
-                }).join('');
+                    if (locationParts.length > 0) {
+                        detailsHtml += `<div class="item-details">${locationParts.join(' • ')}</div>`;
+                    }
+                }
+
+                // Always show source
+                if (mat.vendor_info) {
+                    const vendorClass = mat.needs_favor ? 'vendor-info needs-favor' : 'vendor-info';
+                    detailsHtml += `<div class="${vendorClass}">🛒 ${escapeHtml(mat.vendor_info)}</div>`;
+                } else {
+                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(mat.name)}`;
+                    detailsHtml += `<div class="source-info">🔍 Gather <a href="${wikiUrl}" target="_blank" class="wiki-link">📖 Wiki</a></div>`;
+                }
+
+                // Show which recipes need this material
+                detailsHtml += `<div class="item-recipes">For: ${mat.recipes.join(', ')}</div>`;
 
                 return `
-                    <div class="recipe-group ready">
-                        <div class="recipe-header">
-                            <span class="recipe-name">${escapeHtml(recipe.name)}</span>
-                            <span class="recipe-qty">×${recipe.quantity}</span>
-                        </div>
-                        <div class="recipe-skill">${escapeHtml(recipe.skill)} • Level ${recipe.level}</div>
-                        <div class="item-list" style="margin-top: 8px;">${materialsHtml}</div>
+                    <div class="item completed">
+                        <span class="item-name">${escapeHtml(mat.name)}</span>
+                        <span class="item-progress">${Math.min(mat.have, mat.need)}/${mat.need}</span>
+                        ${detailsHtml}
                     </div>
                 `;
             }).join('');
 
-            content.innerHTML = recipesHtml;
-            document.getElementById('itemCount').textContent = `${readyRecipes.length} recipe${readyRecipes.length !== 1 ? 's' : ''} ready`;
+            // Header showing recipe count
+            const headerHtml = `
+                <div class="section-header">
+                    All Ready Recipe Materials
+                    <span class="section-count">${materials.length} unique across ${allRecipes.length} recipes</span>
+                </div>
+            `;
+
+            content.innerHTML = headerHtml + `<div class="item-list">${materialsHtml}</div>`;
+            document.getElementById('itemCount').textContent = `${allRecipes.length} recipe${allRecipes.length !== 1 ? 's' : ''} ready, ${materials.length} materials`;
         }
 
         function renderShoppingCart(content) {

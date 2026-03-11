@@ -35439,6 +35439,27 @@
     ]
   },
   {
+    "name": "Carp Fillet",
+    "skill": "Fishing",
+    "level": 5,
+    "ingredients": [
+      {
+        "item": "Carp",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Carp Fillet",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Fish Scales",
+        "quantity": 1
+      }
+    ]
+  },
+  {
     "name": "Clownfish Fillet",
     "skill": "Fishing",
     "level": 5,
@@ -77713,282 +77734,6 @@
     ]
   },
   {
-    "name": "Decompose Helm",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 1,
-    "ingredients": [
-      {
-        "item": "Head Armor",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Decompose Helm",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Helm Augment (Level 0-30)",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 8,
-    "ingredients": [
-      {
-        "item": "Small Helm Contraption",
-        "quantity": 20
-      },
-      {
-        "item": "Head Armor",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Helm Augment (Level 0-30)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Decompose Boots",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 13,
-    "ingredients": [
-      {
-        "item": "Footwear",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Decompose Boots",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Boot Augment (Level 0-30)",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 20,
-    "ingredients": [
-      {
-        "item": "Small Shoe Contraption",
-        "quantity": 20
-      },
-      {
-        "item": "Footwear",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Boot Augment (Level 0-30)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Undo Augment on Helm",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 30,
-    "ingredients": [
-      {
-        "item": "Small Helm Contraption",
-        "quantity": 25
-      },
-      {
-        "item": "Head Armor",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Undo Augment on Helm",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Helm Augment (Level 31-60)",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 31,
-    "ingredients": [
-      {
-        "item": "Medium Helm Contraption",
-        "quantity": 20
-      },
-      {
-        "item": "Head Armor",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Helm Augment (Level 31-60)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Undo Augment on Boots",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 40,
-    "ingredients": [
-      {
-        "item": "Small Shoe Contraption",
-        "quantity": 25
-      },
-      {
-        "item": "Footwear",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Undo Augment on Boots",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Boot Augment (Level 31-60)",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 45,
-    "ingredients": [
-      {
-        "item": "Medium Shoe Contraption",
-        "quantity": 20
-      },
-      {
-        "item": "Footwear",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Boot Augment (Level 31-60)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Helm Augment (Level 61-90)",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 61,
-    "ingredients": [
-      {
-        "item": "Large Helm Contraption",
-        "quantity": 20
-      },
-      {
-        "item": "Head Armor",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Helm Augment (Level 61-90)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Boot Augment (Level 61-90)",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 65,
-    "ingredients": [
-      {
-        "item": "Large Shoe Contraption",
-        "quantity": 20
-      },
-      {
-        "item": "Footwear",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Boot Augment (Level 61-90)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Helm Augment (Level 91-120)",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 81,
-    "ingredients": [
-      {
-        "item": "Grand Helm Contraption",
-        "quantity": 20
-      },
-      {
-        "item": "Head Armor",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Helm Augment (Level 91-120)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Boot Augment (Level 91-120)",
-    "skill": "Ancillary-Armor Augmentation",
-    "level": 85,
-    "ingredients": [
-      {
-        "item": "Grand Shoe Contraption",
-        "quantity": 20
-      },
-      {
-        "item": "Footwear",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Boot Augment (Level 91-120)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
     "name": "Carded Cotton",
     "skill": "Textile Creation",
     "level": 1,
@@ -79453,2544 +79198,6 @@
     "results": [
       {
         "item": "Repair Transmutation Damage (Amulite)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Butter",
-    "skill": "Cheesemaking",
-    "level": 0,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Salt",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Butter",
-        "quantity": 3
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Sour Cream",
-    "skill": "Cheesemaking",
-    "level": 2,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Salt",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Firkin of Sour Cream",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Cottage Cheese",
-    "skill": "Cheesemaking",
-    "level": 4,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Cottage Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Sweet Butter",
-    "skill": "Cheesemaking",
-    "level": 4,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      },
-      {
-        "item": "Salt",
-        "quantity": 1
-      },
-      {
-        "item": "Sugar",
-        "quantity": 2
-      }
-    ],
-    "results": [
-      {
-        "item": "Sweet Butter",
-        "quantity": 3
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Cream Cheese",
-    "skill": "Cheesemaking",
-    "level": 5,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Cream Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Prim Cheese",
-    "skill": "Cheesemaking",
-    "level": 6,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Sour Cream",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Prim Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Laressa's Cheese",
-    "skill": "Cheesemaking",
-    "level": 9,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Sugar",
-        "quantity": 2
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Laressa's Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Urda Cheese",
-    "skill": "Cheesemaking",
-    "level": 10,
-    "ingredients": [
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Urda Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Neufchatel Cheese",
-    "skill": "Cheesemaking",
-    "level": 12,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Neufchatel Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Mild Cheddar Cheese",
-    "skill": "Cheesemaking",
-    "level": 14,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Mild Cheddar Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Ricotta Cheese",
-    "skill": "Cheesemaking",
-    "level": 16,
-    "ingredients": [
-      {
-        "item": "Bottle of Whey",
-        "quantity": 4
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Ricotta Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 5
-      }
-    ]
-  },
-  {
-    "name": "Munster Cheese",
-    "skill": "Cheesemaking",
-    "level": 17,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Munster Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Cheshire Cheese",
-    "skill": "Cheesemaking",
-    "level": 18,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Cheshire Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Gloucester Cheese",
-    "skill": "Cheesemaking",
-    "level": 19,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Gloucester Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Brunost Cheese",
-    "skill": "Cheesemaking",
-    "level": 20,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Sour Cream",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Brunost Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Fairwing Cheese",
-    "skill": "Cheesemaking",
-    "level": 21,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Fairwing Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Cantal Cheese",
-    "skill": "Cheesemaking",
-    "level": 22,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Cantal Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Slave's Cheese",
-    "skill": "Cheesemaking",
-    "level": 23,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Muntok Peppercorns",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Slave's Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Sharp Cheddar Cheese",
-    "skill": "Cheesemaking",
-    "level": 24,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Sharp Cheddar Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Brocciu Cheese",
-    "skill": "Cheesemaking",
-    "level": 26,
-    "ingredients": [
-      {
-        "item": "Bottle of Whey",
-        "quantity": 4
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Brocciu Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 5
-      }
-    ]
-  },
-  {
-    "name": "Brie Cheese",
-    "skill": "Cheesemaking",
-    "level": 28,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Sweet Butter",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Firkin of Brie Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Raclette Cheese",
-    "skill": "Cheesemaking",
-    "level": 30,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Raclette Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Mogyar Cheese",
-    "skill": "Cheesemaking",
-    "level": 31,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Firkin of Mogyar Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Havarti Cheese",
-    "skill": "Cheesemaking",
-    "level": 32,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Sweet Butter",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Havarti Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Monterey Jack Cheese",
-    "skill": "Cheesemaking",
-    "level": 33,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Monterey Jack Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Camembert Cheese",
-    "skill": "Cheesemaking",
-    "level": 34,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Firkin of Camembert Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Soy Milk",
-    "skill": "Cheesemaking",
-    "level": 35,
-    "ingredients": [
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Soybeans",
-        "quantity": 2
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Bottle Of Soy Milk",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Parmesan Cheese",
-    "skill": "Cheesemaking",
-    "level": 36,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Parmesan Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Mozzarella Cheese",
-    "skill": "Cheesemaking",
-    "level": 38,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Mozzarella Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Emmentaler Cheese",
-    "skill": "Cheesemaking",
-    "level": 40,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Firkin of Emmentaler Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Pepper Jack Cheese",
-    "skill": "Cheesemaking",
-    "level": 42,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Peppercorns",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Pepper Jack Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Limburger Cheese",
-    "skill": "Cheesemaking",
-    "level": 44,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Salt",
-        "quantity": 2
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Firkin of Limburger Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Tofu",
-    "skill": "Cheesemaking",
-    "level": 45,
-    "ingredients": [
-      {
-        "item": "Bottle Of Soy Milk",
-        "quantity": 4
-      },
-      {
-        "item": "Basic Vinegar",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Tofu",
-        "quantity": 5
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Haerel Cheese",
-    "skill": "Cheesemaking",
-    "level": 46,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Haerel Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Danablu Cheese",
-    "skill": "Cheesemaking",
-    "level": 48,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 3
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Danablu Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Appenzeller Cheese",
-    "skill": "Cheesemaking",
-    "level": 50,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Salt",
-        "quantity": 2
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Firkin of Appenzeller Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Gul Cheese",
-    "skill": "Cheesemaking",
-    "level": 51,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Gul Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Edam Cheese",
-    "skill": "Cheesemaking",
-    "level": 52,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Firkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Edam Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Roquefort Cheese",
-    "skill": "Cheesemaking",
-    "level": 54,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 3
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Ratkin Cheese Mold",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Roquefort Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Firm Tofu",
-    "skill": "Cheesemaking",
-    "level": 55,
-    "ingredients": [
-      {
-        "item": "Bottle Of Soy Milk",
-        "quantity": 4
-      },
-      {
-        "item": "Gypsum",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Firm Tofu",
-        "quantity": 5
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Ricotta Forte",
-    "skill": "Cheesemaking",
-    "level": 56,
-    "ingredients": [
-      {
-        "item": "Bottle of Whey",
-        "quantity": 4
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Ricotta Forte",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 5
-      }
-    ]
-  },
-  {
-    "name": "Gorgonzola Cheese",
-    "skill": "Cheesemaking",
-    "level": 57,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 3
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Ratkin Cheese Mold",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Gorgonzola Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Sirine Cheese",
-    "skill": "Cheesemaking",
-    "level": 58,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Salt",
-        "quantity": 2
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Sirine Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Grasgot Cheese",
-    "skill": "Cheesemaking",
-    "level": 60,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 3
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Ratkin Cheese Mold",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Grasgot Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Soft Tofu",
-    "skill": "Cheesemaking",
-    "level": 60,
-    "ingredients": [
-      {
-        "item": "Bottle Of Soy Milk",
-        "quantity": 4
-      },
-      {
-        "item": "Gypsum",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Soft Tofu",
-        "quantity": 5
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Provolone Cheese",
-    "skill": "Cheesemaking",
-    "level": 62,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 2
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Provolone Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 5
-      }
-    ]
-  },
-  {
-    "name": "Esgarion Cheese",
-    "skill": "Cheesemaking",
-    "level": 63,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 3
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Ratkin Cheese Mold",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Butter Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Esgarion Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Telemea Cheese",
-    "skill": "Cheesemaking",
-    "level": 64,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Salt",
-        "quantity": 2
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Telemea Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Cambozola Cheese",
-    "skill": "Cheesemaking",
-    "level": 66,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 3
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Ratkin Cheese Mold",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Cambozola Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Scamorza Cheese",
-    "skill": "Cheesemaking",
-    "level": 68,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 2
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Scamorza Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 5
-      }
-    ]
-  },
-  {
-    "name": "Mur Del Cheese",
-    "skill": "Cheesemaking",
-    "level": 69,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Ratkin Cheese Mold",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Mur Del Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Halloumi Cheese",
-    "skill": "Cheesemaking",
-    "level": 70,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Salt",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Halloumi Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 5
-      }
-    ]
-  },
-  {
-    "name": "Feta Cheese",
-    "skill": "Cheesemaking",
-    "level": 72,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Whey",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Salt",
-        "quantity": 2
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Feta Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Gouda Cheese",
-    "skill": "Cheesemaking",
-    "level": 74,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 2
-      },
-      {
-        "item": "Bottle of Water",
-        "quantity": 1
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Voile Muslin",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Gouda Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Bottle of Sweet Whey",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Stilton Cheese",
-    "skill": "Cheesemaking",
-    "level": 76,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 3
-      },
-      {
-        "item": "Strong Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Ratkin Cheese Mold",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Stilton Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Blue-Whisker Cheese",
-    "skill": "Cheesemaking",
-    "level": 78,
-    "ingredients": [
-      {
-        "item": "Bottle of Milk",
-        "quantity": 3
-      },
-      {
-        "item": "Pungent Rennet",
-        "quantity": 1
-      },
-      {
-        "item": "Ratkin Cheese Mold",
-        "quantity": 1
-      },
-      {
-        "item": "Kilderkin",
-        "quantity": 1
-      },
-      {
-        "item": "Fine Cheesecloth",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Kilderkin of Blue-Whisker Cheese",
-        "quantity": 1
-      },
-      {
-        "item": "Empty Bottle",
-        "quantity": 4
-      }
-    ]
-  },
-  {
-    "name": "Decompose Main-Hand Weapon",
-    "skill": "Weapon Augmentation",
-    "level": 1,
-    "ingredients": [
-      {
-        "item": "Main-Hand Item",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Decompose Main-Hand Weapon",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Main-Hand Augment (Level 0-30)",
-    "skill": "Weapon Augmentation",
-    "level": 8,
-    "ingredients": [
-      {
-        "item": "Small Main-Hand Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Main-Hand Item",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Main-Hand Augment (Level 0-30)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Decompose Off-Hand Weapon",
-    "skill": "Weapon Augmentation",
-    "level": 13,
-    "ingredients": [
-      {
-        "item": "Off-Hand Item",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Decompose Off-Hand Weapon",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Decompose Gloves",
-    "skill": "Weapon Augmentation",
-    "level": 18,
-    "ingredients": [
-      {
-        "item": "Gloves",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Decompose Gloves",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Off-Hand Augment (Level 0-30)",
-    "skill": "Weapon Augmentation",
-    "level": 20,
-    "ingredients": [
-      {
-        "item": "Small Off-Hand Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Off-Hand Item",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Off-Hand Augment (Level 0-30)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Glove Augment (Level 0-30)",
-    "skill": "Weapon Augmentation",
-    "level": 25,
-    "ingredients": [
-      {
-        "item": "Small Glove Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Gloves",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Glove Augment (Level 0-30)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Main-Hand Augment (Level 31-60)",
-    "skill": "Weapon Augmentation",
-    "level": 31,
-    "ingredients": [
-      {
-        "item": "Medium Main-Hand Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Main-Hand Item",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Main-Hand Augment (Level 31-60)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Undo Augment on Main-Hand Weapon",
-    "skill": "Weapon Augmentation",
-    "level": 38,
-    "ingredients": [
-      {
-        "item": "Small Main-Hand Bead",
-        "quantity": 25
-      },
-      {
-        "item": "Main-Hand Item",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Undo Augment on Main-Hand Weapon",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Undo Augment on Off-Hand Weapon",
-    "skill": "Weapon Augmentation",
-    "level": 42,
-    "ingredients": [
-      {
-        "item": "Small Off-Hand Bead",
-        "quantity": 25
-      },
-      {
-        "item": "Off-Hand Item",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Undo Augment on Off-Hand Weapon",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Off-Hand Augment (Level 31-60)",
-    "skill": "Weapon Augmentation",
-    "level": 45,
-    "ingredients": [
-      {
-        "item": "Medium Off-Hand Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Off-Hand Item",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Off-Hand Augment (Level 31-60)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Glove Augment (Level 31-60)",
-    "skill": "Weapon Augmentation",
-    "level": 50,
-    "ingredients": [
-      {
-        "item": "Medium Glove Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Gloves",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Glove Augment (Level 31-60)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Undo Augment on Gloves",
-    "skill": "Weapon Augmentation",
-    "level": 50,
-    "ingredients": [
-      {
-        "item": "Small Glove Bead",
-        "quantity": 25
-      },
-      {
-        "item": "Gloves",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Undo Augment on Gloves",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Main-Hand Augment (Level 61-90)",
-    "skill": "Weapon Augmentation",
-    "level": 61,
-    "ingredients": [
-      {
-        "item": "Large Main-Hand Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Main-Hand Item",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Main-Hand Augment (Level 61-90)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Off-Hand Augment (Level 61-90)",
-    "skill": "Weapon Augmentation",
-    "level": 65,
-    "ingredients": [
-      {
-        "item": "Large Off-Hand Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Off-Hand Item",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Off-Hand Augment (Level 61-90)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Glove Augment (Level 61-90)",
-    "skill": "Weapon Augmentation",
-    "level": 70,
-    "ingredients": [
-      {
-        "item": "Large Glove Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Gloves",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Glove Augment (Level 61-90)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Main-Hand Augment (Level 91-120)",
-    "skill": "Weapon Augmentation",
-    "level": 81,
-    "ingredients": [
-      {
-        "item": "Grand Main-Hand Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Main-Hand Item",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Main-Hand Augment (Level 91-120)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Off-Hand Augment (Level 91-120)",
-    "skill": "Weapon Augmentation",
-    "level": 85,
-    "ingredients": [
-      {
-        "item": "Grand Off-Hand Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Off-Hand Item",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Off-Hand Augment (Level 91-120)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Extract Glove Augment (Level 91-120)",
-    "skill": "Weapon Augmentation",
-    "level": 90,
-    "ingredients": [
-      {
-        "item": "Grand Glove Bead",
-        "quantity": 20
-      },
-      {
-        "item": "Gloves",
-        "quantity": 1
-      },
-      {
-        "item": "Crystal",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Extract Glove Augment (Level 91-120)",
         "quantity": 1
       }
     ]
@@ -91588,521 +88795,6 @@
     ]
   },
   {
-    "name": "Basic Bait",
-    "skill": "Angling",
-    "level": 15,
-    "ingredients": [
-      {
-        "item": "Small Fish",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Basic Bait",
-        "quantity": 2
-      },
-      {
-        "item": "Basic Bait",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Bait",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Good Bait",
-    "skill": "Angling",
-    "level": 30,
-    "ingredients": [
-      {
-        "item": "Medium Fish",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Good Bait",
-        "quantity": 2
-      },
-      {
-        "item": "Good Bait",
-        "quantity": 1
-      },
-      {
-        "item": "Good Bait",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Bait",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Expert Bait",
-    "skill": "Angling",
-    "level": 45,
-    "ingredients": [
-      {
-        "item": "Large Fish",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Expert Bait",
-        "quantity": 2
-      },
-      {
-        "item": "Expert Bait",
-        "quantity": 1
-      },
-      {
-        "item": "Expert Bait",
-        "quantity": 1
-      },
-      {
-        "item": "Good Bait",
-        "quantity": 1
-      },
-      {
-        "item": "Basic Bait",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Leather Strips",
-    "skill": "Tanning",
-    "level": 1,
-    "ingredients": [
-      {
-        "item": "Shoddy Leather Roll",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Leather Strips",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Leather Strips (from Crude Leather)",
-    "skill": "Tanning",
-    "level": 1,
-    "ingredients": [
-      {
-        "item": "Crude Leather Roll",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Leather Strips",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Leather Strips (from Decent Leather)",
-    "skill": "Tanning",
-    "level": 1,
-    "ingredients": [
-      {
-        "item": "Decent Leather Roll",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Leather Strips",
-        "quantity": 3
-      }
-    ]
-  },
-  {
-    "name": "Leather Strips (from Rough Leather)",
-    "skill": "Tanning",
-    "level": 1,
-    "ingredients": [
-      {
-        "item": "Rough Leather Roll",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Leather Strips",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Shoddy Leather Roll",
-    "skill": "Tanning",
-    "level": 1,
-    "ingredients": [
-      {
-        "item": "Shoddy Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Rough Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Shoddy Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Dye Leather Armor (1 color)",
-    "skill": "Tanning",
-    "level": 5,
-    "ingredients": [
-      {
-        "item": "Rough Tannin Powder",
-        "quantity": 1
-      },
-      {
-        "item": "Leather Dyeable Armor",
-        "quantity": 1
-      },
-      {
-        "item": "Dye",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Dye Leather Armor (1 color)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Rough Leather Roll",
-    "skill": "Tanning",
-    "level": 8,
-    "ingredients": [
-      {
-        "item": "Rough Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Rough Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Rough Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Crude Leather Roll",
-    "skill": "Tanning",
-    "level": 18,
-    "ingredients": [
-      {
-        "item": "Crude Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Decent Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Crude Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Rawhide Sheet",
-    "skill": "Tanning",
-    "level": 20,
-    "ingredients": [
-      {
-        "item": "Rough Leather Roll",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Rawhide Sheet",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Dye Leather Armor (2 colors)",
-    "skill": "Tanning",
-    "level": 25,
-    "ingredients": [
-      {
-        "item": "Decent Tannin Powder",
-        "quantity": 1
-      },
-      {
-        "item": "Leather Dyeable Armor",
-        "quantity": 1
-      },
-      {
-        "item": "Dye",
-        "quantity": 1
-      },
-      {
-        "item": "Dye",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Dye Leather Armor (2 colors)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Decent Leather Roll",
-    "skill": "Tanning",
-    "level": 28,
-    "ingredients": [
-      {
-        "item": "Decent Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Decent Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Decent Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Rawhide Liner",
-    "skill": "Tanning",
-    "level": 30,
-    "ingredients": [
-      {
-        "item": "Decent Leather Roll",
-        "quantity": 1
-      },
-      {
-        "item": "Crude Leather Roll",
-        "quantity": 1
-      },
-      {
-        "item": "Decent Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Rawhide Liner",
-        "quantity": 2
-      }
-    ]
-  },
-  {
-    "name": "Nice Leather Roll",
-    "skill": "Tanning",
-    "level": 35,
-    "ingredients": [
-      {
-        "item": "Nice Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Quality Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Nice Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Quality Leather Roll",
-    "skill": "Tanning",
-    "level": 43,
-    "ingredients": [
-      {
-        "item": "Quality Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Quality Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Quality Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Dye Leather Armor (3 colors)",
-    "skill": "Tanning",
-    "level": 50,
-    "ingredients": [
-      {
-        "item": "Quality Tannin Powder",
-        "quantity": 1
-      },
-      {
-        "item": "Leather Dyeable Armor",
-        "quantity": 1
-      },
-      {
-        "item": "Dye",
-        "quantity": 1
-      },
-      {
-        "item": "Dye",
-        "quantity": 1
-      },
-      {
-        "item": "Dye",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Dye Leather Armor (3 colors)",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Great Leather Roll",
-    "skill": "Tanning",
-    "level": 50,
-    "ingredients": [
-      {
-        "item": "Great Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Amazing Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Great Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Amazing Leather Roll",
-    "skill": "Tanning",
-    "level": 65,
-    "ingredients": [
-      {
-        "item": "Amazing Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Amazing Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Amazing Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Astounding Leather Roll",
-    "skill": "Tanning",
-    "level": 80,
-    "ingredients": [
-      {
-        "item": "Astounding Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Awesome Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Astounding Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Awesome Leather Roll",
-    "skill": "Tanning",
-    "level": 90,
-    "ingredients": [
-      {
-        "item": "Awesome Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Awesome Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Awesome Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
-    "name": "Incredible  Leather Roll",
-    "skill": "Tanning",
-    "level": 100,
-    "ingredients": [
-      {
-        "item": "Awesome Animal Skin",
-        "quantity": 1
-      },
-      {
-        "item": "Incredible Tannin Powder",
-        "quantity": 1
-      }
-    ],
-    "results": [
-      {
-        "item": "Incredible  Leather Roll",
-        "quantity": 1
-      }
-    ]
-  },
-  {
     "name": "Simple Skinning Knife",
     "skill": "Toolcrafting",
     "level": 1,
@@ -99593,6 +96285,4107 @@
     "results": [
       {
         "item": "Awesome Arachnid Mechaharness",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Decompose Helm",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 1,
+    "ingredients": [
+      {
+        "item": "Head Armor",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Decompose Helm",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Helm Augment (Level 0-30)",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 8,
+    "ingredients": [
+      {
+        "item": "Small Helm Contraption",
+        "quantity": 20
+      },
+      {
+        "item": "Head Armor",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Helm Augment (Level 0-30)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Decompose Boots",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 13,
+    "ingredients": [
+      {
+        "item": "Footwear",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Decompose Boots",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Boot Augment (Level 0-30)",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 20,
+    "ingredients": [
+      {
+        "item": "Small Shoe Contraption",
+        "quantity": 20
+      },
+      {
+        "item": "Footwear",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Boot Augment (Level 0-30)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Undo Augment on Helm",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 30,
+    "ingredients": [
+      {
+        "item": "Small Helm Contraption",
+        "quantity": 25
+      },
+      {
+        "item": "Head Armor",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Undo Augment on Helm",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Helm Augment (Level 31-60)",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 31,
+    "ingredients": [
+      {
+        "item": "Medium Helm Contraption",
+        "quantity": 20
+      },
+      {
+        "item": "Head Armor",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Helm Augment (Level 31-60)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Undo Augment on Boots",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 40,
+    "ingredients": [
+      {
+        "item": "Small Shoe Contraption",
+        "quantity": 25
+      },
+      {
+        "item": "Footwear",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Undo Augment on Boots",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Boot Augment (Level 31-60)",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 45,
+    "ingredients": [
+      {
+        "item": "Medium Shoe Contraption",
+        "quantity": 20
+      },
+      {
+        "item": "Footwear",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Boot Augment (Level 31-60)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Helm Augment (Level 61-90)",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 61,
+    "ingredients": [
+      {
+        "item": "Large Helm Contraption",
+        "quantity": 20
+      },
+      {
+        "item": "Head Armor",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Helm Augment (Level 61-90)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Boot Augment (Level 61-90)",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 65,
+    "ingredients": [
+      {
+        "item": "Large Shoe Contraption",
+        "quantity": 20
+      },
+      {
+        "item": "Footwear",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Boot Augment (Level 61-90)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Helm Augment (Level 91-120)",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 81,
+    "ingredients": [
+      {
+        "item": "Grand Helm Contraption",
+        "quantity": 20
+      },
+      {
+        "item": "Head Armor",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Helm Augment (Level 91-120)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Boot Augment (Level 91-120)",
+    "skill": "Ancillary-Armor Augmentation",
+    "level": 85,
+    "ingredients": [
+      {
+        "item": "Grand Shoe Contraption",
+        "quantity": 20
+      },
+      {
+        "item": "Footwear",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Boot Augment (Level 91-120)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Leather Strips",
+    "skill": "Tanning",
+    "level": 1,
+    "ingredients": [
+      {
+        "item": "Shoddy Leather Roll",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Leather Strips",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Leather Strips (from Crude Leather)",
+    "skill": "Tanning",
+    "level": 1,
+    "ingredients": [
+      {
+        "item": "Crude Leather Roll",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Leather Strips",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Leather Strips (from Decent Leather)",
+    "skill": "Tanning",
+    "level": 1,
+    "ingredients": [
+      {
+        "item": "Decent Leather Roll",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Leather Strips",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Leather Strips (from Rough Leather)",
+    "skill": "Tanning",
+    "level": 1,
+    "ingredients": [
+      {
+        "item": "Rough Leather Roll",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Leather Strips",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Shoddy Leather Roll",
+    "skill": "Tanning",
+    "level": 1,
+    "ingredients": [
+      {
+        "item": "Shoddy Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Rough Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Shoddy Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Dye Leather Armor (1 color)",
+    "skill": "Tanning",
+    "level": 5,
+    "ingredients": [
+      {
+        "item": "Rough Tannin Powder",
+        "quantity": 1
+      },
+      {
+        "item": "Leather Dyeable Armor",
+        "quantity": 1
+      },
+      {
+        "item": "Dye",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Dye Leather Armor (1 color)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Rough Leather Roll",
+    "skill": "Tanning",
+    "level": 8,
+    "ingredients": [
+      {
+        "item": "Rough Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Rough Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Rough Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Crude Leather Roll",
+    "skill": "Tanning",
+    "level": 18,
+    "ingredients": [
+      {
+        "item": "Crude Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Decent Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Crude Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Rawhide Sheet",
+    "skill": "Tanning",
+    "level": 20,
+    "ingredients": [
+      {
+        "item": "Rough Leather Roll",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Rawhide Sheet",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Dye Leather Armor (2 colors)",
+    "skill": "Tanning",
+    "level": 25,
+    "ingredients": [
+      {
+        "item": "Decent Tannin Powder",
+        "quantity": 1
+      },
+      {
+        "item": "Leather Dyeable Armor",
+        "quantity": 1
+      },
+      {
+        "item": "Dye",
+        "quantity": 1
+      },
+      {
+        "item": "Dye",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Dye Leather Armor (2 colors)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Decent Leather Roll",
+    "skill": "Tanning",
+    "level": 28,
+    "ingredients": [
+      {
+        "item": "Decent Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Decent Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Decent Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Rawhide Liner",
+    "skill": "Tanning",
+    "level": 30,
+    "ingredients": [
+      {
+        "item": "Decent Leather Roll",
+        "quantity": 1
+      },
+      {
+        "item": "Crude Leather Roll",
+        "quantity": 1
+      },
+      {
+        "item": "Decent Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Rawhide Liner",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Nice Leather Roll",
+    "skill": "Tanning",
+    "level": 35,
+    "ingredients": [
+      {
+        "item": "Nice Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Quality Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Nice Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Quality Leather Roll",
+    "skill": "Tanning",
+    "level": 43,
+    "ingredients": [
+      {
+        "item": "Quality Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Quality Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Quality Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Dye Leather Armor (3 colors)",
+    "skill": "Tanning",
+    "level": 50,
+    "ingredients": [
+      {
+        "item": "Quality Tannin Powder",
+        "quantity": 1
+      },
+      {
+        "item": "Leather Dyeable Armor",
+        "quantity": 1
+      },
+      {
+        "item": "Dye",
+        "quantity": 1
+      },
+      {
+        "item": "Dye",
+        "quantity": 1
+      },
+      {
+        "item": "Dye",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Dye Leather Armor (3 colors)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Great Leather Roll",
+    "skill": "Tanning",
+    "level": 50,
+    "ingredients": [
+      {
+        "item": "Great Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Amazing Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Great Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Amazing Leather Roll",
+    "skill": "Tanning",
+    "level": 65,
+    "ingredients": [
+      {
+        "item": "Amazing Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Amazing Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Amazing Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Astounding Leather Roll",
+    "skill": "Tanning",
+    "level": 80,
+    "ingredients": [
+      {
+        "item": "Astounding Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Awesome Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Astounding Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Awesome Leather Roll",
+    "skill": "Tanning",
+    "level": 90,
+    "ingredients": [
+      {
+        "item": "Awesome Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Awesome Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Awesome Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Incredible  Leather Roll",
+    "skill": "Tanning",
+    "level": 100,
+    "ingredients": [
+      {
+        "item": "Awesome Animal Skin",
+        "quantity": 1
+      },
+      {
+        "item": "Incredible Tannin Powder",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Incredible  Leather Roll",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Decompose Main-Hand Weapon",
+    "skill": "Weapon Augmentation",
+    "level": 1,
+    "ingredients": [
+      {
+        "item": "Main-Hand Item",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Decompose Main-Hand Weapon",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Main-Hand Augment (Level 0-30)",
+    "skill": "Weapon Augmentation",
+    "level": 8,
+    "ingredients": [
+      {
+        "item": "Small Main-Hand Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Main-Hand Item",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Main-Hand Augment (Level 0-30)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Decompose Off-Hand Weapon",
+    "skill": "Weapon Augmentation",
+    "level": 13,
+    "ingredients": [
+      {
+        "item": "Off-Hand Item",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Decompose Off-Hand Weapon",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Decompose Gloves",
+    "skill": "Weapon Augmentation",
+    "level": 18,
+    "ingredients": [
+      {
+        "item": "Gloves",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Decompose Gloves",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Off-Hand Augment (Level 0-30)",
+    "skill": "Weapon Augmentation",
+    "level": 20,
+    "ingredients": [
+      {
+        "item": "Small Off-Hand Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Off-Hand Item",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Off-Hand Augment (Level 0-30)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Glove Augment (Level 0-30)",
+    "skill": "Weapon Augmentation",
+    "level": 25,
+    "ingredients": [
+      {
+        "item": "Small Glove Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Gloves",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Glove Augment (Level 0-30)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Main-Hand Augment (Level 31-60)",
+    "skill": "Weapon Augmentation",
+    "level": 31,
+    "ingredients": [
+      {
+        "item": "Medium Main-Hand Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Main-Hand Item",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Main-Hand Augment (Level 31-60)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Undo Augment on Main-Hand Weapon",
+    "skill": "Weapon Augmentation",
+    "level": 38,
+    "ingredients": [
+      {
+        "item": "Small Main-Hand Bead",
+        "quantity": 25
+      },
+      {
+        "item": "Main-Hand Item",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Undo Augment on Main-Hand Weapon",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Undo Augment on Off-Hand Weapon",
+    "skill": "Weapon Augmentation",
+    "level": 42,
+    "ingredients": [
+      {
+        "item": "Small Off-Hand Bead",
+        "quantity": 25
+      },
+      {
+        "item": "Off-Hand Item",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Undo Augment on Off-Hand Weapon",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Off-Hand Augment (Level 31-60)",
+    "skill": "Weapon Augmentation",
+    "level": 45,
+    "ingredients": [
+      {
+        "item": "Medium Off-Hand Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Off-Hand Item",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Off-Hand Augment (Level 31-60)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Glove Augment (Level 31-60)",
+    "skill": "Weapon Augmentation",
+    "level": 50,
+    "ingredients": [
+      {
+        "item": "Medium Glove Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Gloves",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Glove Augment (Level 31-60)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Undo Augment on Gloves",
+    "skill": "Weapon Augmentation",
+    "level": 50,
+    "ingredients": [
+      {
+        "item": "Small Glove Bead",
+        "quantity": 25
+      },
+      {
+        "item": "Gloves",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Undo Augment on Gloves",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Main-Hand Augment (Level 61-90)",
+    "skill": "Weapon Augmentation",
+    "level": 61,
+    "ingredients": [
+      {
+        "item": "Large Main-Hand Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Main-Hand Item",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Main-Hand Augment (Level 61-90)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Off-Hand Augment (Level 61-90)",
+    "skill": "Weapon Augmentation",
+    "level": 65,
+    "ingredients": [
+      {
+        "item": "Large Off-Hand Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Off-Hand Item",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Off-Hand Augment (Level 61-90)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Glove Augment (Level 61-90)",
+    "skill": "Weapon Augmentation",
+    "level": 70,
+    "ingredients": [
+      {
+        "item": "Large Glove Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Gloves",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Glove Augment (Level 61-90)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Main-Hand Augment (Level 91-120)",
+    "skill": "Weapon Augmentation",
+    "level": 81,
+    "ingredients": [
+      {
+        "item": "Grand Main-Hand Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Main-Hand Item",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Main-Hand Augment (Level 91-120)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Off-Hand Augment (Level 91-120)",
+    "skill": "Weapon Augmentation",
+    "level": 85,
+    "ingredients": [
+      {
+        "item": "Grand Off-Hand Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Off-Hand Item",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Off-Hand Augment (Level 91-120)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Extract Glove Augment (Level 91-120)",
+    "skill": "Weapon Augmentation",
+    "level": 90,
+    "ingredients": [
+      {
+        "item": "Grand Glove Bead",
+        "quantity": 20
+      },
+      {
+        "item": "Gloves",
+        "quantity": 1
+      },
+      {
+        "item": "Crystal",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Extract Glove Augment (Level 91-120)",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Butter",
+    "skill": "Cheesemaking",
+    "level": 0,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Salt",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Butter",
+        "quantity": 3
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Sour Cream",
+    "skill": "Cheesemaking",
+    "level": 2,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Salt",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Firkin of Sour Cream",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Cottage Cheese",
+    "skill": "Cheesemaking",
+    "level": 4,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Cottage Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Sweet Butter",
+    "skill": "Cheesemaking",
+    "level": 4,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 1
+      },
+      {
+        "item": "Sugar",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Sweet Butter",
+        "quantity": 3
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Cream Cheese",
+    "skill": "Cheesemaking",
+    "level": 5,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Cream Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Prim Cheese",
+    "skill": "Cheesemaking",
+    "level": 6,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Sour Cream",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Prim Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Laressa's Cheese",
+    "skill": "Cheesemaking",
+    "level": 9,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Sugar",
+        "quantity": 2
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Laressa's Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Urda Cheese",
+    "skill": "Cheesemaking",
+    "level": 10,
+    "ingredients": [
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Urda Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Neufchatel Cheese",
+    "skill": "Cheesemaking",
+    "level": 12,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Neufchatel Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Mild Cheddar Cheese",
+    "skill": "Cheesemaking",
+    "level": 14,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Mild Cheddar Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Ricotta Cheese",
+    "skill": "Cheesemaking",
+    "level": 16,
+    "ingredients": [
+      {
+        "item": "Bottle of Whey",
+        "quantity": 4
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Ricotta Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 5
+      }
+    ]
+  },
+  {
+    "name": "Munster Cheese",
+    "skill": "Cheesemaking",
+    "level": 17,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Munster Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Cheshire Cheese",
+    "skill": "Cheesemaking",
+    "level": 18,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Cheshire Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Gloucester Cheese",
+    "skill": "Cheesemaking",
+    "level": 19,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Gloucester Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Brunost Cheese",
+    "skill": "Cheesemaking",
+    "level": 20,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Sour Cream",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Brunost Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Fairwing Cheese",
+    "skill": "Cheesemaking",
+    "level": 21,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Fairwing Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Cantal Cheese",
+    "skill": "Cheesemaking",
+    "level": 22,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Cantal Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Slave's Cheese",
+    "skill": "Cheesemaking",
+    "level": 23,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Muntok Peppercorns",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Slave's Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Sharp Cheddar Cheese",
+    "skill": "Cheesemaking",
+    "level": 24,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Sharp Cheddar Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Brocciu Cheese",
+    "skill": "Cheesemaking",
+    "level": 26,
+    "ingredients": [
+      {
+        "item": "Bottle of Whey",
+        "quantity": 4
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Brocciu Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 5
+      }
+    ]
+  },
+  {
+    "name": "Brie Cheese",
+    "skill": "Cheesemaking",
+    "level": 28,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Sweet Butter",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Firkin of Brie Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Raclette Cheese",
+    "skill": "Cheesemaking",
+    "level": 30,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Raclette Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Mogyar Cheese",
+    "skill": "Cheesemaking",
+    "level": 31,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Firkin of Mogyar Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Havarti Cheese",
+    "skill": "Cheesemaking",
+    "level": 32,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Sweet Butter",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Havarti Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Monterey Jack Cheese",
+    "skill": "Cheesemaking",
+    "level": 33,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Monterey Jack Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Camembert Cheese",
+    "skill": "Cheesemaking",
+    "level": 34,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Firkin of Camembert Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Soy Milk",
+    "skill": "Cheesemaking",
+    "level": 35,
+    "ingredients": [
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Soybeans",
+        "quantity": 2
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Bottle Of Soy Milk",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Parmesan Cheese",
+    "skill": "Cheesemaking",
+    "level": 36,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Parmesan Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Mozzarella Cheese",
+    "skill": "Cheesemaking",
+    "level": 38,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Mozzarella Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "name": "Emmentaler Cheese",
+    "skill": "Cheesemaking",
+    "level": 40,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Firkin of Emmentaler Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Pepper Jack Cheese",
+    "skill": "Cheesemaking",
+    "level": 42,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Peppercorns",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Pepper Jack Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Limburger Cheese",
+    "skill": "Cheesemaking",
+    "level": 44,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 2
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Firkin of Limburger Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Tofu",
+    "skill": "Cheesemaking",
+    "level": 45,
+    "ingredients": [
+      {
+        "item": "Bottle Of Soy Milk",
+        "quantity": 4
+      },
+      {
+        "item": "Basic Vinegar",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Tofu",
+        "quantity": 5
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Haerel Cheese",
+    "skill": "Cheesemaking",
+    "level": 46,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Haerel Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Danablu Cheese",
+    "skill": "Cheesemaking",
+    "level": 48,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 3
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Danablu Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Appenzeller Cheese",
+    "skill": "Cheesemaking",
+    "level": 50,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 2
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Firkin of Appenzeller Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Gul Cheese",
+    "skill": "Cheesemaking",
+    "level": 51,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Gul Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Edam Cheese",
+    "skill": "Cheesemaking",
+    "level": 52,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Firkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Edam Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Roquefort Cheese",
+    "skill": "Cheesemaking",
+    "level": 54,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 3
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Ratkin Cheese Mold",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Roquefort Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Firm Tofu",
+    "skill": "Cheesemaking",
+    "level": 55,
+    "ingredients": [
+      {
+        "item": "Bottle Of Soy Milk",
+        "quantity": 4
+      },
+      {
+        "item": "Gypsum",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Firm Tofu",
+        "quantity": 5
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Ricotta Forte",
+    "skill": "Cheesemaking",
+    "level": 56,
+    "ingredients": [
+      {
+        "item": "Bottle of Whey",
+        "quantity": 4
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Ricotta Forte",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 5
+      }
+    ]
+  },
+  {
+    "name": "Gorgonzola Cheese",
+    "skill": "Cheesemaking",
+    "level": 57,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 3
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Ratkin Cheese Mold",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Gorgonzola Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Sirine Cheese",
+    "skill": "Cheesemaking",
+    "level": 58,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 2
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Sirine Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Grasgot Cheese",
+    "skill": "Cheesemaking",
+    "level": 60,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 3
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Ratkin Cheese Mold",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Grasgot Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Soft Tofu",
+    "skill": "Cheesemaking",
+    "level": 60,
+    "ingredients": [
+      {
+        "item": "Bottle Of Soy Milk",
+        "quantity": 4
+      },
+      {
+        "item": "Gypsum",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Soft Tofu",
+        "quantity": 5
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Provolone Cheese",
+    "skill": "Cheesemaking",
+    "level": 62,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 2
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Provolone Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 5
+      }
+    ]
+  },
+  {
+    "name": "Esgarion Cheese",
+    "skill": "Cheesemaking",
+    "level": 63,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 3
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Ratkin Cheese Mold",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Butter Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Esgarion Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Telemea Cheese",
+    "skill": "Cheesemaking",
+    "level": 64,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 2
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Telemea Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Cambozola Cheese",
+    "skill": "Cheesemaking",
+    "level": 66,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 3
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Ratkin Cheese Mold",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Cambozola Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Scamorza Cheese",
+    "skill": "Cheesemaking",
+    "level": 68,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 2
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Scamorza Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 5
+      }
+    ]
+  },
+  {
+    "name": "Mur Del Cheese",
+    "skill": "Cheesemaking",
+    "level": 69,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Ratkin Cheese Mold",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Mur Del Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Halloumi Cheese",
+    "skill": "Cheesemaking",
+    "level": 70,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Halloumi Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 5
+      }
+    ]
+  },
+  {
+    "name": "Feta Cheese",
+    "skill": "Cheesemaking",
+    "level": 72,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Whey",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 2
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Feta Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Gouda Cheese",
+    "skill": "Cheesemaking",
+    "level": 74,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 2
+      },
+      {
+        "item": "Bottle of Water",
+        "quantity": 1
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Voile Muslin",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Gouda Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Bottle of Sweet Whey",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "name": "Stilton Cheese",
+    "skill": "Cheesemaking",
+    "level": 76,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 3
+      },
+      {
+        "item": "Strong Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Ratkin Cheese Mold",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Stilton Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Blue-Whisker Cheese",
+    "skill": "Cheesemaking",
+    "level": 78,
+    "ingredients": [
+      {
+        "item": "Bottle of Milk",
+        "quantity": 3
+      },
+      {
+        "item": "Pungent Rennet",
+        "quantity": 1
+      },
+      {
+        "item": "Ratkin Cheese Mold",
+        "quantity": 1
+      },
+      {
+        "item": "Kilderkin",
+        "quantity": 1
+      },
+      {
+        "item": "Fine Cheesecloth",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Kilderkin of Blue-Whisker Cheese",
+        "quantity": 1
+      },
+      {
+        "item": "Empty Bottle",
+        "quantity": 4
+      }
+    ]
+  },
+  {
+    "name": "Basic Bait",
+    "skill": "Angling",
+    "level": 15,
+    "ingredients": [
+      {
+        "item": "Small Fish",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Basic Bait",
+        "quantity": 2
+      },
+      {
+        "item": "Basic Bait",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Bait",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Good Bait",
+    "skill": "Angling",
+    "level": 30,
+    "ingredients": [
+      {
+        "item": "Medium Fish",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Good Bait",
+        "quantity": 2
+      },
+      {
+        "item": "Good Bait",
+        "quantity": 1
+      },
+      {
+        "item": "Good Bait",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Bait",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Expert Bait",
+    "skill": "Angling",
+    "level": 45,
+    "ingredients": [
+      {
+        "item": "Large Fish",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Expert Bait",
+        "quantity": 2
+      },
+      {
+        "item": "Expert Bait",
+        "quantity": 1
+      },
+      {
+        "item": "Expert Bait",
+        "quantity": 1
+      },
+      {
+        "item": "Good Bait",
+        "quantity": 1
+      },
+      {
+        "item": "Basic Bait",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 1",
+    "skill": "Weather Witching",
+    "level": 1,
+    "ingredients": [
+      {
+        "item": "Salt",
+        "quantity": 3
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 1",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 5",
+    "skill": "Weather Witching",
+    "level": 5,
+    "ingredients": [
+      {
+        "item": "Shock Dust",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 5",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 10",
+    "skill": "Weather Witching",
+    "level": 10,
+    "ingredients": [
+      {
+        "item": "Shock Dust",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 10",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 15",
+    "skill": "Weather Witching",
+    "level": 15,
+    "ingredients": [
+      {
+        "item": "Sulfur",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 15",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Song of the Sun",
+    "skill": "Weather Witching",
+    "level": 20,
+    "ingredients": [
+      {
+        "item": "Salt",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Song of the Sun",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 20",
+    "skill": "Weather Witching",
+    "level": 20,
+    "ingredients": [
+      {
+        "item": "Sulfur",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 20",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Errana's Lesson To Kirad",
+    "skill": "Weather Witching",
+    "level": 25,
+    "ingredients": [
+      {
+        "item": "Grass",
+        "quantity": 10
+      }
+    ],
+    "results": [
+      {
+        "item": "Errana's Lesson To Kirad",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 25",
+    "skill": "Weather Witching",
+    "level": 25,
+    "ingredients": [
+      {
+        "item": "Fulgurite",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 25",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 30",
+    "skill": "Weather Witching",
+    "level": 30,
+    "ingredients": [
+      {
+        "item": "Fulgurite",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 30",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Errana's Soliloquy",
+    "skill": "Weather Witching",
+    "level": 35,
+    "ingredients": [
+      {
+        "item": "Elven Lily",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Errana's Soliloquy",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 35",
+    "skill": "Weather Witching",
+    "level": 35,
+    "ingredients": [
+      {
+        "item": "Shock Dust",
+        "quantity": 2
+      },
+      {
+        "item": "Sulfur",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 35",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 40",
+    "skill": "Weather Witching",
+    "level": 40,
+    "ingredients": [
+      {
+        "item": "Shock Dust",
+        "quantity": 1
+      },
+      {
+        "item": "Sulfur",
+        "quantity": 1
+      },
+      {
+        "item": "Fulgurite",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 40",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Paullus's Pulsing Reminder",
+    "skill": "Weather Witching",
+    "level": 45,
+    "ingredients": [
+      {
+        "item": "Salt",
+        "quantity": 1
+      },
+      {
+        "item": "Sugar",
+        "quantity": 1
+      },
+      {
+        "item": "Strange Dirt",
+        "quantity": 1
+      },
+      {
+        "item": "Brown Ale",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Paullus's Pulsing Reminder",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 45",
+    "skill": "Weather Witching",
+    "level": 45,
+    "ingredients": [
+      {
+        "item": "Shock Dust",
+        "quantity": 2
+      },
+      {
+        "item": "Sulfur",
+        "quantity": 1
+      },
+      {
+        "item": "Fulgurite",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 45",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Litany of Stillness",
+    "skill": "Weather Witching",
+    "level": 50,
+    "ingredients": [
+      {
+        "item": "Enchanted Holly Seeds",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Litany of Stillness",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 50",
+    "skill": "Weather Witching",
+    "level": 50,
+    "ingredients": [
+      {
+        "item": "Shock Dust",
+        "quantity": 2
+      },
+      {
+        "item": "Sulfur",
+        "quantity": 2
+      },
+      {
+        "item": "Fulgurite",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 50",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "The Flopsy Dance",
+    "skill": "Weather Witching",
+    "level": 55,
+    "ingredients": [
+      {
+        "item": "Good First Aid Kit",
+        "quantity": 1
+      },
+      {
+        "item": "Salt",
+        "quantity": 1
+      },
+      {
+        "item": "Banana",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "The Flopsy Dance",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 55",
+    "skill": "Weather Witching",
+    "level": 55,
+    "ingredients": [
+      {
+        "item": "Sulfur",
+        "quantity": 2
+      },
+      {
+        "item": "Tentakiller Tentacle",
+        "quantity": 1
+      },
+      {
+        "item": "Dwarven N Core",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 55",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Trial of Lannasea",
+    "skill": "Weather Witching",
+    "level": 60,
+    "ingredients": [
+      {
+        "item": "Salt",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Trial of Lannasea",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 60",
+    "skill": "Weather Witching",
+    "level": 60,
+    "ingredients": [
+      {
+        "item": "Sulfur",
+        "quantity": 2
+      },
+      {
+        "item": "Tentakiller Tentacle",
+        "quantity": 2
+      },
+      {
+        "item": "Dwarven N Core",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 60",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Meditation on Water",
+    "skill": "Weather Witching",
+    "level": 65,
+    "ingredients": [
+      {
+        "item": "Salt",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Meditation on Water",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 65",
+    "skill": "Weather Witching",
+    "level": 65,
+    "ingredients": [
+      {
+        "item": "Magic Sand",
+        "quantity": 1
+      },
+      {
+        "item": "Dwarven N Core",
+        "quantity": 1
+      },
+      {
+        "item": "Explosive Runestone",
+        "quantity": 1
+      },
+      {
+        "item": "Shock Nib",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 65",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Final Rites of Cae-a-Lee",
+    "skill": "Weather Witching",
+    "level": 70,
+    "ingredients": [
+      {
+        "item": "Salt",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Final Rites of Cae-a-Lee",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 70",
+    "skill": "Weather Witching",
+    "level": 70,
+    "ingredients": [
+      {
+        "item": "Magic Sand",
+        "quantity": 1
+      },
+      {
+        "item": "Dwarven N Core",
+        "quantity": 2
+      },
+      {
+        "item": "Explosive Runestone",
+        "quantity": 1
+      },
+      {
+        "item": "Shock Nib",
+        "quantity": 2
+      },
+      {
+        "item": "Guano",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 70",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Lessons of the Swamp",
+    "skill": "Weather Witching",
+    "level": 75,
+    "ingredients": [
+      {
+        "item": "Ratkin Glare Protectors",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Lessons of the Swamp",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 75",
+    "skill": "Weather Witching",
+    "level": 75,
+    "ingredients": [
+      {
+        "item": "Accuracy Circuit",
+        "quantity": 1
+      },
+      {
+        "item": "Pemphredo Eye",
+        "quantity": 1
+      },
+      {
+        "item": "Shock Nib",
+        "quantity": 1
+      },
+      {
+        "item": "Pixie Dust",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 75",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Mope's Method",
+    "skill": "Weather Witching",
+    "level": 80,
+    "ingredients": [
+      {
+        "item": "Strange Dirt",
+        "quantity": 1
+      },
+      {
+        "item": "Shock Dust",
+        "quantity": 1
+      },
+      {
+        "item": "Fulgurite",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Mope's Method",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 80",
+    "skill": "Weather Witching",
+    "level": 80,
+    "ingredients": [
+      {
+        "item": "Accuracy Circuit",
+        "quantity": 2
+      },
+      {
+        "item": "Pemphredo Eye",
+        "quantity": 2
+      },
+      {
+        "item": "Pixie Dust",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 80",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 85",
+    "skill": "Weather Witching",
+    "level": 85,
+    "ingredients": [
+      {
+        "item": "Accuracy Circuit",
+        "quantity": 2
+      },
+      {
+        "item": "Pemphredo Eye",
+        "quantity": 2
+      },
+      {
+        "item": "Pixie Dust",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 85",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Weather Witching Research Level 90",
+    "skill": "Weather Witching",
+    "level": 90,
+    "ingredients": [
+      {
+        "item": "Accuracy Circuit",
+        "quantity": 2
+      },
+      {
+        "item": "Pemphredo Eye",
+        "quantity": 2
+      },
+      {
+        "item": "Pixie Dust",
+        "quantity": 2
+      }
+    ],
+    "results": [
+      {
+        "item": "Weather Witching Research Level 90",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Necromancy Dust",
+    "skill": "Necromancy",
+    "level": 2,
+    "ingredients": [
+      {
+        "item": "Any Decent-Sized Bone",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Necromancy Dust",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Necromancy Dust (from Stack)",
+    "skill": "Necromancy",
+    "level": 22,
+    "ingredients": [
+      {
+        "item": "Stack of Decent-Sized Bones",
+        "quantity": 10
+      }
+    ],
+    "results": [
+      {
+        "item": "Necromancy Dust",
+        "quantity": 10
+      }
+    ]
+  },
+  {
+    "name": "Simple Skull Ritual-Powder",
+    "skill": "Necromancy",
+    "level": 40,
+    "ingredients": [
+      {
+        "item": "Uncrossing Oil",
+        "quantity": 1
+      },
+      {
+        "item": "Humanoid Skull",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Simple Skull Ritual-Powder",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Basic Skull Ritual-Powder",
+    "skill": "Necromancy",
+    "level": 50,
+    "ingredients": [
+      {
+        "item": "Fear Oil",
+        "quantity": 1
+      },
+      {
+        "item": "Impressive Humanoid Skull",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Basic Skull Ritual-Powder",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Good Skull Ritual-Powder",
+    "skill": "Necromancy",
+    "level": 60,
+    "ingredients": [
+      {
+        "item": "Hatred Oil",
+        "quantity": 1
+      },
+      {
+        "item": "Astonishing Humanoid Skull",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Good Skull Ritual-Powder",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "name": "Perceive Undead Spawn Premonitions (10 secs)",
+    "skill": "Necromancy",
+    "level": 70,
+    "ingredients": [
+      {
+        "item": "Diamond",
+        "quantity": 1
+      },
+      {
+        "item": "Gem Crusher",
+        "quantity": 1
+      },
+      {
+        "item": "Astonishing Humanoid Skull",
+        "quantity": 1
+      }
+    ],
+    "results": [
+      {
+        "item": "Perceive Undead Spawn Premonitions (10 secs)",
         "quantity": 1
       }
     ]

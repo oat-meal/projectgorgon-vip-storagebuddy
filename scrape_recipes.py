@@ -16,6 +16,27 @@ CATEGORY_URL = "https://wiki.projectgorgon.com/wiki/Category:Recipes"
 SKILLS_URL = "https://wiki.projectgorgon.com/wiki/Skills"
 WIKI_BASE = "https://wiki.projectgorgon.com"
 
+# Combat skills that have crafting recipes for abilities
+# These are skills where you craft items to unlock combat abilities
+COMBAT_SKILLS_WITH_RECIPES = [
+    "Weather Witching",
+    "Necromancy",
+    "Bard",
+    "Fairy Magic",
+    "Priest",
+    "Druid",
+    "Lycanthropy",
+    "Vampirism",
+    "Spider",
+    "Cow",
+    "Deer",
+    "Pig",
+    "Rabbit",
+    "Giant Bat",
+    "Spirit Fox",
+    "Warden",
+]
+
 
 def get_trade_skills_from_skills_page():
     """Get Trade Skills from the Skills page (catches skills not in Category:Recipes like Cheesemaking)"""
@@ -112,6 +133,21 @@ def get_skill_pages():
 
     if added_from_trade > 0:
         print(f"Added {added_from_trade} additional skills from Trade Skills page")
+
+    # Add combat skills that have crafting recipes
+    added_from_combat = 0
+    for skill_name in COMBAT_SKILLS_WITH_RECIPES:
+        if skill_name.lower() not in known_skills:
+            url = f"{WIKI_BASE}/wiki/{skill_name.replace(' ', '_')}/Recipes"
+            skill_pages.append({
+                'skill': skill_name,
+                'url': url
+            })
+            known_skills.add(skill_name.lower())
+            added_from_combat += 1
+
+    if added_from_combat > 0:
+        print(f"Added {added_from_combat} combat skills with recipes")
 
     print(f"Total: {len(skill_pages)} skill recipe pages to scrape")
     return skill_pages

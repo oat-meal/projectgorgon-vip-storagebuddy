@@ -463,3 +463,167 @@ def get_player_inventory():
     except Exception as e:
         logger.error(f"Error loading inventory: {e}")
         return api_error(str(e), status_code=500)
+
+
+@crafting_bp.route('/ready_recipes')
+def get_ready_recipes():
+    """Get all recipes that are ready to craft or buyable (have all materials, can craft, or can buy with favor)"""
+    config = get_config()
+    cache = get_cache()
+
+    # Get player skills and favor
+    char_service = CharacterService(config.get_reports_dir())
+    player_skills = char_service.get_effective_skill_levels()
+    player_favor = char_service.get_favor()
+
+    # Load recipes (cached)
+    recipes_file = get_bundled_path('recipes.json')
+    if not recipes_file.exists():
+        return api_response(data={'recipes': []}, message="No recipes file found")
+
+    all_recipes = cache.get_or_compute(
+        'recipes:all',
+        lambda: safe_read_json(recipes_file),
+        ttl=60.0,
+        file_path=recipes_file
+    )
+
+    if not all_recipes:
+        return api_response(data={'recipes': []})
+
+    # Build recipes-by-output lookup
+    recipes_by_output = {}
+    for recipe in all_recipes:
+        for result in recipe.get('results', []):
+            output_name = result.get('item', '')
+            if output_name:
+                if output_name not in recipes_by_output:
+                    recipes_by_output[output_name] = []
+                recipes_by_output[output_name].append({
+                    'recipe': recipe,
+                    'output_qty': result.get('quantity', 1)
+                })
+
+    # Get player inventory
+    player_inventory = {}
+    inventory_details = {}
+
+    try:
+        from .decorators import get_tracker_components
+        _, _, inventory_parser, _ = get_tracker_components()
+
+        if inventory_parser:
+            items_file = inventory_parser.get_latest_items_file()
+            if items_file:
+                inventory_data = inventory_parser.parse_items(items_file)
+                for name, data in inventory_data.items():
+                    player_inventory[name] = data['total']
+                    inventory_details[name] = data
+    except Exception as e:
+        logger.warning(f"Could not load inventory: {e}")
+
+    # Load vendor data
+    vendor_items = _load_vendor_items()
+    vendor_service = get_vendor_service()
+
+    # Check each recipe for readiness
+    ready_recipes = []
+
+    for idx, recipe in enumerate(all_recipes):
+        recipe_skill = recipe.get('skill', '')
+        recipe_level = recipe.get('level', 0)
+        player_level = player_skills.get(recipe_skill, 0)
+
+        # Skip if player lacks skill
+        if player_level < recipe_level:
+            continue
+
+        # Check all ingredients using same logic as main UI
+        all_ready = True  # All materials available (in storage or craftable)
+        has_gather = False  # Any ingredient requires gathering
+        has_buy = False  # Any ingredient requires buying (with favor)
+        has_buy_needs_favor = False  # Any ingredient needs more favor to buy
+        materials = []
+
+        for ingredient in recipe.get('ingredients', []):
+            mat_name = ingredient.get('item') or ingredient.get('name', 'Unknown')
+            mat_qty = ingredient.get('quantity', 1)
+            mat_have = player_inventory.get(mat_name, 0)
+
+            # Get storage details
+            details = inventory_details.get(mat_name, {})
+            in_inventory = details.get('in_inventory', 0) if isinstance(details, dict) else 0
+            in_storage = 0
+            storage_locations = {}
+
+            if isinstance(details, dict):
+                for k, v in details.items():
+                    if k not in ['total', 'in_inventory'] and isinstance(v, (int, float)) and v > 0:
+                        in_storage += v
+                        storage_locations[k] = v
+
+            mat_result = {
+                'name': mat_name,
+                'need': mat_qty,
+                'have': min(mat_have, mat_qty),
+                'in_inventory': in_inventory,
+                'in_storage': in_storage,
+                'storage_locations': storage_locations
+            }
+            materials.append(mat_result)
+
+            if mat_have >= mat_qty:
+                # Have enough in storage
+                continue
+
+            # Missing items - categorize them
+            missing = mat_qty - mat_have
+
+            # Check if craftable
+            can_craft, _ = _can_craft_item(
+                mat_name, missing,
+                player_inventory, player_skills,
+                recipes_by_output
+            )
+            if can_craft:
+                # Can craft with available materials - still "ready"
+                continue
+
+            # Check if buyable from vendor
+            if mat_name in vendor_items:
+                # Check favor
+                has_favor, _ = vendor_service.check_vendor_favor_from_dicts(
+                    vendor_items[mat_name], player_favor
+                )
+                if has_favor:
+                    has_buy = True
+                    all_ready = False
+                else:
+                    has_buy_needs_favor = True
+                    all_ready = False
+            else:
+                # Must gather
+                has_gather = True
+                all_ready = False
+
+        # Apply same hierarchy as main UI:
+        # - craftable: all materials ready (green)
+        # - buyable: all missing can be bought with current favor, no gather needed (orange)
+        # Include both in ready recipes
+        is_craftable = all_ready
+        is_buyable = not has_gather and not has_buy_needs_favor and has_buy
+
+        if is_craftable or is_buyable:
+            recipe_id = f"{recipe.get('skill', 'Unknown')}_{recipe.get('name', 'Unknown')}_{idx}"
+            status = 'ready' if is_craftable else 'buyable'
+            ready_recipes.append({
+                'id': recipe_id,
+                'name': recipe.get('name', 'Unknown'),
+                'skill': recipe_skill,
+                'level': recipe_level,
+                'quantity': 1,
+                'materials': materials,
+                'status': status
+            })
+
+    return api_response(data={'recipes': ready_recipes})

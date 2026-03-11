@@ -370,6 +370,10 @@
             background: var(--bg-item-hover);
         }
 
+        .quest-item.needs-gather {
+            border-left-color: var(--info);
+        }
+
         .quest-item-name {
             font-weight: 600;
             color: var(--text-primary);
@@ -913,7 +917,7 @@
                                     <div style="color: var(--text-secondary);">Vendor sells item but requires more favor</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: rgba(74, 111, 138, 0.1); border-left: 3px solid var(--info); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--info); font-size: 11px;">Blue</div>
                                     <div style="color: var(--text-secondary);">Need to gather materials</div>
                                 </div>
                                 <div style="display: flex; align-items: center;">
@@ -1720,40 +1724,40 @@
                     } else {
                         const category = categorizeMaterial(item.name, needed, totalHave);
 
-                        if (category.source === 'storage') {
-                            retrievalMethod = '✓ Have materials';
-                            methodColor = 'var(--success)';
+                        // Always show source - where to get more of this item
+                        if (category.complete) {
                             itemClass += ' complete';
-                        } else if (category.source === 'craft') {
+                        }
+                        if (category.source === 'craft') {
                             const craftInfo = category.info;
                             retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
                             if (craftInfo.craftsNeeded > 1) {
                                 retrievalMethod += ` x${craftInfo.craftsNeeded}`;
                             }
-                            methodColor = 'var(--success)';
-                            itemClass += ' craftable';
+                            methodColor = category.complete ? 'var(--success)' : 'var(--success)';
+                            if (!category.complete) itemClass += ' craftable';
                         } else if (category.source === 'buy') {
                             const vendors = category.info;
                             const firstVendor = vendors[0];
                             const price = firstVendor.price || 0;
                             const totalCost = price * missing;
                             retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
-                            if (price > 0) {
+                            if (price > 0 && missing > 0) {
                                 retrievalMethod += ` - ${missing}x ${price.toFixed(0)} = ${totalCost.toFixed(0)} councils`;
                             }
-                            methodColor = 'var(--warning)';
-                            itemClass += ' buyable';
+                            methodColor = category.complete ? 'var(--success)' : 'var(--warning)';
+                            if (!category.complete) itemClass += ' buyable';
                         } else if (category.source === 'buy_needs_favor') {
                             const vendors = category.info;
                             const firstVendor = vendors[0];
                             const requiredFavor = firstVendor.favor || 'Unknown';
                             retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
-                            methodColor = 'var(--favor)';
-                            itemClass += ' needs-favor';
+                            methodColor = category.complete ? 'var(--success)' : 'var(--favor)';
+                            if (!category.complete) itemClass += ' needs-favor';
                         } else {
                             const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
                             retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.name}">📖 Wiki</a>`;
-                            methodColor = 'var(--accent)';
+                            methodColor = category.complete ? 'var(--success)' : 'var(--accent)';
                         }
                     }
 
@@ -2080,55 +2084,41 @@
                         // Use categorizeMaterial for smart sourcing
                         const category = categorizeMaterial(item.name, needed, totalHave);
 
-                        if (category.source === 'storage') {
-                            // Show where to retrieve items from for storage source too
-                            let retrieveFrom = [];
-                            if (item.inInventory > 0) {
-                                retrieveFrom.push(`Inventory (${item.inInventory})`);
-                            }
-                            if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
-                                for (const [location, count] of Object.entries(item.storageLocations)) {
-                                    retrieveFrom.push(`${location} (${count})`);
-                                }
-                            }
-                            if (retrieveFrom.length > 0) {
-                                retrievalMethod = `✓ Ready - retrieve from: ${retrieveFrom.join(', ')}`;
-                            } else {
-                                retrievalMethod = '✓ Have materials';
-                            }
-                            methodColor = 'var(--success)';
+                        // Always show source - where to get more of this item
+                        if (category.complete) {
                             itemClass += ' complete';
-                        } else if (category.source === 'craft') {
+                        }
+                        if (category.source === 'craft') {
                             const craftInfo = category.info;
                             retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
                             if (craftInfo.craftsNeeded > 1) {
                                 retrievalMethod += ` x${craftInfo.craftsNeeded}`;
                             }
-                            methodColor = 'var(--success)';
-                            itemClass += ' craftable';
+                            methodColor = category.complete ? 'var(--success)' : 'var(--success)';
+                            if (!category.complete) itemClass += ' craftable';
                         } else if (category.source === 'buy') {
                             const vendors = category.info;
                             const firstVendor = vendors[0];
                             const price = firstVendor.price || 0;
                             const totalCost = price * missing;
                             retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
-                            if (price > 0) {
+                            if (price > 0 && missing > 0) {
                                 retrievalMethod += ` - ${missing}x ${price.toFixed(0)} = ${totalCost.toFixed(0)} councils`;
                             }
-                            methodColor = 'var(--warning)';
-                            itemClass += ' buyable';
+                            methodColor = category.complete ? 'var(--success)' : 'var(--warning)';
+                            if (!category.complete) itemClass += ' buyable';
                         } else if (category.source === 'buy_needs_favor') {
                             const vendors = category.info;
                             const firstVendor = vendors[0];
                             const requiredFavor = firstVendor.favor || 'Unknown';
                             retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
-                            methodColor = 'var(--favor)';
-                            itemClass += ' needs-favor';
+                            methodColor = category.complete ? 'var(--success)' : 'var(--favor)';
+                            if (!category.complete) itemClass += ' needs-favor';
                         } else {
                             // Must be gathered - add wiki link
                             const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
                             retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.name}">📖 Wiki</a>`;
-                            methodColor = 'var(--accent)';
+                            methodColor = category.complete ? 'var(--success)' : 'var(--accent)';
                         }
                     }
 
@@ -2363,8 +2353,8 @@
                     const missing = needed - have;
                     const category = categorizeMaterial(itemName, needed, have);
 
-                    if (category.source === 'storage') {
-                        // Already have (shouldn't reach here but handle it)
+                    if (category.complete) {
+                        // Already have enough
                         continue;
                     } else if (category.source === 'craft') {
                         // Can craft with available materials - still "ready"
@@ -2517,15 +2507,12 @@
 
         function categorizeMaterial(itemName, qtyNeeded, qtyHave) {
             const missing = qtyNeeded - qtyHave;
+            const isComplete = missing <= 0;
 
-            if (missing <= 0) {
-                return { source: 'storage', info: null };
-            }
-
-            // Check if craftable with current inventory
-            const craftResult = canCraftItem(itemName, missing);
+            // Check if craftable
+            const craftResult = canCraftItem(itemName, Math.max(1, missing));
             if (craftResult.canCraft) {
-                return { source: 'craft', info: craftResult.craftInfo };
+                return { source: 'craft', info: craftResult.craftInfo, complete: isComplete };
             }
 
             // Check if buyable from vendor (with favor check)
@@ -2533,15 +2520,15 @@
             if (favorCheck.canBuy) {
                 if (favorCheck.hasFavor) {
                     // Player has sufficient favor with at least one vendor
-                    return { source: 'buy', info: favorCheck.vendorsWithFavor };
+                    return { source: 'buy', info: favorCheck.vendorsWithFavor, complete: isComplete };
                 } else {
                     // Vendor exists but player lacks favor
-                    return { source: 'buy_needs_favor', info: favorCheck.vendors };
+                    return { source: 'buy_needs_favor', info: favorCheck.vendors, complete: isComplete };
                 }
             }
 
             // Must be gathered
-            return { source: 'gather', info: null };
+            return { source: 'gather', info: null, complete: isComplete };
         }
 
         function switchRecipeView() {
@@ -2605,7 +2592,7 @@
                                     <div style="color: var(--text-secondary);">Missing materials can be purchased from vendor</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="min-width: 80px; padding: 6px 10px; background: rgba(74, 111, 138, 0.1); border-left: 3px solid var(--info); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--info); font-size: 11px;">Blue</div>
                                     <div style="color: var(--text-secondary);">Need to gather/farm materials</div>
                                 </div>
                                 <div style="display: flex; align-items: center;">
@@ -3228,40 +3215,42 @@
                 const missing = Math.max(0, needed - have);
                 const category = categorizeMaterial(itemName, needed, have);
 
-                // Determine retrieval method and color
+                // Determine retrieval method and color - always show source
+                const isComplete = category.complete;
                 let retrievalMethod = '';
                 let methodColor = 'var(--accent)';
 
-                if (category.source === 'storage') {
-                    retrievalMethod = '✓ Have materials';
-                    methodColor = 'var(--success)';
-                } else if (category.source === 'craft') {
+                if (category.source === 'craft') {
                     const craftInfo = category.info;
                     retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
                     if (craftInfo.craftsNeeded > 1) {
                         retrievalMethod += ` x${craftInfo.craftsNeeded}`;
                     }
-                    methodColor = 'var(--success)';
+                    methodColor = isComplete ? 'var(--success)' : 'var(--success)';
                 } else if (category.source === 'buy') {
                     const vendors = category.info;
                     const firstVendor = vendors[0];
                     const price = firstVendor.price || 0;
-                    const totalCost = price * missing;
-                    retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
-                    if (price > 0) {
-                        retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
+                    if (isComplete) {
+                        retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                    } else {
+                        const totalCost = price * missing;
+                        retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                        if (price > 0) {
+                            retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
+                        }
                     }
-                    methodColor = 'var(--warning)';
+                    methodColor = isComplete ? 'var(--success)' : 'var(--warning)';
                 } else if (category.source === 'buy_needs_favor') {
                     const vendors = category.info;
                     const firstVendor = vendors[0];
                     const requiredFavor = firstVendor.favor || 'Unknown';
                     retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
-                    methodColor = 'var(--favor)';
+                    methodColor = isComplete ? 'var(--success)' : 'var(--favor)';
                 } else {
                     const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(itemName)}`;
                     retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${itemName}">📖 Wiki</a>`;
-                    methodColor = 'var(--accent)';
+                    methodColor = isComplete ? 'var(--success)' : 'var(--accent)';
                 }
 
                 // Location info for items in storage
@@ -3284,7 +3273,7 @@
                                 Have: ${have} / Need: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}
                             </div>
                             ${locationInfo}
-                            ${missing > 0 ? `<div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">${retrievalMethod}</div>` : ''}
+                            <div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">${retrievalMethod}</div>
                         </div>
                     </div>
                 `;
@@ -3519,54 +3508,42 @@
                     }
                     methodColor = 'var(--success)';
                 } else {
-                    // Use categorizeMaterial for smart sourcing
+                    // Use categorizeMaterial for smart sourcing - always show source
                     const category = categorizeMaterial(item.display_name, needed, totalCollected);
+                    const isComplete = category.complete;
 
-                    if (category.source === 'storage') {
-                        // Show where to retrieve items from
-                        let retrieveFrom = [];
-                        if (inInventory > 0) {
-                            retrieveFrom.push(`Inventory (${inInventory})`);
-                        }
-                        if (item.storage_locations && Object.keys(item.storage_locations).length > 0) {
-                            for (const [location, count] of Object.entries(item.storage_locations)) {
-                                retrieveFrom.push(`${location} (${count})`);
-                            }
-                        }
-                        if (retrieveFrom.length > 0) {
-                            retrievalMethod = `✓ Ready - retrieve from: ${retrieveFrom.join(', ')}`;
-                        } else {
-                            retrievalMethod = '✓ Have materials';
-                        }
-                        methodColor = 'var(--success)';
-                    } else if (category.source === 'craft') {
+                    if (category.source === 'craft') {
                         const craftInfo = category.info;
                         retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
                         if (craftInfo.craftsNeeded > 1) {
                             retrievalMethod += ` x${craftInfo.craftsNeeded}`;
                         }
-                        methodColor = 'var(--success)';
+                        methodColor = isComplete ? 'var(--success)' : 'var(--success)';
                     } else if (category.source === 'buy') {
                         const vendors = category.info;
                         const firstVendor = vendors[0];
                         const price = firstVendor.price || item.vendor_price || item.price || 0;
-                        const totalCost = price * missing;
-                        retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
-                        if (price > 0) {
-                            retrievalMethod += ` - ${missing}x ${price.toFixed(0)} = ${totalCost.toFixed(0)} councils`;
+                        if (isComplete) {
+                            retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                        } else {
+                            const totalCost = price * missing;
+                            retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                            if (price > 0) {
+                                retrievalMethod += ` - ${missing}x ${price.toFixed(0)} = ${totalCost.toFixed(0)} councils`;
+                            }
                         }
-                        methodColor = 'var(--warning)';
+                        methodColor = isComplete ? 'var(--success)' : 'var(--warning)';
                     } else if (category.source === 'buy_needs_favor') {
                         const vendors = category.info;
                         const firstVendor = vendors[0];
                         const requiredFavor = firstVendor.favor || 'Unknown';
                         retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
-                        methodColor = 'var(--favor)';
+                        methodColor = isComplete ? 'var(--success)' : 'var(--favor)';
                     } else {
                         // Must be gathered - add wiki link
                         const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.display_name)}`;
                         retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.display_name}">📖 Wiki</a>`;
-                        methodColor = 'var(--accent)';
+                        methodColor = isComplete ? 'var(--success)' : 'var(--accent)';
                     }
                 }
 
@@ -3747,6 +3724,7 @@
                     else if (isCraftable) classes.push('craftable');
                     else if (isBuyable) classes.push('buyable');
                     else if (needsFavor) classes.push('needs-favor');
+                    else classes.push('needs-gather'); // Default: needs materials gathered
 
                     // Build skill badge
                     let skillBadge = '';
@@ -3759,7 +3737,7 @@
                     html += `
                         <div class="${classes.join(' ')}"
                              onclick="toggleRecipeSelection('${recipe.id}')">
-                            <div class="quest-item-name">${recipe.name}${skillBadge}</div>
+                            <div class="quest-item-name">${isSelected ? '📌 ' : ''}${recipe.name}${skillBadge}</div>
                             <div class="quest-item-location">${recipe.ingredients.length} ingredients</div>
                         </div>
                     `;
@@ -3856,7 +3834,7 @@
                             <div>Vendor sells item but requires more favor</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="min-width: 120px; padding: 8px 12px; background: var(--accent-light); border-left: 4px solid var(--accent); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--accent);">Blue</div>
+                            <div style="min-width: 120px; padding: 8px 12px; background: rgba(74, 111, 138, 0.1); border-left: 4px solid var(--info); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--info);">Blue</div>
                             <div>Need to gather/farm items (not vendor-purchasable)</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -4112,6 +4090,15 @@
                             <p style="margin: 0; color: var(--text-muted); font-size: 12px;"><strong>Please use "Update Game Data" sparingly</strong> — it scrapes the wiki and should only be used when data is outdated or missing.</p>
                         </div>
                     </div>
+
+                    <!-- Special Thanks Section -->
+                    <div style="padding: 15px; background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; margin-top: 15px;">
+                        <h3 style="color: var(--text-secondary); margin-bottom: 10px; font-size: 14px;">Special Thanks</h3>
+                        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin: 0;">
+                            Thanks to <a href="https://www.youtube.com/@okaygamer" target="_blank" style="color: var(--accent);">okaygamer</a> (Jzhynda on Arisetsu)
+                            and my partner Narsha (Arisetsu) for spending time giving feedback and finding bugs!
+                        </p>
+                    </div>
                 </div>
             `;
         }
@@ -4155,7 +4142,7 @@
                                     <div style="color: var(--text-secondary);">Vendor sells item but requires more favor</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: rgba(74, 111, 138, 0.1); border-left: 3px solid var(--info); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--info); font-size: 11px;">Blue</div>
                                     <div style="color: var(--text-secondary);">Need to gather materials</div>
                                 </div>
                                 <div style="display: flex; align-items: center;">
@@ -4313,59 +4300,47 @@
                     locationInfo += `</div>`;
                 }
 
-                // Determine retrieval method using enhanced categorization
+                // Determine retrieval method using enhanced categorization - always show source
                 const category = categorizeMaterial(material.name, needed, totalOwned);
+                const isComplete = category.complete;
                 let retrievalMethod = '';
                 let methodColor = 'var(--text-muted)';
 
-                if (category.source === 'storage') {
-                    // Show where to retrieve items from
-                    let retrieveFrom = [];
-                    if (inInventory > 0) {
-                        retrieveFrom.push(`Inventory (${inInventory})`);
-                    }
-                    if (storageLocations && Object.keys(storageLocations).length > 0) {
-                        for (const [location, count] of Object.entries(storageLocations)) {
-                            retrieveFrom.push(`${location} (${count})`);
-                        }
-                    }
-                    if (retrieveFrom.length > 0) {
-                        retrievalMethod = `✓ Ready - retrieve from: ${retrieveFrom.join(', ')}`;
-                    } else {
-                        retrievalMethod = '✓ Have materials';
-                    }
-                    methodColor = 'var(--success)';
-                } else if (category.source === 'craft') {
+                if (category.source === 'craft') {
                     // Item can be crafted with available materials
                     const craftInfo = category.info;
                     retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
                     if (craftInfo.craftsNeeded > 1) {
                         retrievalMethod += ` x${craftInfo.craftsNeeded}`;
                     }
-                    methodColor = 'var(--success)'; // Green - ready to make
+                    methodColor = isComplete ? 'var(--success)' : 'var(--success)';
                 } else if (category.source === 'buy') {
                     // Item can be bought from vendor - show vendor info with price
                     const vendors = category.info;
                     const firstVendor = vendors[0];
                     const price = firstVendor.price || 0;
-                    const totalCost = price * missing;
-                    retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
-                    if (price > 0) {
-                        retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
+                    if (isComplete) {
+                        retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                    } else {
+                        const totalCost = price * missing;
+                        retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                        if (price > 0) {
+                            retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
+                        }
                     }
-                    methodColor = 'var(--warning)'; // Orange
+                    methodColor = isComplete ? 'var(--success)' : 'var(--warning)';
                 } else if (category.source === 'buy_needs_favor') {
                     // Item can be bought but requires more favor
                     const vendors = category.info;
                     const firstVendor = vendors[0];
                     const requiredFavor = firstVendor.favor || 'Unknown';
                     retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
-                    methodColor = 'var(--favor)'; // Purple
+                    methodColor = isComplete ? 'var(--success)' : 'var(--favor)';
                 } else {
                     // Must be gathered - add wiki link
                     const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(material.name)}`;
                     retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${material.name}">📖 Wiki</a>`;
-                    methodColor = 'var(--accent)'; // Blue for gather
+                    methodColor = isComplete ? 'var(--success)' : 'var(--accent)';
                 }
 
                 // Show matched items for keyword-based ingredients
@@ -4396,7 +4371,7 @@
 
                 // Progress text like Ready Quests: "have/need"
                 const progressText = `${totalOwned}/${needed}`;
-                const isComplete = missing === 0;
+                // isComplete already defined above from category.complete
 
                 html += `
                     <div class="checklist-item" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
