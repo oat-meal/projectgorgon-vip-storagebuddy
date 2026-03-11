@@ -42,6 +42,7 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 
 ### General
 - **Auto-refresh** - Updates every 5 seconds
+- **Update Notifications** - Checks GitHub for new releases on launch and notifies when updates are available
 - **Interactive Help** - Built-in documentation with color legends and setup instructions
 
 ## How It Works
