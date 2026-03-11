@@ -468,7 +468,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #4caf50;
+            background: var(--success);
             margin-right: 8px;
             animation: pulse 2s infinite;
         }
@@ -797,7 +797,7 @@
                             <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Recipe Color Legend</h4>
                             <div style="font-size: 12px; line-height: 1.6;">
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid var(--success); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--success); font-size: 11px;">Green</div>
                                     <div style="color: var(--text-secondary);">Ready to craft</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -805,11 +805,11 @@
                                     <div style="color: var(--text-secondary);">Missing materials can be purchased from vendor</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: #f3e5f5; border-left: 3px solid #9c27b0; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #9c27b0; font-size: 11px;">Purple</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--favor-light); border-left: 3px solid var(--favor); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--favor); font-size: 11px;">Purple</div>
                                     <div style="color: var(--text-secondary);">Vendor sells item but requires more favor</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: #e8eaf6; border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
                                     <div style="color: var(--text-secondary);">Need to gather materials</div>
                                 </div>
                                 <div style="display: flex; align-items: center;">
@@ -854,7 +854,7 @@
                             <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Quest Color Legend</h4>
                             <div style="font-size: 12px; line-height: 1.6;">
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid var(--success); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--success); font-size: 11px;">Green</div>
                                     <div style="color: var(--text-secondary);">Ready to turn in</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -979,8 +979,8 @@
 
             // Build center panel: simple list grouped by location like crafting
             let listHtml = `
-                <div style="background: var(--bg-item-complete); border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">📋 Quest Checklist</div>
+                <div style="background: var(--bg-item-complete); border: 2px solid var(--success); padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="font-weight: bold; color: var(--success); margin-bottom: 6px; font-size: 14px;">📋 Quest Checklist</div>
                     <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                         Pin quests to build your quest checklist. Click a quest to see its items.
                     </div>
@@ -1014,7 +1014,7 @@
                     // Status badge
                     let statusBadge = '';
                     if (isCompletable) {
-                        statusBadge = `<span style="font-size: 11px; color: #4caf50; margin-left: 8px;">✓ Ready</span>`;
+                        statusBadge = `<span style="font-size: 11px; color: var(--success); margin-left: 8px;">✓ Ready</span>`;
                     } else if (isPurchasable) {
                         statusBadge = `<span style="font-size: 11px; color: var(--warning); margin-left: 8px;">🛒 Purchasable</span>`;
                     } else if (isNeedsFavor) {
@@ -1062,7 +1062,7 @@
                             <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Quest Color Legend</h4>
                             <div style="font-size: 12px; line-height: 1.6;">
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid var(--success); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--success); font-size: 11px;">Green</div>
                                     <div style="color: var(--text-secondary);">Ready to turn in (have all items)</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -1117,8 +1117,8 @@
 
             // Build summary header for left panel
             let listHtml = `
-                <div style="background: var(--bg-item-complete); border: 2px solid #4caf50; padding: 14px; margin-bottom: 16px; border-radius: 6px;">
-                    <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">✨ ${readyQuests.length} Ready Quest${readyQuests.length !== 1 ? 's' : ''}</div>
+                <div style="background: var(--bg-item-complete); border: 2px solid var(--success); padding: 14px; margin-bottom: 16px; border-radius: 6px;">
+                    <div style="font-weight: bold; color: var(--success); margin-bottom: 6px; font-size: 14px;">✨ ${readyQuests.length} Ready Quest${readyQuests.length !== 1 ? 's' : ''}</div>
                     <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                         ${completableCount > 0 ? `${completableCount} completable` : ''}${completableCount > 0 && purchasableOnlyCount > 0 ? ' · ' : ''}${purchasableOnlyCount > 0 ? `${purchasableOnlyCount} purchasable` : ''}
                     </div>
@@ -1163,7 +1163,7 @@
                     // Status badge
                     let statusBadge = '';
                     if (isCompletable) {
-                        statusBadge = `<span style="font-size: 11px; color: #4caf50; margin-left: 8px;">✓ Ready</span>`;
+                        statusBadge = `<span style="font-size: 11px; color: var(--success); margin-left: 8px;">✓ Ready</span>`;
                     } else if (isPurchasable) {
                         statusBadge = `<span style="font-size: 11px; color: var(--warning); margin-left: 8px;">🛒 Buy</span>`;
                     }
@@ -1265,7 +1265,7 @@
                                         <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">${statusText}</div>
                                     </div>
                                     <button onclick="event.stopPropagation(); toggleQuestPin('${quest.id}'); renderReadyQuestsView();"
-                                            style="padding: 6px 12px; border: 1px solid ${isPinned ? '#f44336' : 'var(--accent)'}; border-radius: 4px; background: var(--bg-card); color: ${isPinned ? '#f44336' : 'var(--accent)'}; cursor: pointer; font-size: 12px; font-weight: 500;">
+                                            style="padding: 6px 12px; border: 1px solid ${isPinned ? 'var(--danger)' : 'var(--accent)'}; border-radius: 4px; background: var(--bg-card); color: ${isPinned ? 'var(--danger)' : 'var(--accent)'}; cursor: pointer; font-size: 12px; font-weight: 500;">
                                         ${isPinned ? '✕ Unpin' : '📌 Pin'}
                                     </button>
                                 </div>
@@ -1300,7 +1300,7 @@
 
                             // Determine retrieval method
                             let retrievalMethod = '';
-                            let methodColor = '#999';
+                            let methodColor = 'var(--text-muted)';
                             let itemClass = 'checklist-item';
 
                             if (isComplete) {
@@ -1437,7 +1437,7 @@
                     const isNeedsFavor = needsFavorQuestSet.has(quest.id);
 
                     // Determine background color and status
-                    let bgColor = '#f5f5f5';
+                    let bgColor = 'var(--bg-item)';
                     let statusBadge = '';
                     if (isCompletable) {
                         bgColor = 'var(--bg-item-complete)';
@@ -1469,7 +1469,7 @@
                             <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${location} • ${completeItems}/${totalItems} items • ${statusBadge}</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <button onclick="toggleQuestPin('${quest.id}'); switchQuestView();" style="width: 28px; height: 28px; border: 1px solid #f44336; border-radius: 4px; background: #fff; color: #f44336; cursor: pointer; font-size: 14px;" title="Unpin">✕</button>
+                            <button onclick="toggleQuestPin('${quest.id}'); switchQuestView();" style="width: 28px; height: 28px; border: 1px solid var(--danger); border-radius: 4px; background: var(--bg-card); color: var(--danger); cursor: pointer; font-size: 14px;" title="Unpin">✕</button>
                         </div>
                     </div>`;
                 }
@@ -1573,7 +1573,7 @@
 
                     // Determine retrieval method using categorizeMaterial
                     let retrievalMethod = '';
-                    let methodColor = '#999';
+                    let methodColor = 'var(--text-muted)';
                     let itemClass = 'checklist-item';
 
                     if (isComplete) {
@@ -1694,7 +1694,7 @@
                             <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Quest Color Legend</h4>
                             <div style="font-size: 12px; line-height: 1.6;">
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--bg-item-complete); border-left: 3px solid var(--success); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--success); font-size: 11px;">Green</div>
                                     <div style="color: var(--text-secondary);">Ready to turn in (have all items)</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -1796,7 +1796,7 @@
                         // Status badge
                         let statusBadge = '';
                         if (isCompletable) {
-                            statusBadge = `<span style="font-size: 11px; color: #4caf50; margin-left: 8px;">✓ Ready</span>`;
+                            statusBadge = `<span style="font-size: 11px; color: var(--success); margin-left: 8px;">✓ Ready</span>`;
                         } else if (isPurchasable) {
                             statusBadge = `<span style="font-size: 11px; color: var(--warning); margin-left: 8px;">🛒 Purchasable</span>`;
                         }
@@ -1916,7 +1916,7 @@
 
                     // Determine retrieval method using categorizeMaterial for consistency
                     let retrievalMethod = '';
-                    let methodColor = '#999';
+                    let methodColor = 'var(--text-muted)';
                     let itemClass = 'checklist-item';
 
                     if (isComplete) {
@@ -2431,7 +2431,7 @@
                             <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Recipe Color Legend</h4>
                             <div style="font-size: 12px; line-height: 1.6;">
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--bg-item-complete); border-left: 3px solid var(--success); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--success); font-size: 11px;">Green</div>
                                     <div style="color: var(--text-secondary);">Ready to craft (have all materials)</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -2439,7 +2439,7 @@
                                     <div style="color: var(--text-secondary);">Missing materials can be purchased from vendor</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 80px; padding: 6px 10px; background: #e8eaf6; border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="min-width: 80px; padding: 6px 10px; background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
                                     <div style="color: var(--text-secondary);">Need to gather/farm materials</div>
                                 </div>
                                 <div style="display: flex; align-items: center;">
@@ -2508,7 +2508,7 @@
 
                 let headerStyle = 'display: flex; justify-content: space-between; align-items: center;';
                 if (isCraftable) {
-                    headerStyle += ' background: var(--bg-item-complete); border-left: 3px solid #4caf50;';
+                    headerStyle += ' background: var(--bg-item-complete); border-left: 3px solid var(--success);';
                 } else if (isBuyable) {
                     headerStyle += ' background: var(--accent-light); border-left: 3px solid var(--warning);';
                 }
@@ -2542,7 +2542,7 @@
                         <div class="${itemClass}" style="cursor: default; padding: 8px 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <span style="font-weight: 500;">${statusIcon} ${itemName}</span>
-                                <span style="font-size: 12px; ${isComplete ? 'color: #4caf50;' : 'color: var(--text-muted);'}">
+                                <span style="font-size: 12px; ${isComplete ? 'color: var(--success);' : 'color: var(--text-muted);'}">
                                     ${have}/${needed}
                                 </span>
                             </div>
@@ -2617,7 +2617,7 @@
                     <div class="${itemClass}">
                         <div class="item-info">
                             <span class="item-name">${isComplete ? '✓ ' : ''}${item.name}</span>
-                            <span class="item-count" style="${isComplete ? 'color: #4caf50;' : ''}">
+                            <span class="item-count" style="${isComplete ? 'color: var(--success);' : ''}">
                                 ${item.have}/${item.totalNeeded}${missing > 0 ? ` (need ${missing})` : ''}
                             </span>
                         </div>
@@ -2685,7 +2685,7 @@
 
                     if (matchingRecipes.length > 0) {
                         if (searchType === 'all' && html.length > 0) {
-                            html += '<div style="margin: 20px 0; border-top: 1px solid #e0e0e0;"></div>';
+                            html += '<div style="margin: 20px 0; border-top: 1px solid var(--border-color);"></div>';
                         }
                         if (searchType === 'all') {
                             html += '<h3 style="color: var(--accent); margin-bottom: 10px; font-size: 16px;">Recipes</h3>';
@@ -2794,8 +2794,8 @@
                 });
 
                 let html = `
-                    <div style="background: var(--bg-item-complete); border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">🔍 Search Results</div>
+                    <div style="background: var(--bg-item-complete); border: 2px solid var(--success); padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-weight: bold; color: var(--success); margin-bottom: 6px; font-size: 14px;">🔍 Search Results</div>
                         <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                             Found ${matchingRecipes.length} recipe${matchingRecipes.length !== 1 ? 's' : ''} matching "${query}"
                         </div>
@@ -2848,13 +2848,13 @@
             if (hasNoSkill) {
                 const recipeLevel = recipe.level || 0;
                 const playerLevel = playerSkills[recipe.skill] || 0;
-                statusBadge = `<span style="background: #9e9e9e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🔒 Need ${recipe.skill} ${recipeLevel} (have ${playerLevel})</span>`;
+                statusBadge = `<span style="background: var(--disabled); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🔒 Need ${recipe.skill} ${recipeLevel} (have ${playerLevel})</span>`;
             } else if (isCraftable) {
-                statusBadge = `<span style="background: #4caf50; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">✓ Ready to craft</span>`;
+                statusBadge = `<span style="background: var(--success); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">✓ Ready to craft</span>`;
             } else if (isBuyable) {
-                statusBadge = `<span style="background: #ff9800; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🛒 Can buy materials</span>`;
+                statusBadge = `<span style="background: var(--warning); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🛒 Can buy materials</span>`;
             } else if (needsFavor) {
-                statusBadge = `<span style="background: #9c27b0; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">❤️ Need more favor</span>`;
+                statusBadge = `<span style="background: var(--favor); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">❤️ Need more favor</span>`;
             }
 
             let html = `
@@ -2875,18 +2875,18 @@
 
                 // Determine retrieval method and color
                 let retrievalMethod = '';
-                let methodColor = '#667eea';
+                let methodColor = 'var(--accent)';
 
                 if (category.source === 'storage') {
                     retrievalMethod = '✓ Have materials';
-                    methodColor = '#4caf50';
+                    methodColor = 'var(--success)';
                 } else if (category.source === 'craft') {
                     const craftInfo = category.info;
                     retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
                     if (craftInfo.craftsNeeded > 1) {
                         retrievalMethod += ` x${craftInfo.craftsNeeded}`;
                     }
-                    methodColor = '#4caf50';
+                    methodColor = 'var(--success)';
                 } else if (category.source === 'buy') {
                     const vendors = category.info;
                     const firstVendor = vendors[0];
@@ -2896,17 +2896,17 @@
                     if (price > 0) {
                         retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
                     }
-                    methodColor = '#ff9800';
+                    methodColor = 'var(--warning)';
                 } else if (category.source === 'buy_needs_favor') {
                     const vendors = category.info;
                     const firstVendor = vendors[0];
                     const requiredFavor = firstVendor.favor || 'Unknown';
                     retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
-                    methodColor = '#9c27b0';
+                    methodColor = 'var(--favor)';
                 } else {
                     const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(itemName)}`;
                     retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${itemName}">📖 Wiki</a>`;
-                    methodColor = '#667eea';
+                    methodColor = 'var(--accent)';
                 }
 
                 // Location info for items in storage
@@ -2917,7 +2917,7 @@
                         locParts.push(`${loc}: ${count}`);
                     }
                     if (locParts.length > 0) {
-                        locationInfo = `<div style="font-size: 11px; color: #888; margin-top: 2px;">${locParts.join(', ')}</div>`;
+                        locationInfo = `<div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${locParts.join(', ')}</div>`;
                     }
                 }
 
@@ -2926,7 +2926,7 @@
                         <div class="item-info" style="flex: 1;">
                             <div class="item-name">${ingredient.name}</div>
                             <div class="item-progress">
-                                Have: ${have} / Need: ${needed}${missing > 0 ? ` | <span style="color: #f44336;">Missing: ${missing}</span>` : ''}
+                                Have: ${have} / Need: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}
                             </div>
                             ${locationInfo}
                             ${missing > 0 ? `<div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">${retrievalMethod}</div>` : ''}
@@ -2958,8 +2958,8 @@
             let tabNotice = '';
             if (currentTab === 'quests') {
                 tabNotice = `
-                    <div style="background: #f3e5f5; border: 2px solid #9c27b0; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <div style="font-weight: bold; color: #6a1b9a; margin-bottom: 6px; font-size: 14px;">📋 Items not showing?</div>
+                    <div style="background: var(--favor-light); border: 2px solid var(--favor); padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-weight: bold; color: var(--favor); margin-bottom: 6px; font-size: 14px;">📋 Items not showing?</div>
                         <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                             Generate a fresh <strong>Character Report</strong> in-game to update inventory detection.
                         </div>
@@ -3137,14 +3137,14 @@
                 if (item.keyword_match && item.matching_items && item.matching_items.length > 0) {
                     const itemsList = item.matching_items.slice(0, 3).join(', ');
                     const moreCount = item.matching_items.length - 3;
-                    keywordInfo = `<div style="font-size: 12px; color: #9c27b0; margin-top: 2px; font-style: italic;">`;
+                    keywordInfo = `<div style="font-size: 12px; color: var(--favor); margin-top: 2px; font-style: italic;">`;
                     keywordInfo += `Matched: ${itemsList}${moreCount > 0 ? ` (+${moreCount} more)` : ''}`;
                     keywordInfo += `</div>`;
                 }
 
                 // Determine retrieval method using categorizeMaterial for consistency with crafting
                 let retrievalMethod = '';
-                let methodColor = '#999';
+                let methodColor = 'var(--text-muted)';
 
                 if (completed) {
                     // Show where to retrieve items from
@@ -3356,8 +3356,8 @@
             }
 
             let html = `
-                <div style="background: var(--bg-item-complete); border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">🔨 Crafting List</div>
+                <div style="background: var(--bg-item-complete); border: 2px solid var(--success); padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="font-weight: bold; color: var(--success); margin-bottom: 6px; font-size: 14px;">🔨 Crafting List</div>
                     <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                         Pin recipes to build your crafting checklist. Totals are aggregated automatically.
                     </div>
@@ -3396,9 +3396,9 @@
                     // Build skill badge
                     let skillBadge = '';
                     if (hasNoSkill) {
-                        skillBadge = `<span style="font-size: 11px; color: #9e9e9e; margin-left: 8px;" title="Need ${recipe.skill} ${recipeLevel}, have ${playerLevel}">🔒 Lv${recipeLevel}</span>`;
+                        skillBadge = `<span style="font-size: 11px; color: var(--disabled); margin-left: 8px;" title="Need ${recipe.skill} ${recipeLevel}, have ${playerLevel}">🔒 Lv${recipeLevel}</span>`;
                     } else {
-                        skillBadge = `<span style="font-size: 11px; color: #757575; margin-left: 8px;">Lv${recipeLevel}</span>`;
+                        skillBadge = `<span style="font-size: 11px; color: var(--text-muted); margin-left: 8px;">Lv${recipeLevel}</span>`;
                     }
 
                     html += `
@@ -3475,7 +3475,7 @@
                     <h3 style="color: var(--accent); margin-bottom: 15px;">Color Legend</h3>
                     <div style="font-size: 13px; line-height: 1.6;">
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="min-width: 120px; padding: 8px 12px; background: var(--bg-item-complete); border-left: 4px solid #4caf50; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #2e7d32;">Green</div>
+                            <div style="min-width: 120px; padding: 8px 12px; background: var(--bg-item-complete); border-left: 4px solid var(--success); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--success);">Green</div>
                             <div>Ready (have materials or can craft sub-components)</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -3483,20 +3483,20 @@
                             <div>Can buy all missing items from vendors</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="min-width: 120px; padding: 8px 12px; background: #f3e5f5; border-left: 4px solid #9c27b0; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #9c27b0;">Purple</div>
+                            <div style="min-width: 120px; padding: 8px 12px; background: var(--favor-light); border-left: 4px solid var(--favor); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--favor);">Purple</div>
                             <div>Vendor sells item but requires more favor</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="min-width: 120px; padding: 8px 12px; background: #e8eaf6; border-left: 4px solid var(--accent); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--accent);">Blue</div>
+                            <div style="min-width: 120px; padding: 8px 12px; background: var(--accent-light); border-left: 4px solid var(--accent); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--accent);">Blue</div>
                             <div>Need to gather/farm items (not vendor-purchasable)</div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="min-width: 120px; padding: 8px 12px; background: #f5f5f5; border-left: 4px solid #9e9e9e; border-radius: 4px; margin-right: 12px; font-weight: 600; color: #757575; opacity: 0.7;">Gray 🔒</div>
+                            <div style="min-width: 120px; padding: 8px 12px; background: var(--bg-item); border-left: 4px solid var(--disabled); border-radius: 4px; margin-right: 12px; font-weight: 600; color: var(--text-muted); opacity: 0.7;">Gray 🔒</div>
                             <div>Skill level too low (shows required vs current level)</div>
                         </div>
                     </div>
 
-                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
                     <h3 style="color: var(--accent); margin-bottom: 15px;">Material Sources</h3>
                     <div style="font-size: 13px; line-height: 1.8; text-align: left;">
@@ -3510,14 +3510,28 @@
                         </div>
                     </div>
 
-                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+                    <h3 style="color: var(--accent); margin-bottom: 15px;">Storage Locations</h3>
+                    <div style="font-size: 13px; line-height: 1.8; text-align: left;">
+                        <p style="margin-bottom: 10px;"><strong>Icons show where items are stored:</strong></p>
+                        <div style="padding-left: 10px; margin-bottom: 8px;">
+                            <div style="margin-bottom: 8px;">📦 <strong>Inventory</strong> - Items on your character</div>
+                            <div style="margin-bottom: 8px;">💤 <strong>Dream Chest</strong> - Dream Realm storage</div>
+                            <div style="margin-bottom: 8px;">🎒 <strong>Saddlebag</strong> - Animal companion storage</div>
+                            <div style="margin-bottom: 8px;">🏠 <strong>Community</strong> - Shared guild storage</div>
+                            <div style="margin-bottom: 8px;">🏦 <strong>Vault</strong> - Item vaults & storage chests</div>
+                        </div>
+                    </div>
+
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
                     <h3 style="color: var(--accent); margin-bottom: 15px;">Keeping Data Fresh</h3>
-                    <div style="font-size: 13px; line-height: 1.6; color: #555;">
+                    <div style="font-size: 13px; line-height: 1.6; color: var(--text-secondary);">
                         <p style="margin-bottom: 8px;">Open the <strong>VIP Menu</strong> in-game and export your <strong>Storage</strong> and <strong>Character</strong> JSON files to update your data.</p>
                         <p style="margin-bottom: 8px; color: var(--text-secondary); font-size: 12px;"><strong>Storage JSON</strong> — Updates inventory, storage chests, and saddlebag contents</p>
                         <p style="margin-bottom: 8px; color: var(--text-secondary); font-size: 12px;"><strong>Character JSON</strong> — Updates active quests and crafting skill levels</p>
-                        <p style="color: #888; font-size: 12px;">StorageBuddy reads your export files to track items and determine which recipes you can craft.</p>
+                        <p style="color: var(--text-muted); font-size: 12px;">StorageBuddy reads your export files to track items and determine which recipes you can craft.</p>
                     </div>
                 </div>
             `;
@@ -3529,12 +3543,12 @@
                     <!-- Getting Started -->
                     <div style="margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 8px; border: 1px solid #667eea30;">
                         <h3 style="color: var(--accent); margin-bottom: 12px; font-size: 16px;">Getting Started</h3>
-                        <div style="font-size: 14px; line-height: 1.7; color: #555;">
+                        <div style="font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
                             <p style="margin-bottom: 12px;">StorageBuddy helps you track quest items and crafting materials across your inventory, storage chests, and saddlebags.</p>
 
-                            <div style="margin-bottom: 15px; padding: 12px; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
-                                <p style="margin: 0; font-weight: 600; color: #856404;">Requirements:</p>
-                                <ul style="margin: 8px 0 0 15px; padding: 0; color: #856404;">
+                            <div style="margin-bottom: 15px; padding: 12px; background: var(--warning-light); border-radius: 6px; border-left: 4px solid var(--warning);">
+                                <p style="margin: 0; font-weight: 600; color: var(--warning);">Requirements:</p>
+                                <ul style="margin: 8px 0 0 15px; padding: 0; color: var(--warning);">
                                     <li>VIP status in Project Gorgon</li>
                                     <li>Enable log exports: In-game, open the <strong>VIP menu</strong> and enable <strong>Logs Export</strong></li>
                                 </ul>
@@ -3559,22 +3573,42 @@
                     </div>
 
                     <!-- Quests Tab Section -->
-                    <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="margin-bottom: 30px; padding: 20px; background: var(--bg-item); border-radius: 8px;">
                         <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 16px;">📋 Quests Tab</h3>
-                        <div style="font-size: 14px; line-height: 1.7; color: #555;">
+                        <div style="font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
                             <p style="margin-bottom: 10px;">View your active quests that need item collection.</p>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
                                 <p style="margin-bottom: 6px;"><strong>Filters:</strong></p>
                                 <ul style="margin-left: 15px; color: var(--text-secondary);">
                                     <li><strong>All</strong> — Show all active quests</li>
-                                    <li><strong>Ready</strong> — Only show quests you can complete now</li>
+                                    <li><strong>Ready</strong> — Only show quests you can complete now (shows Ready Quests Checklist)</li>
                                     <li><strong>Pinned</strong> — View only your pinned quests (up to 20)</li>
                                 </ul>
                             </div>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
-                                <p style="margin-bottom: 6px;"><strong>Pin quests:</strong> Click any quest to pin/unpin it for quick access</p>
+                                <p style="margin-bottom: 6px;"><strong>Ready Quests Checklist:</strong></p>
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
+                                    <li>Shows all completable quests grouped by region</li>
+                                    <li>Each item displays count (have/need) and storage locations</li>
+                                    <li>Pin quests to track specific ones across sessions</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Storage Location Icons:</strong></p>
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
+                                    <li>📦 <strong>Inventory</strong> — Items on your character</li>
+                                    <li>💤 <strong>Dream Realm Chest</strong> — Dream storage</li>
+                                    <li>🎒 <strong>Saddlebag</strong> — Animal companion storage</li>
+                                    <li>🏠 <strong>Community Chest</strong> — Shared guild storage</li>
+                                    <li>🏦 <strong>Other vaults</strong> — Item vaults, storage chests</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Pin quests:</strong> Click the 📌 Pin button on any quest to pin/unpin it</p>
                             </div>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
@@ -3585,7 +3619,7 @@
                                 <p style="margin-bottom: 6px;"><strong>Quest details show:</strong></p>
                                 <ul style="margin-left: 15px; color: var(--text-secondary);">
                                     <li>Color-coded progress: <span style="color: var(--success);">ready</span>, <span style="color: var(--warning);">in storage</span>, <span style="color: var(--text-muted);">needed</span></li>
-                                    <li>Where items are stored (inventory, bank, saddlebag)</li>
+                                    <li>Where items are stored with icons for each location</li>
                                     <li>Vendor info if items can be purchased</li>
                                     <li>Wiki links for items that need to be gathered</li>
                                 </ul>
@@ -3594,9 +3628,9 @@
                     </div>
 
                     <!-- Crafting Tab Section -->
-                    <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="margin-bottom: 30px; padding: 20px; background: var(--bg-item); border-radius: 8px;">
                         <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 16px;">🔨 Crafting Tab</h3>
-                        <div style="font-size: 14px; line-height: 1.7; color: #555;">
+                        <div style="font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
                             <p style="margin-bottom: 10px;">Build your crafting checklist by pinning recipes (up to 20).</p>
 
                             <div style="margin-left: 15px; margin-bottom: 12px;">
@@ -3632,20 +3666,20 @@
                                 </ol>
                             </div>
 
-                            <p style="color: #888; font-size: 13px; margin-top: 10px;">Selections are saved automatically. Craftable sub-components are detected recursively (3 levels deep) and respect your skill levels.</p>
+                            <p style="color: var(--text-muted); font-size: 13px; margin-top: 10px;">Selections are saved automatically. Craftable sub-components are detected recursively (3 levels deep) and respect your skill levels.</p>
                         </div>
                     </div>
 
                     <!-- Vendor Tip -->
                     <div style="margin-bottom: 30px; padding: 15px; background: var(--accent-light); border-left: 4px solid var(--warning); border-radius: 0 8px 8px 0;">
                         <p style="font-weight: 600; color: var(--warning); margin-bottom: 6px;">Vendor Tip</p>
-                        <p style="font-size: 14px; color: #555; margin: 0;">Can't find items at vendors? <strong>Uncheck "Hide Unusable"</strong> in the vendor window — this filter often hides quest items like seeds and ingredients.</p>
+                        <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">Can't find items at vendors? <strong>Uncheck "Hide Unusable"</strong> in the vendor window — this filter often hides quest items like seeds and ingredients.</p>
                     </div>
 
                     <!-- Pop-Out Overlay Section -->
-                    <div style="margin-bottom: 30px; padding: 20px; background: #e3f2fd; border-radius: 8px;">
-                        <h3 style="color: #1565c0; margin-bottom: 12px; font-size: 16px;">⧉ Pop-Out Overlay (In-Game Use)</h3>
-                        <div style="font-size: 14px; line-height: 1.7; color: #555;">
+                    <div style="margin-bottom: 30px; padding: 20px; background: var(--accent-light); border-radius: 8px;">
+                        <h3 style="color: var(--info); margin-bottom: 12px; font-size: 16px;">⧉ Pop-Out Overlay (In-Game Use)</h3>
+                        <div style="font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
                             <p style="margin-bottom: 10px;">Track quests and crafting while playing with a compact overlay window!</p>
 
                             <div style="margin-left: 15px; margin-bottom: 15px;">
@@ -3669,9 +3703,9 @@
                                 </ul>
                             </div>
 
-                            <div style="background: #fff; padding: 12px; border-radius: 6px; border-left: 4px solid #1565c0;">
-                                <p style="margin: 0 0 8px 0; font-weight: 600; color: #1565c0;">Always-On-Top Tips</p>
-                                <p style="margin: 0 0 8px 0; color: #555; font-size: 13px;">
+                            <div style="background: var(--bg-card); padding: 12px; border-radius: 6px; border-left: 4px solid var(--info);">
+                                <p style="margin: 0 0 8px 0; font-weight: 600; color: var(--info);">Always-On-Top Tips</p>
+                                <p style="margin: 0 0 8px 0; color: var(--text-secondary); font-size: 13px;">
                                     To keep the overlay visible over your game:
                                 </p>
                                 <ul style="margin: 0 0 8px 15px; padding: 0; color: var(--text-secondary); font-size: 13px;">
@@ -3683,7 +3717,7 @@
                     </div>
 
                     <!-- Quick Tips -->
-                    <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="padding: 15px; background: var(--bg-item); border-radius: 8px; margin-bottom: 20px;">
                         <h3 style="color: var(--text-primary); margin-bottom: 10px; font-size: 14px;">Quick Tips</h3>
                         <ul style="font-size: 13px; line-height: 1.8; color: var(--text-secondary); margin: 0; padding-left: 20px;">
                             <li>Use the search box to find specific quests or recipes</li>
@@ -3696,7 +3730,7 @@
                     </div>
 
                     <!-- Debug Mode Section -->
-                    <div style="padding: 15px; background: #fafafa; border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div style="padding: 15px; background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px;">
                         <h3 style="color: var(--text-secondary); margin-bottom: 10px; font-size: 14px;">Troubleshooting</h3>
                         <div style="font-size: 13px; line-height: 1.7; color: var(--text-secondary);">
                             <p style="margin-bottom: 8px;"><strong>Enable Debug</strong> (footer button) activates diagnostic features:</p>
@@ -3704,9 +3738,9 @@
                                 <li>Logs app activity to browser console (F12 → Console)</li>
                                 <li>Shows the "Update Game Data" button to refresh quest/item/recipe data</li>
                             </ul>
-                            <p style="margin: 0 0 8px 0; color: #888; font-size: 12px;">Share console output when reporting issues.</p>
-                            <p style="margin: 0 0 8px 0; color: #888; font-size: 12px;"><strong>Note:</strong> Quest, item, and recipe data is sourced from the <a href="https://wiki.projectgorgon.com" target="_blank" style="color: var(--accent);">Project Gorgon Wiki</a>.</p>
-                            <p style="margin: 0; color: #888; font-size: 12px;"><strong>Please use "Update Game Data" sparingly</strong> — it scrapes the wiki and should only be used when data is outdated or missing.</p>
+                            <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 12px;">Share console output when reporting issues.</p>
+                            <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 12px;"><strong>Note:</strong> Quest, item, and recipe data is sourced from the <a href="https://wiki.projectgorgon.com" target="_blank" style="color: var(--accent);">Project Gorgon Wiki</a>.</p>
+                            <p style="margin: 0; color: var(--text-muted); font-size: 12px;"><strong>Please use "Update Game Data" sparingly</strong> — it scrapes the wiki and should only be used when data is outdated or missing.</p>
                         </div>
                     </div>
                 </div>
@@ -3740,7 +3774,7 @@
                             <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Recipe Color Legend</h4>
                             <div style="font-size: 12px; line-height: 1.6;">
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid var(--success); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--success); font-size: 11px;">Green</div>
                                     <div style="color: var(--text-secondary);">Ready to craft</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -3748,11 +3782,11 @@
                                     <div style="color: var(--text-secondary);">Missing materials can be purchased from vendor</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: #f3e5f5; border-left: 3px solid #9c27b0; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #9c27b0; font-size: 11px;">Purple</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--favor-light); border-left: 3px solid var(--favor); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--favor); font-size: 11px;">Purple</div>
                                     <div style="color: var(--text-secondary);">Vendor sells item but requires more favor</div>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: #e8eaf6; border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
+                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--accent); font-size: 11px;">Blue</div>
                                     <div style="color: var(--text-secondary);">Need to gather materials</div>
                                 </div>
                                 <div style="display: flex; align-items: center;">
@@ -3819,11 +3853,11 @@
                     const hasSkill = playerLevel >= recipeLevel;
 
                     // Determine background color based on skill
-                    let bgColor = '#f5f5f5'; // Default
+                    let bgColor = 'var(--bg-item)';
                     let skillBadge = '';
                     if (!hasSkill) {
-                        bgColor = '#ffebee'; // Light red for missing skill
-                        skillBadge = `<span style="color: #d32f2f; font-weight: 500;" title="Need ${recipeSkill} ${recipeLevel}, you have ${playerLevel}">🔒 Need Lv${recipeLevel} (You: ${playerLevel})</span>`;
+                        bgColor = 'var(--bg-item-disabled)';
+                        skillBadge = `<span style="color: var(--danger); font-weight: 500;" title="Need ${recipeSkill} ${recipeLevel}, you have ${playerLevel}">🔒 Need Lv${recipeLevel} (You: ${playerLevel})</span>`;
                     } else {
                         skillBadge = `<span style="color: var(--success);">✓ Lv${recipeLevel}</span>`;
                     }
@@ -3834,12 +3868,12 @@
                             <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${recipe.skill} • ${skillBadge}</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <button onclick="updateRecipeQuantity('${escapedId}', -1)" style="width: 28px; height: 28px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-size: 16px;">−</button>
+                            <button onclick="updateRecipeQuantity('${escapedId}', -1)" style="width: 28px; height: 28px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 16px;">−</button>
                             <input type="number" value="${qty}" min="1" max="999"
                                 onchange="setRecipeQuantity('${escapedId}', this.value)"
-                                style="width: 48px; height: 28px; text-align: center; font-weight: 500; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
-                            <button onclick="updateRecipeQuantity('${escapedId}', 1)" style="width: 28px; height: 28px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-size: 16px;">+</button>
-                            <button onclick="toggleRecipeSelection('${escapedId}')" style="width: 28px; height: 28px; border: 1px solid #f44336; border-radius: 4px; background: #fff; color: #f44336; cursor: pointer; font-size: 14px;" title="Remove">✕</button>
+                                style="width: 48px; height: 28px; text-align: center; font-weight: 500; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background: var(--bg-input); color: var(--text-primary);">
+                            <button onclick="updateRecipeQuantity('${escapedId}', 1)" style="width: 28px; height: 28px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 16px;">+</button>
+                            <button onclick="toggleRecipeSelection('${escapedId}')" style="width: 28px; height: 28px; border: 1px solid var(--danger); border-radius: 4px; background: var(--bg-card); color: var(--danger); cursor: pointer; font-size: 14px;" title="Remove">✕</button>
                         </div>
                     </div>`;
                 }
@@ -3911,7 +3945,7 @@
                 // Determine retrieval method using enhanced categorization
                 const category = categorizeMaterial(material.name, needed, totalOwned);
                 let retrievalMethod = '';
-                let methodColor = '#999';
+                let methodColor = 'var(--text-muted)';
 
                 if (category.source === 'storage') {
                     // Show where to retrieve items from
@@ -3929,7 +3963,7 @@
                     } else {
                         retrievalMethod = '✓ Have materials';
                     }
-                    methodColor = '#4caf50';
+                    methodColor = 'var(--success)';
                 } else if (category.source === 'craft') {
                     // Item can be crafted with available materials
                     const craftInfo = category.info;
@@ -3937,7 +3971,7 @@
                     if (craftInfo.craftsNeeded > 1) {
                         retrievalMethod += ` x${craftInfo.craftsNeeded}`;
                     }
-                    methodColor = '#4caf50'; // Green - ready to make
+                    methodColor = 'var(--success)'; // Green - ready to make
                 } else if (category.source === 'buy') {
                     // Item can be bought from vendor - show vendor info with price
                     const vendors = category.info;
@@ -3948,19 +3982,19 @@
                     if (price > 0) {
                         retrievalMethod += ` - ${missing}x ${price} = ${totalCost} councils`;
                     }
-                    methodColor = '#ff9800'; // Orange
+                    methodColor = 'var(--warning)'; // Orange
                 } else if (category.source === 'buy_needs_favor') {
                     // Item can be bought but requires more favor
                     const vendors = category.info;
                     const firstVendor = vendors[0];
                     const requiredFavor = firstVendor.favor || 'Unknown';
                     retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
-                    methodColor = '#9c27b0'; // Purple
+                    methodColor = 'var(--favor)'; // Purple
                 } else {
                     // Must be gathered - add wiki link
                     const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(material.name)}`;
                     retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${material.name}">📖 Wiki</a>`;
-                    methodColor = '#667eea'; // Blue for gather
+                    methodColor = 'var(--accent)'; // Blue for gather
                 }
 
                 // Show matched items for keyword-based ingredients
@@ -3968,7 +4002,7 @@
                 if (ingredientInfo.matchType === 'keyword' && ingredientInfo.matchedItems.length > 0) {
                     const itemsList = ingredientInfo.matchedItems.slice(0, 3).join(', ');
                     const moreCount = ingredientInfo.matchedItems.length - 3;
-                    matchedItemsInfo = `<div style="font-size: 12px; color: #9c27b0; margin-top: 2px; font-style: italic;">
+                    matchedItemsInfo = `<div style="font-size: 12px; color: var(--favor); margin-top: 2px; font-style: italic;">
                         Matched: ${itemsList}${moreCount > 0 ? ` (+${moreCount} more)` : ''}
                     </div>`;
                 }
@@ -3979,7 +4013,7 @@
                             <div class="item-name">${material.name}</div>
                             ${matchedItemsInfo}
                             <div class="item-progress">
-                                Needed: ${needed}${missing > 0 ? ` | <span style="color: #f44336;">Missing: ${missing}</span>` : ''}
+                                Needed: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}
                             </div>
                             ${locationInfo}
                             <div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">
@@ -4149,7 +4183,7 @@
 
             if (debugMode) {
                 debugBtn.textContent = 'Debug ON';
-                debugBtn.style.background = '#f44336';
+                debugBtn.style.background = 'var(--danger)';
                 updateBtn.style.display = 'inline-block';
                 debugLog('Debug mode enabled');
                 debugLog('App state:', {
