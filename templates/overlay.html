@@ -679,7 +679,7 @@
         let currentTab = 'quests';
         let currentView = 'all';
         let currentRegion = '';
-        let craftingView = 'all';
+        let craftingView = 'pinned';  // Default to 'pinned' to match first dropdown option
         let characterView = 'skills';
         let characterSearch = '';
         let lastUpdateTime = Date.now();
@@ -994,11 +994,11 @@
                 return;
             }
 
-            if (craftingView === 'pinned') {
-                renderPinnedRecipes(content);
-            } else if (craftingView === 'ready') {
+            // Handle view rendering - default to 'pinned' for any unknown value
+            if (craftingView === 'ready') {
                 renderReadyRecipes(content);
             } else {
+                // 'pinned' or any other value defaults to pinned view
                 renderPinnedRecipes(content);
             }
         }

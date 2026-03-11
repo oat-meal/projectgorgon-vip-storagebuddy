@@ -227,16 +227,29 @@
         .search-box {
             width: 100%;
             padding: 12px;
-            border: 2px solid var(--border-color);
+            border: 1px solid var(--border-color);
             border-radius: 5px;
             font-size: 14px;
             margin-bottom: 15px;
             transition: border-color 0.3s;
+            background: var(--bg-item);
+            color: var(--text-primary);
         }
 
         .search-box:focus {
             outline: none;
             border-color: var(--accent);
+        }
+
+        .search-box option {
+            background: var(--bg-item);
+            color: var(--text-primary);
+        }
+
+        /* View filter dropdowns */
+        select.search-box {
+            cursor: pointer;
+            appearance: auto;
         }
 
         .tab-buttons {
@@ -483,6 +496,100 @@
             padding: 20px;
             color: var(--text-muted);
         }
+
+        /* Character View Styles */
+        .character-header {
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: var(--bg-item);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .character-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            border-radius: 6px 6px 0 0;
+            margin-top: 15px;
+        }
+
+        .section-count {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+
+        .skill-list, .favor-list {
+            background: var(--bg-item);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .skill-item, .favor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .skill-item:last-child, .favor-item:last-child {
+            border-bottom: none;
+        }
+
+        .skill-name, .favor-npc {
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .skill-level {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .skill-level .bonus {
+            color: var(--success);
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .favor-level {
+            font-weight: 600;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        /* Favor level colors */
+        .favor-level.soul-mates { background: #ff69b4; color: white; }
+        .favor-level.like-family { background: #e91e63; color: white; }
+        .favor-level.best-friends { background: #9c27b0; color: white; }
+        .favor-level.close-friends { background: #673ab7; color: white; }
+        .favor-level.friends { background: #3f51b5; color: white; }
+        .favor-level.comfortable { background: #2196f3; color: white; }
+        .favor-level.friendly { background: #03a9f4; color: white; }
+        .favor-level.warm { background: #00bcd4; color: white; }
+        .favor-level.neutral { background: #607d8b; color: white; }
+        .favor-level.awkward { background: #795548; color: white; }
+        .favor-level.cold { background: #455a64; color: white; }
+        .favor-level.unfriendly { background: #f44336; color: white; }
+        .favor-level.hate { background: #b71c1c; color: white; }
     </style>
 </head>
 <body>
@@ -518,6 +625,7 @@
                 <div class="tab-buttons">
                     <button class="tab-btn" onclick="switchTab('quests')">📋 Quests</button>
                     <button class="tab-btn" onclick="switchTab('crafting')">🔨 Crafting</button>
+                    <button class="tab-btn" onclick="switchTab('character')">👤 Character</button>
                     <button class="tab-btn active" onclick="switchTab('help')">❓ Help</button>
                 </div>
 
@@ -533,35 +641,29 @@
                        placeholder="Search recipes..."
                        style="display: none;">
 
-                <div id="questFilter" style="display: none; gap: 10px; justify-content: center; margin-bottom: 10px;">
-                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
-                        <input type="radio" name="questView" value="all" checked style="margin-right: 5px;" onchange="switchQuestView()">
-                        All
-                    </label>
-                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
-                        <input type="radio" name="questView" value="ready" style="margin-right: 5px;" onchange="switchQuestView()">
-                        Ready
-                    </label>
-                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
-                        <input type="radio" name="questView" value="pinned" style="margin-right: 5px;" onchange="switchQuestView()">
-                        Pinned
-                    </label>
-                </div>
+                <input type="text"
+                       class="search-box"
+                       id="characterSearchBox"
+                       placeholder="Search skills or NPCs..."
+                       style="display: none;">
 
-                <div id="recipeFilter" style="display: none; gap: 10px; justify-content: center; margin-bottom: 10px;">
-                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
-                        <input type="radio" name="recipeView" value="all" checked style="margin-right: 5px;" onchange="switchRecipeView()">
-                        All
-                    </label>
-                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
-                        <input type="radio" name="recipeView" value="craftable" style="margin-right: 5px;" onchange="switchRecipeView()">
-                        Ready
-                    </label>
-                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
-                        <input type="radio" name="recipeView" value="shopping" style="margin-right: 5px;" onchange="switchRecipeView()">
-                        Pinned
-                    </label>
-                </div>
+                <select class="search-box" id="characterFilter" style="display: none;" onchange="switchCharacterView()">
+                    <option value="skills">Skills</option>
+                    <option value="favor">NPC Favor</option>
+                    <option value="both">Both</option>
+                </select>
+
+                <select class="search-box" id="questFilter" style="display: none;" onchange="switchQuestView()">
+                    <option value="all">All Quests</option>
+                    <option value="ready">Ready</option>
+                    <option value="pinned">Pinned</option>
+                </select>
+
+                <select class="search-box" id="recipeFilter" style="display: none;" onchange="switchRecipeView()">
+                    <option value="all">All Recipes</option>
+                    <option value="craftable">Ready</option>
+                    <option value="shopping">Pinned</option>
+                </select>
 
                 <select class="search-box" id="regionFilter" style="display: none;">
                     <option value="">All Regions</option>
@@ -663,6 +765,8 @@
         let playerFavor = {}; // NPC name -> { level: "Friends", rank: 2 }
         let favorLevels = []; // Ordered list of favor levels for comparison
         let itemKeywords = {}; // Keyword -> list of item names (e.g., "Bone" -> ["Femur", "Rib Bone", ...])
+        let characterData = {}; // Full character data including skills, favor, character name
+        let currentCharacterView = 'skills'; // 'skills', 'favor', or 'both'
         let vendorItems = {}; // Item name -> vendor info (for checking if items can be bought)
         let debugMode = false; // Debug mode state
 
@@ -898,10 +1002,12 @@
             if (tab === 'quests') {
                 questSearchBox.style.display = 'block';
                 craftingSearchBox.style.display = 'none';
-                questFilter.style.display = 'flex';
+                questFilter.style.display = 'block';
                 recipeFilter.style.display = 'none';
                 regionFilter.style.display = 'block';
                 skillFilter.style.display = 'none';
+                document.getElementById('characterSearchBox').style.display = 'none';
+                document.getElementById('characterFilter').style.display = 'none';
                 questSearchBox.value = '';
                 // Load data and apply current filter
                 loadActiveQuests().then(() => {
@@ -911,9 +1017,11 @@
                 questSearchBox.style.display = 'none';
                 craftingSearchBox.style.display = 'block';
                 questFilter.style.display = 'none';
-                recipeFilter.style.display = 'flex';
+                recipeFilter.style.display = 'block';
                 regionFilter.style.display = 'none';
                 skillFilter.style.display = 'block';
+                document.getElementById('characterSearchBox').style.display = 'none';
+                document.getElementById('characterFilter').style.display = 'none';
                 craftingSearchBox.value = '';
                 loadCraftingRecipes().then(() => {
                     // Restore shopping list if recipes are selected
@@ -921,11 +1029,24 @@
                         updateShoppingList();
                     }
                 });
+            } else if (tab === 'character') {
+                questSearchBox.style.display = 'none';
+                craftingSearchBox.style.display = 'none';
+                document.getElementById('characterSearchBox').style.display = 'block';
+                questFilter.style.display = 'none';
+                recipeFilter.style.display = 'none';
+                document.getElementById('characterFilter').style.display = 'block';
+                regionFilter.style.display = 'none';
+                skillFilter.style.display = 'none';
+                document.getElementById('characterSearchBox').value = '';
+                loadCharacterData();
             } else if (tab === 'help') {
                 questSearchBox.style.display = 'none';
                 craftingSearchBox.style.display = 'none';
+                document.getElementById('characterSearchBox').style.display = 'none';
                 questFilter.style.display = 'none';
                 recipeFilter.style.display = 'none';
+                document.getElementById('characterFilter').style.display = 'none';
                 regionFilter.style.display = 'none';
                 skillFilter.style.display = 'none';
                 showHelp();
@@ -933,7 +1054,7 @@
         }
 
         function switchQuestView() {
-            const questView = document.querySelector('input[name="questView"]:checked').value;
+            const questView = document.getElementById('questFilter').value;
             currentQuestView = questView;
 
             if (questView === 'all') {
@@ -1537,7 +1658,9 @@
                         <div class="quest-detail-description">${validQuests.length} quest${validQuests.length !== 1 ? 's' : ''}, ${totalItems} unique item${totalItems !== 1 ? 's' : ''} (${completeItems} complete)</div>
                     </div>
                     ${questsInfo}
-                    <div class="checklist-items">
+                    <div style="margin-top: 16px; padding: 16px; background: var(--bg-item); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">📦 Items Needed</div>
+                        <div class="checklist-items">
                 `;
 
                 for (const item of items) {
@@ -1634,29 +1757,43 @@
                         }
                     }
 
-                    // Build progress line
-                    const progressLine = `Needed: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}`;
+                    // Build storage line like Ready Quests format
+                    let storageParts = [];
+                    if (item.inInventory > 0) {
+                        storageParts.push(`📦 Inventory: ${item.inInventory}`);
+                    }
+                    if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
+                        for (const [loc, count] of Object.entries(item.storageLocations)) {
+                            let icon = '🏦';
+                            if (loc.toLowerCase().includes('dream')) icon = '💤';
+                            else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
+                            else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                            storageParts.push(`${icon} ${loc}: ${count}`);
+                        }
+                    }
+                    const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
+
+                    // Progress text like Ready Quests: "have/need"
+                    const progressText = `${totalHave}/${needed}`;
+
+                    // Quest list for this item
+                    const questsList = item.quests.length <= 2 ? item.quests.join(', ') : `${item.quests.slice(0, 2).join(', ')} +${item.quests.length - 2} more`;
 
                     html += `
-                        <div class="${itemClass}">
-                            <div class="item-info" style="flex: 1;">
-                                <div class="item-name">${item.name}</div>
-                                <div class="item-progress">
-                                    ${progressLine}
-                                </div>
-                                ${locationInfo}
-                                <div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">
-                                    ${retrievalMethod}
-                                </div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                                    For: ${item.quests.join(', ')}
-                                </div>
-                            </div>
+                        <div class="${itemClass}" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${item.name}</td>
+                                    <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine ? '6px' : '0'};">${progressText}</td>
+                                </tr>
+                                ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center;">${storageLine}</td></tr>` : ''}
+                                <tr><td colspan="2" style="font-size: 11px; color: var(--text-muted); padding-top: 4px;">For: ${questsList}</td></tr>
+                            </table>
                         </div>
                     `;
                 }
 
-                html += '</div>';
+                html += '</div></div>';
                 detailContainer.innerHTML = html;
 
             } catch (error) {
@@ -1879,7 +2016,9 @@
                         <div class="quest-detail-name">All Pinned Quest Items</div>
                         <div class="quest-detail-description">${items.length} unique item${items.length !== 1 ? 's' : ''} needed</div>
                     </div>
-                    <div class="checklist-items">
+                    <div style="margin-top: 16px; padding: 16px; background: var(--bg-item); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">📦 Items Needed</div>
+                        <div class="checklist-items">
                 `;
 
                 for (const item of items) {
@@ -1993,29 +2132,43 @@
                         }
                     }
 
-                    // Build progress line matching crafting format
-                    const progressLine = `Needed: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}`;
+                    // Build storage line like Ready Quests format
+                    let storageParts = [];
+                    if (item.inInventory > 0) {
+                        storageParts.push(`📦 Inventory: ${item.inInventory}`);
+                    }
+                    if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
+                        for (const [loc, count] of Object.entries(item.storageLocations)) {
+                            let icon = '🏦';
+                            if (loc.toLowerCase().includes('dream')) icon = '💤';
+                            else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
+                            else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                            storageParts.push(`${icon} ${loc}: ${count}`);
+                        }
+                    }
+                    const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
+
+                    // Progress text like Ready Quests: "have/need"
+                    const progressText = `${totalHave}/${needed}`;
+
+                    // Quest list for this item
+                    const questsList = item.quests.length <= 2 ? item.quests.join(', ') : `${item.quests.slice(0, 2).join(', ')} +${item.quests.length - 2} more`;
 
                     detailHtml += `
-                        <div class="${itemClass}">
-                            <div class="item-info" style="flex: 1;">
-                                <div class="item-name">${item.name}</div>
-                                <div class="item-progress">
-                                    ${progressLine}
-                                </div>
-                                ${locationInfo}
-                                <div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">
-                                    ${retrievalMethod}
-                                </div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                                    For: ${item.quests.join(', ')}
-                                </div>
-                            </div>
+                        <div class="${itemClass}" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${item.name}</td>
+                                    <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine ? '6px' : '0'};">${progressText}</td>
+                                </tr>
+                                ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center;">${storageLine}</td></tr>` : ''}
+                                <tr><td colspan="2" style="font-size: 11px; color: var(--text-muted); padding-top: 4px;">For: ${questsList}</td></tr>
+                            </table>
                         </div>
                     `;
                 }
 
-                detailHtml += '</div>';
+                detailHtml += '</div></div>';
                 detailContainer.innerHTML = detailHtml;
 
             } catch (error) {
@@ -2095,10 +2248,20 @@
                 vendorItems = vendorsData.data?.vendor_items || {};
 
                 // Store player skills (skill name -> effective level)
+                // Also store normalized versions with spaces for matching recipe skill names
+                // e.g., "FireMagic" -> "Fire Magic", "WeatherWitching" -> "Weather Witching"
                 playerSkills = {};
                 if (skillsData.data?.skills) {
                     for (const [skillName, skillData] of Object.entries(skillsData.data.skills)) {
-                        playerSkills[skillName] = skillData.effectiveLevel || 0;
+                        const level = skillData.effectiveLevel || 0;
+                        // Store original name
+                        playerSkills[skillName] = level;
+                        // Also store with spaces inserted before capital letters
+                        // "FireMagic" -> "Fire Magic"
+                        const spacedName = skillName.replace(/([a-z])([A-Z])/g, '$1 $2');
+                        if (spacedName !== skillName) {
+                            playerSkills[spacedName] = level;
+                        }
                     }
                 }
 
@@ -2382,16 +2545,19 @@
         }
 
         function switchRecipeView() {
-            const recipeView = document.querySelector('input[name="recipeView"]:checked').value;
+            const recipeView = document.getElementById('recipeFilter').value;
             currentRecipeView = recipeView;
 
             if (recipeView === 'shopping') {
                 // Pinned view - show only pinned recipes
                 renderShoppingCartView();
-            } else {
-                // All or Ready view - show recipes with pins preserved
+            } else if (recipeView === 'craftable') {
+                // Ready view - show ready recipes in left panel, all ready recipe materials in right panel
                 renderCraftingList();
-                // Update materials panel to show pinned recipe materials
+                renderReadyRecipeMaterials();
+            } else {
+                // All view - show all recipes, pinned recipe materials in right panel
+                renderCraftingList();
                 updateShoppingList();
             }
         }
@@ -2491,75 +2657,80 @@
                 return;
             }
 
-            // Build center panel: list each pinned recipe with its ingredients
+            // Count craftable vs buyable
+            const craftableCount = selectedRecipes.filter(r => craftableRecipeSet.has(r.id)).length;
+            const buyableCount = selectedRecipes.filter(r => buyableRecipeSet.has(r.id) && !craftableRecipeSet.has(r.id)).length;
+
+            // Group recipes by skill
+            const recipesBySkill = {};
+            for (const recipe of selectedRecipes) {
+                const skill = recipe.skill || 'Unknown';
+                if (!recipesBySkill[skill]) {
+                    recipesBySkill[skill] = [];
+                }
+                recipesBySkill[skill].push(recipe);
+            }
+
+            // Build center panel: grouped by skill (matching quest pinned style)
             let listHtml = `
-                <div style="padding: 10px; background: var(--accent-light); border-radius: 8px; margin-bottom: 12px;">
-                    <div style="font-weight: bold; color: var(--accent); margin-bottom: 6px;">📌 Pinned Recipes</div>
-                    <div style="font-size: 13px; color: var(--text-secondary);">
+                <div style="background: var(--accent-light); border: 2px solid var(--accent); padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="font-weight: bold; color: var(--accent); margin-bottom: 6px; font-size: 14px;">📌 Pinned Recipes</div>
+                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
                         ${selectedRecipes.length} recipe${selectedRecipes.length !== 1 ? 's' : ''} pinned
+                        ${craftableCount > 0 ? ` · ${craftableCount} ready` : ''}${buyableCount > 0 ? ` · ${buyableCount} buyable` : ''}
                     </div>
                 </div>
             `;
 
-            for (const recipe of selectedRecipes) {
-                const qty = recipeQuantities[recipe.id]?.quantity || 1;
-                const isCraftable = craftableRecipeSet.has(recipe.id);
-                const isBuyable = buyableRecipeSet.has(recipe.id);
+            // Sort skills alphabetically
+            const sortedSkills = Object.keys(recipesBySkill).sort();
 
-                let headerStyle = 'display: flex; justify-content: space-between; align-items: center;';
-                if (isCraftable) {
-                    headerStyle += ' background: var(--bg-item-complete); border-left: 3px solid var(--success);';
-                } else if (isBuyable) {
-                    headerStyle += ' background: var(--accent-light); border-left: 3px solid var(--warning);';
-                }
+            for (const skill of sortedSkills) {
+                const recipes = recipesBySkill[skill];
 
                 listHtml += `
-                    <div class="skill-group">
-                        <div class="skill-header" style="${headerStyle}">
-                            <span>${recipe.name} (×${qty})</span>
-                            <span style="font-size: 11px; color: var(--text-muted);">${recipe.skill || 'Unknown'}</span>
-                        </div>
-                        <div class="skill-recipes">
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: bold; color: var(--accent); margin-bottom: 10px; font-size: 16px;">${skill} (${recipes.length} recipe${recipes.length !== 1 ? 's' : ''})</div>
                 `;
 
-                for (const ing of recipe.ingredients) {
-                    const itemName = ing.item || ing.name;
-                    const needed = (ing.quantity || 1) * qty;
-                    const have = playerInventory[itemName] || 0;
-                    const isComplete = have >= needed;
+                for (const recipe of recipes) {
+                    const qty = recipeQuantities[recipe.id]?.quantity || 1;
+                    const isCraftable = craftableRecipeSet.has(recipe.id);
+                    const isBuyable = buyableRecipeSet.has(recipe.id);
 
-                    let itemClass = 'quest-item';
-                    let statusIcon = '';
-                    if (isComplete) {
-                        itemClass += ' completable';
-                        statusIcon = '✓';
-                    } else if (vendorItems[itemName]) {
-                        itemClass += ' buyable';
-                        statusIcon = '🛒';
+                    // Build CSS classes
+                    const classes = ['quest-item', 'pinned'];
+                    if (isCraftable) classes.push('completable');
+                    else if (isBuyable) classes.push('buyable');
+
+                    // Status badge
+                    let statusBadge = '';
+                    if (isCraftable) {
+                        statusBadge = `<span style="font-size: 11px; color: var(--success); margin-left: 8px;">✓ Ready</span>`;
+                    } else if (isBuyable) {
+                        statusBadge = `<span style="font-size: 11px; color: var(--warning); margin-left: 8px;">🛒 Buyable</span>`;
                     }
 
+                    // Ingredient count summary
+                    const totalIngs = recipe.ingredients?.length || 0;
+                    const completeIngs = (recipe.ingredients || []).filter(ing => {
+                        const itemName = ing.item || ing.name;
+                        const needed = (ing.quantity || 1) * qty;
+                        const have = playerInventory[itemName] || 0;
+                        return have >= needed;
+                    }).length;
+
                     listHtml += `
-                        <div class="${itemClass}" style="cursor: default; padding: 8px 12px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 500;">${statusIcon} ${itemName}</span>
-                                <span style="font-size: 12px; ${isComplete ? 'color: var(--success);' : 'color: var(--text-muted);'}">
-                                    ${have}/${needed}
-                                </span>
-                            </div>
+                        <div class="${classes.join(' ')}"
+                             onclick="toggleRecipeSelection('${recipe.id}'); renderShoppingCartView();"
+                             style="cursor: pointer;">
+                            <div class="quest-item-name">📌 ${recipe.name}${qty > 1 ? ` (×${qty})` : ''}${statusBadge}</div>
+                            <div class="quest-item-location">${completeIngs}/${totalIngs} materials complete</div>
                         </div>
                     `;
                 }
 
-                listHtml += `
-                            <div style="text-align: right; padding: 4px 8px;">
-                                <button onclick="event.stopPropagation(); toggleRecipeSelection('${recipe.id}'); renderShoppingCartView();"
-                                        style="font-size: 11px; padding: 4px 8px; cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-secondary);">
-                                    Unpin
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                listHtml += `</div>`;
             }
 
             container.innerHTML = listHtml;
@@ -2594,46 +2765,230 @@
                 return a.name.localeCompare(b.name);
             });
 
+            // Get detailed inventory info for storage locations
+            for (const item of items) {
+                const invDetails = playerInventoryDetails[item.name];
+                item.inInventory = invDetails ? invDetails.inventory : 0;
+                item.storageLocations = invDetails ? invDetails.storage : {};
+            }
+
             let detailHtml = `
                 <div class="quest-detail-header">
                     <div class="quest-detail-name">All Pinned Recipe Materials</div>
                     <div class="quest-detail-description">${items.length} unique material${items.length !== 1 ? 's' : ''} needed</div>
                 </div>
-                <div class="checklist-items">
+                <div style="margin-top: 16px; padding: 16px; background: var(--bg-item); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">📦 Materials Needed</div>
+                    <div class="checklist-items">
             `;
 
             for (const item of items) {
                 const missing = Math.max(0, item.totalNeeded - item.have);
                 const isComplete = missing === 0;
 
-                let itemClass = 'checklist-item';
+                // Build storage line
+                let storageParts = [];
+                if (item.inInventory > 0) {
+                    storageParts.push(`📦 Inventory: ${item.inInventory}`);
+                }
+                if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
+                    for (const [loc, count] of Object.entries(item.storageLocations)) {
+                        let icon = '🏦';
+                        if (loc.toLowerCase().includes('dream')) icon = '💤';
+                        else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
+                        else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                        storageParts.push(`${icon} ${loc}: ${count}`);
+                    }
+                }
+                const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
+
+                // Progress text
+                const progressText = `${item.have}/${item.totalNeeded}`;
+
+                // Recipe list for this material
+                const recipesList = item.recipes.length <= 2 ? item.recipes.join(', ') : `${item.recipes.slice(0, 2).join(', ')} +${item.recipes.length - 2} more`;
+
+                // Determine source method
+                let sourceInfo = '';
                 if (isComplete) {
-                    itemClass += ' complete';
-                } else if (item.vendor) {
-                    itemClass += ' buyable';
+                    sourceInfo = `<span style="color: var(--success);">✓ Have materials</span>`;
+                } else {
+                    // Check if craftable
+                    const category = categorizeMaterial(item.name, item.totalNeeded, item.have);
+                    if (category.source === 'craft') {
+                        const craftInfo = category.info;
+                        sourceInfo = `<span style="color: var(--success);">🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})</span>`;
+                    } else if (category.source === 'buy') {
+                        const vendors = category.info;
+                        const firstVendor = vendors[0];
+                        const price = firstVendor.price || 0;
+                        const totalCost = price * missing;
+                        sourceInfo = `<span style="color: var(--warning);">🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})${price > 0 ? ` - ${missing}x @ ${price} = ${totalCost} councils` : ''}</span>`;
+                    } else if (category.source === 'buy_needs_favor') {
+                        const vendors = category.info;
+                        const firstVendor = vendors[0];
+                        sourceInfo = `<span style="color: var(--favor);">❤️ Need ${firstVendor.favor || 'more'} favor with ${firstVendor.vendor}</span>`;
+                    } else {
+                        const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
+                        sourceInfo = `<span style="color: var(--accent);">🔍 Farm/Gather</span> <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;">📖 Wiki</a>`;
+                    }
                 }
 
                 detailHtml += `
-                    <div class="${itemClass}">
-                        <div class="item-info">
-                            <span class="item-name">${isComplete ? '✓ ' : ''}${item.name}</span>
-                            <span class="item-count" style="${isComplete ? 'color: var(--success);' : ''}">
-                                ${item.have}/${item.totalNeeded}${missing > 0 ? ` (need ${missing})` : ''}
-                            </span>
-                        </div>
-                        <div class="item-locations" style="font-size: 11px; color: var(--text-muted);">
-                            For: ${item.recipes.join(', ')}
-                        </div>
-                        ${item.vendor && missing > 0 ? `
-                            <div class="item-locations">
-                                <span class="vendor-hint">🛒 ${item.vendor.vendor} (${item.vendor.location}) - ${item.vendor.price}g</span>
-                            </div>
-                        ` : ''}
+                    <div class="checklist-item" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: 6px;">${item.name}</td>
+                                <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: 6px;">${progressText}</td>
+                            </tr>
+                            ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center; padding-bottom: 4px;">${storageLine}</td></tr>` : ''}
+                            <tr><td colspan="2" style="font-size: 12px; padding-bottom: 4px;">${sourceInfo}</td></tr>
+                            <tr><td colspan="2" style="font-size: 11px; color: var(--text-muted);">For: ${recipesList}</td></tr>
+                        </table>
                     </div>
                 `;
             }
 
-            detailHtml += '</div>';
+            detailHtml += '</div></div>';
+            detailContainer.innerHTML = detailHtml;
+        }
+
+        function renderReadyRecipeMaterials() {
+            const detailContainer = document.getElementById('questDetail');
+
+            // Get all ready recipes (craftable + buyable)
+            const readyRecipes = allRecipes.filter(r =>
+                craftableRecipeSet.has(r.id) || buyableRecipeSet.has(r.id)
+            );
+
+            if (readyRecipes.length === 0) {
+                detailContainer.innerHTML = `
+                    <div style="padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <div style="font-size: 40px; margin-bottom: 15px;">📦</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 10px;">No Ready Recipes</h3>
+                            <p style="color: var(--text-secondary); font-size: 13px;">No recipes are currently craftable or buyable</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Aggregate ingredients from all ready recipes (qty=1 for each)
+            const aggregatedItems = {};
+            for (const recipe of readyRecipes) {
+                for (const ing of recipe.ingredients) {
+                    const itemName = ing.item || ing.name;
+                    const needed = ing.quantity || 1;
+                    if (!aggregatedItems[itemName]) {
+                        aggregatedItems[itemName] = {
+                            name: itemName,
+                            totalNeeded: 0,
+                            have: playerInventory[itemName] || 0,
+                            vendor: vendorItems[itemName]?.[0] || null,
+                            recipes: []
+                        };
+                    }
+                    aggregatedItems[itemName].totalNeeded += needed;
+                    aggregatedItems[itemName].recipes.push(recipe.name);
+                }
+            }
+
+            const items = Object.values(aggregatedItems);
+            items.sort((a, b) => {
+                // Sort: incomplete first, then by name
+                const aComplete = a.have >= a.totalNeeded;
+                const bComplete = b.have >= b.totalNeeded;
+                if (aComplete !== bComplete) return aComplete ? 1 : -1;
+                return a.name.localeCompare(b.name);
+            });
+
+            // Get detailed inventory info for storage locations
+            for (const item of items) {
+                const invDetails = playerInventoryDetails[item.name];
+                item.inInventory = invDetails ? invDetails.inventory : 0;
+                item.storageLocations = invDetails ? invDetails.storage : {};
+            }
+
+            let detailHtml = `
+                <div class="quest-detail-header">
+                    <div class="quest-detail-name">All Ready Recipe Materials</div>
+                    <div class="quest-detail-description">${items.length} unique material${items.length !== 1 ? 's' : ''} across ${readyRecipes.length} ready recipe${readyRecipes.length !== 1 ? 's' : ''}</div>
+                </div>
+                <div style="margin-top: 16px; padding: 16px; background: var(--bg-item); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">📦 Materials Needed</div>
+                    <div class="checklist-items">
+            `;
+
+            for (const item of items) {
+                const missing = Math.max(0, item.totalNeeded - item.have);
+                const isComplete = missing === 0;
+
+                // Build storage line
+                let storageParts = [];
+                if (item.inInventory > 0) {
+                    storageParts.push(`📦 Inventory: ${item.inInventory}`);
+                }
+                if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
+                    for (const [loc, count] of Object.entries(item.storageLocations)) {
+                        let icon = '🏦';
+                        if (loc.toLowerCase().includes('dream')) icon = '💤';
+                        else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
+                        else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                        storageParts.push(`${icon} ${loc}: ${count}`);
+                    }
+                }
+                const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
+
+                // Progress text
+                const progressText = `${item.have}/${item.totalNeeded}`;
+
+                // Recipe list for this material (deduplicated)
+                const uniqueRecipes = [...new Set(item.recipes)];
+                const recipesList = uniqueRecipes.length <= 2 ? uniqueRecipes.join(', ') : `${uniqueRecipes.slice(0, 2).join(', ')} +${uniqueRecipes.length - 2} more`;
+
+                // Determine source method
+                let sourceInfo = '';
+                if (isComplete) {
+                    sourceInfo = `<span style="color: var(--success);">✓ Have materials</span>`;
+                } else {
+                    // Check if craftable
+                    const category = categorizeMaterial(item.name, item.totalNeeded, item.have);
+                    if (category.source === 'craft') {
+                        const craftInfo = category.info;
+                        sourceInfo = `<span style="color: var(--success);">🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})</span>`;
+                    } else if (category.source === 'buy') {
+                        const vendors = category.info;
+                        const firstVendor = vendors[0];
+                        const price = firstVendor.price || 0;
+                        const totalCost = price * missing;
+                        sourceInfo = `<span style="color: var(--warning);">🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})${price > 0 ? ` - ${missing}x @ ${price} = ${totalCost} councils` : ''}</span>`;
+                    } else if (category.source === 'buy_needs_favor') {
+                        const vendors = category.info;
+                        const firstVendor = vendors[0];
+                        sourceInfo = `<span style="color: var(--favor);">❤️ Need ${firstVendor.favor || 'more'} favor with ${firstVendor.vendor}</span>`;
+                    } else {
+                        const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
+                        sourceInfo = `<span style="color: var(--accent);">🔍 Farm/Gather</span> <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;">📖 Wiki</a>`;
+                    }
+                }
+
+                detailHtml += `
+                    <div class="checklist-item" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: 6px;">${item.name}</td>
+                                <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: 6px;">${progressText}</td>
+                            </tr>
+                            ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center; padding-bottom: 4px;">${storageLine}</td></tr>` : ''}
+                            <tr><td colspan="2" style="font-size: 12px; padding-bottom: 4px;">${sourceInfo}</td></tr>
+                            <tr><td colspan="2" style="font-size: 11px; color: var(--text-muted);">For: ${recipesList}</td></tr>
+                        </table>
+                    </div>
+                `;
+            }
+
+            detailHtml += '</div></div>';
             detailContainer.innerHTML = detailHtml;
         }
 
@@ -3432,7 +3787,14 @@
 
             localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
             renderCraftingList();
-            await updateShoppingList();
+
+            // In Ready view, keep showing all ready recipe materials
+            // In All view, show pinned recipe materials
+            if (currentRecipeView === 'craftable') {
+                renderReadyRecipeMaterials();
+            } else {
+                await updateShoppingList();
+            }
         }
 
         async function updateRecipeQuantity(recipeId, delta) {
@@ -3447,7 +3809,14 @@
 
             localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
             renderCraftingList();
-            await updateShoppingList();
+
+            // In Ready view, keep showing all ready recipe materials
+            // In All view, show pinned recipe materials
+            if (currentRecipeView === 'craftable') {
+                renderReadyRecipeMaterials();
+            } else {
+                await updateShoppingList();
+            }
         }
 
         async function setRecipeQuantity(recipeId, value) {
@@ -3885,7 +4254,9 @@
                     <div class="quest-detail-description">${selectedRecipeIds.length} recipe${selectedRecipeIds.length !== 1 ? 's' : ''}, ${totalCrafts} craft${totalCrafts !== 1 ? 's' : ''}</div>
                 </div>
                 ${recipesInfo}
-                <div class="checklist-items">
+                <div style="margin-top: 16px; padding: 16px; background: var(--bg-item); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">📦 Materials Needed</div>
+                    <div class="checklist-items">
             `;
 
             for (const material of materials) {
@@ -4002,29 +4373,47 @@
                 if (ingredientInfo.matchType === 'keyword' && ingredientInfo.matchedItems.length > 0) {
                     const itemsList = ingredientInfo.matchedItems.slice(0, 3).join(', ');
                     const moreCount = ingredientInfo.matchedItems.length - 3;
-                    matchedItemsInfo = `<div style="font-size: 12px; color: var(--favor); margin-top: 2px; font-style: italic;">
+                    matchedItemsInfo = `<div style="font-size: 12px; color: var(--favor); font-style: italic;">
                         Matched: ${itemsList}${moreCount > 0 ? ` (+${moreCount} more)` : ''}
                     </div>`;
                 }
 
+                // Build storage line like Ready Quests format
+                let storageParts = [];
+                if (inInventory > 0) {
+                    storageParts.push(`📦 Inventory: ${inInventory}`);
+                }
+                if (storageLocations && Object.keys(storageLocations).length > 0) {
+                    for (const [loc, count] of Object.entries(storageLocations)) {
+                        let icon = '🏦';
+                        if (loc.toLowerCase().includes('dream')) icon = '💤';
+                        else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
+                        else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                        storageParts.push(`${icon} ${loc}: ${count}`);
+                    }
+                }
+                const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
+
+                // Progress text like Ready Quests: "have/need"
+                const progressText = `${totalOwned}/${needed}`;
+                const isComplete = missing === 0;
+
                 html += `
-                    <div class="checklist-item">
-                        <div class="item-info" style="flex: 1;">
-                            <div class="item-name">${material.name}</div>
-                            ${matchedItemsInfo}
-                            <div class="item-progress">
-                                Needed: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}
-                            </div>
-                            ${locationInfo}
-                            <div class="item-progress" style="color: ${methodColor}; font-weight: 500; margin-top: 4px;">
-                                ${retrievalMethod}
-                            </div>
-                        </div>
+                    <div class="checklist-item" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine || matchedItemsInfo ? '6px' : '0'};">${material.name}</td>
+                                <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine || matchedItemsInfo ? '6px' : '0'};">${progressText}</td>
+                            </tr>
+                            ${matchedItemsInfo ? `<tr><td colspan="2" style="padding-bottom: 4px;">${matchedItemsInfo}</td></tr>` : ''}
+                            ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center;">${storageLine}</td></tr>` : ''}
+                        </table>
                     </div>
                 `;
             }
 
             html += `
+                    </div>
                 </div>
             `;
 
@@ -4203,6 +4592,183 @@
                 console.log('[StorageBuddy] Debug mode disabled');
             }
         }
+
+        // Character View Functions
+        async function loadCharacterData() {
+            const listContainer = document.getElementById('questListContainer');
+            const detailContainer = document.getElementById('questDetail');
+
+            try {
+                const response = await fetch('/api/character_info');
+                if (!response.ok) throw new Error('Server not responding');
+
+                const data = await response.json();
+                characterData = data.data || {};
+                renderCharacterView();
+            } catch (error) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p>Could not load character data</p>
+                        <p class="empty-state-hint">${error.message}</p>
+                    </div>
+                `;
+                detailContainer.innerHTML = '';
+            }
+        }
+
+        function renderCharacterView() {
+            const listContainer = document.getElementById('questListContainer');
+            const detailContainer = document.getElementById('questDetail');
+            const searchTerm = document.getElementById('characterSearchBox').value.toLowerCase();
+
+            if (!characterData || (!characterData.skills && !characterData.favor)) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>No character data available</p>
+                        <p class="empty-state-hint">Export your Character JSON from the in-game VIP Menu</p>
+                    </div>
+                `;
+                detailContainer.innerHTML = '';
+                return;
+            }
+
+            let listHtml = '';
+
+            // Character header
+            listHtml += `
+                <div class="character-header">
+                    <div class="character-name">${escapeHtml(characterData.character || 'Unknown Character')}</div>
+                </div>
+            `;
+
+            const showSkills = currentCharacterView === 'skills' || currentCharacterView === 'both';
+            const showFavor = currentCharacterView === 'favor' || currentCharacterView === 'both';
+
+            // Skills section
+            if (showSkills && characterData.skills) {
+                const skills = Object.entries(characterData.skills)
+                    .filter(([name, data]) => {
+                        if (!searchTerm) return true;
+                        return name.toLowerCase().includes(searchTerm);
+                    })
+                    .sort((a, b) => b[1].effectiveLevel - a[1].effectiveLevel);
+
+                listHtml += `
+                    <div class="section-header">
+                        Skills
+                        <span class="section-count">${skills.length} skills</span>
+                    </div>
+                    <div class="skill-list">
+                `;
+
+                if (skills.length === 0) {
+                    listHtml += `<div class="empty-state" style="padding: 20px;">No matching skills</div>`;
+                } else {
+                    for (const [name, data] of skills) {
+                        const bonusText = data.bonusLevels > 0 ? `<span class="bonus">+${data.bonusLevels}</span>` : '';
+                        listHtml += `
+                            <div class="skill-item">
+                                <span class="skill-name">${escapeHtml(name)}</span>
+                                <span class="skill-level">${data.level}${bonusText}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                listHtml += `</div>`;
+            }
+
+            // Favor section
+            if (showFavor && characterData.favor) {
+                const favor = Object.entries(characterData.favor)
+                    .filter(([npc, data]) => {
+                        if (!searchTerm) return true;
+                        return npc.toLowerCase().includes(searchTerm) ||
+                               data.level.toLowerCase().includes(searchTerm);
+                    })
+                    .sort((a, b) => b[1].rank - a[1].rank);
+
+                listHtml += `
+                    <div class="section-header">
+                        NPC Favor
+                        <span class="section-count">${favor.length} NPCs</span>
+                    </div>
+                    <div class="favor-list">
+                `;
+
+                if (favor.length === 0) {
+                    listHtml += `<div class="empty-state" style="padding: 20px;">No matching NPCs</div>`;
+                } else {
+                    for (const [npc, data] of favor) {
+                        const levelClass = data.level.toLowerCase().replace(/\s+/g, '-');
+                        listHtml += `
+                            <div class="favor-item">
+                                <span class="favor-npc">${escapeHtml(npc)}</span>
+                                <span class="favor-level ${levelClass}">${escapeHtml(data.level)}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                listHtml += `</div>`;
+            }
+
+            listContainer.innerHTML = listHtml;
+
+            // Show character info in detail panel
+            detailContainer.innerHTML = `
+                <div style="padding: 20px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 36px; margin-bottom: 10px;">👤</div>
+                        <h3 style="color: var(--text-primary); margin-bottom: 8px;">Character Info</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px;">View your skills and NPC relationships</p>
+                    </div>
+
+                    <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">View Filters</h4>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                            <div style="margin-bottom: 4px;"><strong>Skills</strong> — Shows all your trained skills sorted by level</div>
+                            <div style="margin-bottom: 4px;"><strong>Favor</strong> — Shows NPC relationships sorted by favor level</div>
+                            <div><strong>Both</strong> — Displays both skills and favor together</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Favor Levels</h4>
+                        <div style="font-size: 12px; line-height: 1.8; color: var(--text-secondary);">
+                            <div style="margin-bottom: 4px;"><span class="favor-level soul-mates" style="margin-right: 8px;">Soul Mates</span> Highest tier</div>
+                            <div style="margin-bottom: 4px;"><span class="favor-level like-family" style="margin-right: 8px;">Like Family</span></div>
+                            <div style="margin-bottom: 4px;"><span class="favor-level best-friends" style="margin-right: 8px;">Best Friends</span></div>
+                            <div style="margin-bottom: 4px;"><span class="favor-level close-friends" style="margin-right: 8px;">Close Friends</span></div>
+                            <div style="margin-bottom: 4px;"><span class="favor-level friends" style="margin-right: 8px;">Friends</span></div>
+                            <div style="margin-bottom: 4px;"><span class="favor-level comfortable" style="margin-right: 8px;">Comfortable</span></div>
+                            <div style="margin-bottom: 4px;"><span class="favor-level neutral" style="margin-right: 8px;">Neutral</span> Starting point</div>
+                            <div><span class="favor-level hate" style="margin-right: 8px;">Hate</span> Lowest tier</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function switchCharacterView() {
+            currentCharacterView = document.getElementById('characterFilter').value;
+            renderCharacterView();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Character search event listener
+        document.getElementById('characterSearchBox').addEventListener('input', (e) => {
+            if (currentTab === 'character') {
+                renderCharacterView();
+            }
+        });
 
         function debugLog(...args) {
             if (debugMode) {
