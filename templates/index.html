@@ -1354,8 +1354,13 @@
 
                             // Build simple storage line like overlay (small icon + location: count)
                             let storageLine = '';
+                            let storageParts = [];
+                            // Include inventory if present
+                            if (inInventory > 0) {
+                                storageParts.push(`📦 Inventory: ${inInventory}`);
+                            }
+                            // Include all storage locations
                             if (storageLocations && Object.keys(storageLocations).length > 0) {
-                                let storageParts = [];
                                 for (const [loc, count] of Object.entries(storageLocations)) {
                                     let icon = '🏦';
                                     if (loc.toLowerCase().includes('dream')) icon = '💤';
@@ -1363,6 +1368,8 @@
                                     else if (loc.toLowerCase().includes('community')) icon = '🏠';
                                     storageParts.push(`${icon} ${loc}: ${count}`);
                                 }
+                            }
+                            if (storageParts.length > 0) {
                                 storageLine = storageParts.join(' &nbsp;•&nbsp; ');
                             }
 
