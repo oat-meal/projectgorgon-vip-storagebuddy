@@ -61,7 +61,20 @@ The tracker monitors your Project Gorgon chat logs and automatically detects whe
 3. Double-click to run
 4. Your browser will open automatically to the setup wizard
 
-**Note**: You may see a "Windows protected your PC" warning. Click "More info" → "Run anyway". This is normal for unsigned executables.
+> **Windows Security Warning**
+>
+> This application is **unsigned**, which means Windows will show security warnings when you try to run it. This is normal for open-source software distributed outside the Microsoft Store.
+>
+> **Windows Defender SmartScreen**: "Windows protected your PC"
+> - Click **"More info"**
+> - Click **"Run anyway"**
+>
+> **Windows Defender Antivirus**: May flag the executable
+> - This is a false positive due to PyInstaller packaging
+> - You can verify the source code in this repository
+> - Or run from source (Option 2) to avoid this entirely
+>
+> Code signing certificates cost $200-500/year, which is impractical for a free community tool. If you're uncomfortable running unsigned software, use Option 2 to run from source.
 
 ### Option 2: Run from Source (Windows/Linux)
 
