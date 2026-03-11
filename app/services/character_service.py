@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 from pathlib import Path
 
 from ..utils.security import safe_read_json, validate_path, SecurityError
-from ..utils.constants import CHARACTER_FILE_PATTERN, STORAGE_FILE_PATTERN, FAVOR_LEVELS
+from ..utils.constants import CHARACTER_FILE_PATTERN, STORAGE_FILE_PATTERN, FAVOR_LEVELS, normalize_favor_level
 from .cache_service import get_cache
 
 logger = logging.getLogger(__name__)
@@ -152,30 +152,37 @@ class CharacterService:
 
     def get_favor(self) -> Dict[str, Dict[str, Any]]:
         """
-        Get NPC favor levels.
+        Get NPC favor levels using display names.
 
         Returns:
-            Dict mapping NPC name to favor data:
+            Dict mapping NPC display name to favor data:
             {
-                'Marna': {
-                    'level': 'Friends',
-                    'rank': 2
+                'Joeh': {
+                    'level': 'BestFriends',
+                    'rank': 4
                 }
             }
         """
+        from .npc_service import get_npc_service
+
         char_data = self.get_character_data()
         if not char_data:
             return {}
 
+        npc_service = get_npc_service()
         raw_npcs = char_data.get('NPCs', {})
         favor = {}
 
-        for npc_name, npc_data in raw_npcs.items():
+        for internal_name, npc_data in raw_npcs.items():
             favor_level = npc_data.get('FavorLevel')
             if favor_level:
-                favor[npc_name] = {
-                    'level': favor_level,
-                    'rank': FAVOR_LEVELS.index(favor_level) if favor_level in FAVOR_LEVELS else -1
+                # Convert internal name (NPC_Joe) to display name (Joeh)
+                display_name = npc_service.get_display_name(internal_name)
+                # Normalize favor level (BestFriends -> Best Friends)
+                normalized_level = normalize_favor_level(favor_level)
+                favor[display_name] = {
+                    'level': normalized_level,
+                    'rank': FAVOR_LEVELS.index(normalized_level) if normalized_level in FAVOR_LEVELS else -1
                 }
 
         return favor

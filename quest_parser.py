@@ -338,6 +338,11 @@ class QuestTracker:
                         f"{v['name']} ({v['location']}) - {v.get('note', 'Confirmed vendor')}"
                         for v in hints['vendors'][:3]  # Limit to 3 vendors
                     ]
+                    # Store raw vendor data for favor checking (using 'vendor' key for consistency)
+                    item['vendor_data'] = [
+                        {'vendor': v['name'], 'favor': v.get('favor', 'Neutral')}
+                        for v in hints['vendors'][:3]
+                    ]
                     # Use vendor price if available (might differ from item value)
                     if hints['vendors'] and 'vendor_price' in hints['vendors'][0]:
                         item['vendor_price'] = hints['vendors'][0]['vendor_price']

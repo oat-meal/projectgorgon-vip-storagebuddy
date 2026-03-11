@@ -24,6 +24,7 @@ AUTO_REFRESH_INTERVAL_SECONDS = 5
 OVERLAY_REFRESH_INTERVAL_SECONDS = 3
 
 # Favor levels in order (index = rank, higher = better)
+# These are display names with spaces
 FAVOR_LEVELS = [
     "Neutral",
     "Comfortable",
@@ -33,6 +34,27 @@ FAVOR_LEVELS = [
     "Like Family",
     "Soul Mates"
 ]
+
+# Mapping from game internal format (no spaces) to display format (with spaces)
+FAVOR_LEVEL_ALIASES = {
+    "CloseFriends": "Close Friends",
+    "BestFriends": "Best Friends",
+    "LikeFamily": "Like Family",
+    "SoulMates": "Soul Mates",
+}
+
+
+def normalize_favor_level(favor_level: str) -> str:
+    """
+    Normalize favor level from game format to display format.
+
+    Args:
+        favor_level: Favor level string (e.g., "BestFriends" or "Best Friends")
+
+    Returns:
+        Normalized favor level with spaces (e.g., "Best Friends")
+    """
+    return FAVOR_LEVEL_ALIASES.get(favor_level, favor_level)
 
 # Sensitive fields to redact from logs
 SENSITIVE_LOG_FIELDS = [

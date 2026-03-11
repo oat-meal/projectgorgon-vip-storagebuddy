@@ -14,6 +14,7 @@ from ..utils.security import safe_read_json
 from ..utils.constants import MAX_CRAFTING_DEPTH
 from ..services.character_service import CharacterService
 from ..services.cache_service import get_cache
+from ..services.vendor_service import get_vendor_service
 from .decorators import require_configured
 
 logger = logging.getLogger(__name__)
@@ -55,9 +56,10 @@ def _build_shopping_list():
     config = get_config()
     cache = get_cache()
 
-    # Get player skills
+    # Get player skills and favor
     char_service = CharacterService(config.get_reports_dir())
     player_skills = char_service.get_effective_skill_levels()
+    player_favor = char_service.get_favor()
 
     # Load recipes (cached)
     recipes_file = get_bundled_path('recipes.json')
@@ -124,7 +126,7 @@ def _build_shopping_list():
         recipe_result = _process_recipe(
             recipe, recipe_id, quantity,
             player_skills, player_inventory, inventory_details,
-            vendor_items, recipes_by_output
+            vendor_items, recipes_by_output, player_favor
         )
         result_recipes.append(recipe_result)
 
@@ -134,7 +136,7 @@ def _build_shopping_list():
 def _process_recipe(
     recipe, recipe_id, quantity,
     player_skills, player_inventory, inventory_details,
-    vendor_items, recipes_by_output
+    vendor_items, recipes_by_output, player_favor=None
 ):
     """Process a single recipe for the shopping list"""
     recipe_skill = recipe.get('skill', 'Unknown')
@@ -209,6 +211,16 @@ def _process_recipe(
         # Add vendor info even if craftable
         if mat_name in vendor_items and mat_have < mat_qty and source != 'buy':
             mat_result['vendors'] = vendor_items[mat_name]
+
+        # Check if material needs favor to buy
+        if mat_result.get('vendors') and player_favor and mat_have < mat_qty:
+            vendor_service = get_vendor_service()
+            _, needs_favor = vendor_service.check_vendor_favor_from_dicts(
+                mat_result['vendors'], player_favor
+            )
+            mat_result['needs_favor'] = needs_favor
+        else:
+            mat_result['needs_favor'] = False
 
         recipe_result['materials'].append(mat_result)
 
@@ -400,6 +412,28 @@ def get_player_favor():
         'favor': favor,
         'favor_levels': FAVOR_LEVELS,
         'character': char_service.get_character_name(),
+        'source_file': char_service.get_source_file_name(),
+        'timestamp': char_service.get_timestamp()
+    })
+
+
+@crafting_bp.route('/character_info')
+@require_configured
+def get_character_info():
+    """Get combined character info (skills + favor) for overlay display"""
+    from ..utils.constants import FAVOR_LEVELS
+
+    config = get_config()
+    char_service = CharacterService(config.get_reports_dir())
+
+    skills = char_service.get_skills()
+    favor = char_service.get_favor()
+
+    return api_response(data={
+        'character': char_service.get_character_name(),
+        'skills': skills,
+        'favor': favor,
+        'favor_levels': FAVOR_LEVELS,
         'source_file': char_service.get_source_file_name(),
         'timestamp': char_service.get_timestamp()
     })

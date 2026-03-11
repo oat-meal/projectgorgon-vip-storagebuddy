@@ -10,6 +10,8 @@ from ..utils.responses import api_response, api_error, not_found
 from ..utils.validation import validate_search_query, ValidationError
 from ..utils.constants import MAX_SEARCH_RESULTS
 from ..services.character_service import CharacterService
+from ..services.vendor_service import get_vendor_service
+from ..services.item_resolution_service import get_item_resolution_service
 from .decorators import require_configured
 
 logger = logging.getLogger(__name__)
@@ -155,6 +157,84 @@ def get_purchasable_quests():
     return api_response(data={'quests': purchasable_quests})
 
 
+@quests_bp.route('/needs_favor_quests')
+@require_configured
+def get_needs_favor_quests():
+    """Get list of quests where items are buyable but player lacks favor"""
+    config = get_config()
+    char_service = CharacterService(config.get_reports_dir())
+
+    active_quest_internals = char_service.get_active_quests()
+    if not active_quest_internals:
+        return api_response(data={'quests': []})
+
+    # Get player data for resolution
+    player_favor = char_service.get_favor()
+    player_skills = char_service.get_effective_skill_levels()
+
+    # Get inventory data
+    player_inventory = {}
+    inventory_details = {}
+    try:
+        from .decorators import get_tracker_components
+        _, _, inventory_parser, _ = get_tracker_components()
+        if inventory_parser:
+            items_file = inventory_parser.get_latest_items_file()
+            if items_file:
+                inventory_data = inventory_parser.parse_items(items_file)
+                for name, data in inventory_data.items():
+                    player_inventory[name] = data['total']
+                    inventory_details[name] = data
+    except Exception as e:
+        logger.warning(f"Could not load inventory for needs_favor check: {e}")
+
+    item_resolver = get_item_resolution_service()
+    log_file = g.chat_parser.get_latest_log_file()
+    needs_favor_quests = []
+
+    for quest_internal in active_quest_internals:
+        quest = g.quest_db.get_quest(quest_internal)
+        if not quest or quest.is_guild_quest() or not quest.has_collect_objectives():
+            continue
+
+        checklist = g.tracker.get_quest_checklist(quest_internal)
+        if log_file:
+            g.tracker.update_checklist_from_log(checklist, log_file)
+
+        # Skip if already completable or purchasable
+        if checklist.get('is_completable', False) or checklist.get('is_purchasable', False):
+            continue
+
+        # Check if any missing item needs favor
+        has_needs_favor = False
+        for item in checklist.get('items', []):
+            item_name = item['display_name']
+            required = item['required']
+
+            resolution = item_resolver.resolve_item(
+                item_name,
+                required,
+                player_inventory,
+                inventory_details,
+                player_skills,
+                player_favor
+            )
+
+            # Item needs favor if: missing, buyable, but favor not met
+            if resolution.quantity_missing > 0 and resolution.is_buyable and resolution.needs_favor:
+                has_needs_favor = True
+                break
+
+        if has_needs_favor:
+            needs_favor_quests.append({
+                'internal_name': quest.internal_name,
+                'name': quest.name,
+                'location': quest.displayed_location or 'Unknown'
+            })
+
+    return api_response(data={'quests': needs_favor_quests})
+
+
 @quests_bp.route('/overlay_data')
 @require_configured
 def overlay_data():
@@ -167,6 +247,29 @@ def overlay_data():
     active_quest_internals = char_service.get_active_quests()
     if not active_quest_internals:
         return api_response(data={'quests': []})
+
+    # Get player data for resolution
+    player_favor = char_service.get_favor()
+    player_skills = char_service.get_effective_skill_levels()
+
+    # Get inventory data
+    player_inventory = {}
+    inventory_details = {}
+    try:
+        from .decorators import get_tracker_components
+        _, _, inventory_parser, _ = get_tracker_components()
+        if inventory_parser:
+            items_file = inventory_parser.get_latest_items_file()
+            if items_file:
+                inventory_data = inventory_parser.parse_items(items_file)
+                for name, data in inventory_data.items():
+                    player_inventory[name] = data['total']
+                    inventory_details[name] = data
+    except Exception as e:
+        logger.warning(f"Could not load inventory for quest resolution: {e}")
+
+    # Get item resolution service
+    item_resolver = get_item_resolution_service()
 
     log_file = g.chat_parser.get_latest_log_file()
     simplified_quests = []
@@ -200,16 +303,58 @@ def overlay_data():
         }
 
         for item in checklist.get('items', []):
-            total_have = item.get('in_inventory', 0) + item.get('in_storage', 0)
-            simplified_quest['items'].append({
-                'name': item['display_name'],
-                'have': total_have,
-                'need': item['required'],
-                'in_inventory': item.get('in_inventory', 0),
-                'in_storage': item.get('in_storage', 0),
-                'storage_locations': item.get('storage_locations', {}),
-                'vendor_info': item.get('vendor_info')
-            })
+            item_name = item['display_name']
+            required = item['required']
+
+            # Use ItemResolutionService to get full resolution
+            resolution = item_resolver.resolve_item(
+                item_name,
+                required,
+                player_inventory,
+                inventory_details,
+                player_skills,
+                player_favor
+            )
+
+            # Build vendor_info from possible_vendors if available
+            vendor_info = item.get('vendor_info')
+            if not vendor_info and item.get('possible_vendors'):
+                vendor_info = item['possible_vendors'][0] if item['possible_vendors'] else None
+
+            # Build item data with crafting info
+            item_data = {
+                'name': item_name,
+                'have': resolution.quantity_have,
+                'need': required,
+                'missing': resolution.quantity_missing,
+                'in_inventory': resolution.in_inventory,
+                'in_storage': resolution.in_storage,
+                'storage_locations': resolution.storage_locations,
+                'source': resolution.source,
+                # Vendor info
+                'vendor_info': vendor_info,
+                'is_buyable': resolution.is_buyable,
+                'needs_favor': resolution.needs_favor,
+                'favor_met': resolution.favor_met,
+                # Crafting info
+                'is_craftable': resolution.is_craftable,
+                'recipe_id': resolution.recipe_id
+            }
+
+            # Add recipe details if craftable
+            if resolution.recipe_info:
+                item_data['recipe'] = {
+                    'id': resolution.recipe_info.recipe_id,
+                    'name': resolution.recipe_info.recipe_name,
+                    'skill': resolution.recipe_info.skill,
+                    'level': resolution.recipe_info.level,
+                    'has_skill': resolution.recipe_info.has_skill,
+                    'skill_gap': resolution.recipe_info.skill_gap,
+                    'crafts_needed': resolution.recipe_info.crafts_needed,
+                    'ingredients': resolution.recipe_info.ingredients
+                }
+
+            simplified_quest['items'].append(item_data)
 
         simplified_quests.append(simplified_quest)
 

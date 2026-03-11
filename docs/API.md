@@ -15,7 +15,7 @@ All API endpoints return a consistent, standardized response format.
   "message": "Optional message",
   "meta": {
     "timestamp": "2026-03-10T20:00:00Z",
-    "version": "0.6.2"
+    "version": "0.6.3"
   }
 }
 ```
@@ -45,7 +45,7 @@ The `data` wrapper provides:
   },
   "meta": {
     "timestamp": "2026-03-10T20:00:00Z",
-    "version": "0.6.2"
+    "version": "0.6.3"
   }
 }
 ```

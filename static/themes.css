@@ -1,0 +1,313 @@
+/* Shared Theme Definitions for StorageBuddy */
+
+/* Sepia (Default) - Warm parchment theme */
+:root, [data-theme="sepia"] {
+    --bg-gradient-1: #c4a574;
+    --bg-gradient-2: #8b6914;
+    --bg-page: #f5f0e6;
+    --bg-card: #faf6ee;
+    --bg-card-hover: #f0ebe0;
+    --bg-item: #f0ebe0;
+    --bg-item-hover: #e5dfd2;
+    --bg-item-complete: #e0edd6;
+    --bg-item-complete-hover: #d4e3c8;
+    --bg-item-purchasable: #fdf3e6;
+    --bg-item-purchasable-hover: #fae8d2;
+    --bg-item-favor: #f5eef8;
+    --bg-item-favor-hover: #ebe0f0;
+    --bg-item-disabled: #f0ebe0;
+    --bg-input: #faf6ee;
+    --bg-tab: #e8e0d0;
+    --bg-tab-active: #8b6914;
+    --border-color: #d4c4ae;
+    --border-active: #4a3728;
+    --border-pinned: #8b6914;
+    --text-primary: #4a3728;
+    --text-secondary: #5c4636;
+    --text-muted: #7a6450;
+    --text-on-accent: #ffffff;
+    --accent: #8b6914;
+    --accent-hover: #7a5c12;
+    --accent-light: rgba(139, 105, 20, 0.1);
+    --success: #4a7030;
+    --success-light: #e0edd6;
+    --warning: #c4712b;
+    --warning-light: #fdf3e6;
+    --danger: #a83e32;
+    --info: #4a6f8a;
+    --favor: #7b5090;
+    --favor-light: #f5eef8;
+    --disabled: #8a7a68;
+    --shadow: rgba(74, 55, 40, 0.1);
+    --pinned-glow: rgba(139, 105, 20, 0.3);
+    --focus-ring: rgba(139, 105, 20, 0.5);
+    /* Overlay-specific - increased contrast for compact view */
+    --overlay-controls-bg: #d4c4ae;
+    --overlay-content-bg: #e8e0d0;
+    --overlay-input-bg: #faf6ee;
+    --overlay-tab-text: #4a3728;
+    --overlay-tab-hover: #3a2818;
+    --overlay-item-bg: rgba(74, 55, 40, 0.12);
+    --overlay-item-text: #4a3728;
+    --is-light-theme: 1;
+}
+
+/* Catppuccin Latte - Soft pastel light theme */
+[data-theme="ctp-latte"] {
+    --bg-gradient-1: #7287fd;
+    --bg-gradient-2: #8839ef;
+    --bg-page: #eff1f5;
+    --bg-card: #ffffff;
+    --bg-card-hover: #e6e9ef;
+    --bg-item: #e6e9ef;
+    --bg-item-hover: #dce0e8;
+    --bg-item-complete: #d5f0d5;
+    --bg-item-complete-hover: #c5e6c5;
+    --bg-item-purchasable: #fef0e6;
+    --bg-item-purchasable-hover: #fde3d3;
+    --bg-item-favor: #f3e8f8;
+    --bg-item-favor-hover: #e8d8f0;
+    --bg-item-disabled: #e6e9ef;
+    --bg-input: #ffffff;
+    --bg-tab: #dce0e8;
+    --bg-tab-active: #1e66f5;
+    --border-color: #ccd0da;
+    --border-active: #4c4f69;
+    --border-pinned: #1e66f5;
+    --text-primary: #4c4f69;
+    --text-secondary: #5c5f77;
+    --text-muted: #6c6f85;
+    --text-on-accent: #ffffff;
+    --accent: #1e66f5;
+    --accent-hover: #1a5ae0;
+    --accent-light: rgba(30, 102, 245, 0.1);
+    --success: #40a02b;
+    --success-light: #d5f0d5;
+    --warning: #fe640b;
+    --warning-light: #fef0e6;
+    --danger: #d20f39;
+    --info: #7287fd;
+    --favor: #8839ef;
+    --favor-light: #f3e8f8;
+    --disabled: #9ca0b0;
+    --shadow: rgba(76, 79, 105, 0.1);
+    --pinned-glow: rgba(30, 102, 245, 0.3);
+    --focus-ring: rgba(30, 102, 245, 0.5);
+    /* Overlay-specific - increased contrast for compact view */
+    --overlay-controls-bg: #bcc0cc;
+    --overlay-content-bg: #ccd0da;
+    --overlay-input-bg: #e6e9ef;
+    --overlay-tab-text: #4c4f69;
+    --overlay-tab-hover: #3c3f59;
+    --overlay-item-bg: rgba(76, 79, 105, 0.15);
+    --overlay-item-text: #4c4f69;
+    --is-light-theme: 1;
+}
+
+/* Catppuccin Mocha - Rich dark theme */
+[data-theme="ctp-mocha"] {
+    --bg-gradient-1: #89b4fa;
+    --bg-gradient-2: #cba6f7;
+    --bg-page: #1e1e2e;
+    --bg-card: #313244;
+    --bg-card-hover: #45475a;
+    --bg-item: #45475a;
+    --bg-item-hover: #585b70;
+    --bg-item-complete: #2d4a2d;
+    --bg-item-complete-hover: #3a5c3a;
+    --bg-item-purchasable: #4a3d2d;
+    --bg-item-purchasable-hover: #5c4a38;
+    --bg-item-favor: #3d2d4a;
+    --bg-item-favor-hover: #4a385c;
+    --bg-item-disabled: #3b3d4f;
+    --bg-input: #313244;
+    --bg-tab: #45475a;
+    --bg-tab-active: #89b4fa;
+    --border-color: #585b70;
+    --border-active: #cdd6f4;
+    --border-pinned: #89b4fa;
+    --text-primary: #cdd6f4;
+    --text-secondary: #bac2de;
+    --text-muted: #9399b2;
+    --text-on-accent: #1e1e2e;
+    --accent: #89b4fa;
+    --accent-hover: #74a8f7;
+    --accent-light: rgba(137, 180, 250, 0.15);
+    --success: #a6e3a1;
+    --success-light: #2d4a2d;
+    --warning: #fab387;
+    --warning-light: #4a3d2d;
+    --danger: #f38ba8;
+    --info: #89b4fa;
+    --favor: #cba6f7;
+    --favor-light: #3d2d4a;
+    --disabled: #6c7086;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --pinned-glow: rgba(137, 180, 250, 0.4);
+    --focus-ring: rgba(137, 180, 250, 0.5);
+    /* Overlay-specific */
+    --overlay-controls-bg: #313244;
+    --overlay-content-bg: #1e1e2e;
+    --overlay-input-bg: #45475a;
+    --overlay-tab-text: #bac2de;
+    --overlay-tab-hover: #cdd6f4;
+    --overlay-item-bg: rgba(255, 255, 255, 0.05);
+    --overlay-item-text: #cdd6f4;
+    --is-light-theme: 0;
+}
+
+/* Solarized Light - Classic light theme with optimal contrast */
+[data-theme="solarized-light"] {
+    --bg-gradient-1: #268bd2;
+    --bg-gradient-2: #2aa198;
+    --bg-page: #fdf6e3;
+    --bg-card: #eee8d5;
+    --bg-card-hover: #e4ddc8;
+    --bg-item: #fdf6e3;
+    --bg-item-hover: #f5edd5;
+    --bg-item-complete: #e8f0d8;
+    --bg-item-complete-hover: #dce8ca;
+    --bg-item-purchasable: #fef3e6;
+    --bg-item-purchasable-hover: #fde8d5;
+    --bg-item-favor: #f5edf8;
+    --bg-item-favor-hover: #ebe0f0;
+    --bg-item-disabled: #f0e8d8;
+    --bg-input: #fdf6e3;
+    --bg-tab: #e4ddc8;
+    --bg-tab-active: #268bd2;
+    --border-color: #d3cbb7;
+    --border-active: #073642;
+    --border-pinned: #268bd2;
+    --text-primary: #073642;
+    --text-secondary: #586e75;
+    --text-muted: #657b83;
+    --text-on-accent: #ffffff;
+    --accent: #268bd2;
+    --accent-hover: #1a6fa8;
+    --accent-light: rgba(38, 139, 210, 0.1);
+    --success: #859900;
+    --success-light: #e8f0d8;
+    --warning: #cb4b16;
+    --warning-light: #fef3e6;
+    --danger: #dc322f;
+    --info: #2aa198;
+    --favor: #6c71c4;
+    --favor-light: #f5edf8;
+    --disabled: #93a1a1;
+    --shadow: rgba(7, 54, 66, 0.1);
+    --pinned-glow: rgba(38, 139, 210, 0.3);
+    --focus-ring: rgba(38, 139, 210, 0.5);
+    /* Overlay-specific - increased contrast for compact view */
+    --overlay-controls-bg: #d3cbb7;
+    --overlay-content-bg: #e4ddc8;
+    --overlay-input-bg: #eee8d5;
+    --overlay-tab-text: #073642;
+    --overlay-tab-hover: #002b36;
+    --overlay-item-bg: rgba(7, 54, 66, 0.12);
+    --overlay-item-text: #073642;
+    --is-light-theme: 1;
+}
+
+/* Nord - Arctic-inspired dark theme */
+[data-theme="nord"] {
+    --bg-gradient-1: #88c0d0;
+    --bg-gradient-2: #5e81ac;
+    --bg-page: #2e3440;
+    --bg-card: #3b4252;
+    --bg-card-hover: #434c5e;
+    --bg-item: #434c5e;
+    --bg-item-hover: #4c566a;
+    --bg-item-complete: #3d4a3d;
+    --bg-item-complete-hover: #4a5c4a;
+    --bg-item-purchasable: #4a4535;
+    --bg-item-purchasable-hover: #5c5542;
+    --bg-item-favor: #453a4a;
+    --bg-item-favor-hover: #56485c;
+    --bg-item-disabled: #3f4450;
+    --bg-input: #3b4252;
+    --bg-tab: #434c5e;
+    --bg-tab-active: #88c0d0;
+    --border-color: #4c566a;
+    --border-active: #eceff4;
+    --border-pinned: #88c0d0;
+    --text-primary: #eceff4;
+    --text-secondary: #d8dee9;
+    --text-muted: #9aa5b5;
+    --text-on-accent: #2e3440;
+    --accent: #88c0d0;
+    --accent-hover: #8fbcbb;
+    --accent-light: rgba(136, 192, 208, 0.15);
+    --success: #a3be8c;
+    --success-light: #3d4a3d;
+    --warning: #ebcb8b;
+    --warning-light: #4a4535;
+    --danger: #bf616a;
+    --info: #81a1c1;
+    --favor: #b48ead;
+    --favor-light: #453a4a;
+    --disabled: #616e88;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --pinned-glow: rgba(136, 192, 208, 0.4);
+    --focus-ring: rgba(136, 192, 208, 0.5);
+    /* Overlay-specific */
+    --overlay-controls-bg: #3b4252;
+    --overlay-content-bg: #2e3440;
+    --overlay-input-bg: #434c5e;
+    --overlay-tab-text: #d8dee9;
+    --overlay-tab-hover: #eceff4;
+    --overlay-item-bg: rgba(255, 255, 255, 0.05);
+    --overlay-item-text: #eceff4;
+    --is-light-theme: 0;
+}
+
+/* Gruvbox - Retro earth-toned theme */
+[data-theme="gruvbox"] {
+    --bg-gradient-1: #d79921;
+    --bg-gradient-2: #98971a;
+    --bg-page: #282828;
+    --bg-card: #3c3836;
+    --bg-card-hover: #504945;
+    --bg-item: #504945;
+    --bg-item-hover: #5c524a;
+    --bg-item-complete: #3d4220;
+    --bg-item-complete-hover: #4a5028;
+    --bg-item-purchasable: #4a3820;
+    --bg-item-purchasable-hover: #5c4528;
+    --bg-item-favor: #453545;
+    --bg-item-favor-hover: #564055;
+    --bg-item-disabled: #45403a;
+    --bg-input: #3c3836;
+    --bg-tab: #504945;
+    --bg-tab-active: #d79921;
+    --border-color: #665c54;
+    --border-active: #ebdbb2;
+    --border-pinned: #d79921;
+    --text-primary: #ebdbb2;
+    --text-secondary: #d5c4a1;
+    --text-muted: #a89984;
+    --text-on-accent: #282828;
+    --accent: #d79921;
+    --accent-hover: #fabd2f;
+    --accent-light: rgba(215, 153, 33, 0.15);
+    --success: #b8bb26;
+    --success-light: #3d4220;
+    --warning: #fe8019;
+    --warning-light: #4a3820;
+    --danger: #fb4934;
+    --info: #83a598;
+    --favor: #d3869b;
+    --favor-light: #453545;
+    --disabled: #7c6f64;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --pinned-glow: rgba(215, 153, 33, 0.4);
+    --focus-ring: rgba(215, 153, 33, 0.5);
+    /* Overlay-specific */
+    --overlay-controls-bg: #3c3836;
+    --overlay-content-bg: #282828;
+    --overlay-input-bg: #504945;
+    --overlay-tab-text: #d5c4a1;
+    --overlay-tab-hover: #ebdbb2;
+    --overlay-item-bg: rgba(255, 255, 255, 0.05);
+    --overlay-item-text: #ebdbb2;
+    --is-light-theme: 0;
+}

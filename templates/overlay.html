@@ -4,125 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StorageBuddy Overlay</title>
+    <link rel="stylesheet" href="/static/themes.css">
     <style>
-        /* Theme Definitions - synced with main page */
-        :root, [data-theme="sepia"] {
-            --bg-gradient-1: #c4a574;
-            --bg-gradient-2: #8b6914;
-            --bg-page: #3d3528;
-            --bg-card: #4a4035;
-            --bg-card-hover: #5a5045;
-            --bg-item: #5a5045;
-            --bg-item-complete: #3d4a35;
-            --border-color: #6b5d4a;
-            --text-primary: #f5f0e6;
-            --text-secondary: #d4c4ae;
-            --text-muted: #a89878;
-            --accent: #d4a84a;
-            --success: #8daa6d;
-            --warning: #d4924a;
-            --danger: #c86a5a;
-            --info: #7a9aaa;
-        }
-
-        [data-theme="ctp-latte"] {
-            --bg-gradient-1: #7287fd;
-            --bg-gradient-2: #8839ef;
-            --bg-page: #dce0e8;
-            --bg-card: #e6e9ef;
-            --bg-card-hover: #ccd0da;
-            --bg-item: #ccd0da;
-            --bg-item-complete: #c5e0c5;
-            --border-color: #bcc0cc;
-            --text-primary: #4c4f69;
-            --text-secondary: #5c5f77;
-            --text-muted: #7c7f93;
-            --accent: #1e66f5;
-            --success: #40a02b;
-            --warning: #fe640b;
-            --danger: #d20f39;
-            --info: #7287fd;
-        }
-
-        [data-theme="ctp-mocha"] {
-            --bg-gradient-1: #89b4fa;
-            --bg-gradient-2: #cba6f7;
-            --bg-page: #1e1e2e;
-            --bg-card: #313244;
-            --bg-card-hover: #45475a;
-            --bg-item: #45475a;
-            --bg-item-complete: #2d4a2d;
-            --border-color: #45475a;
-            --text-primary: #cdd6f4;
-            --text-secondary: #bac2de;
-            --text-muted: #a6adc8;
-            --accent: #89b4fa;
-            --success: #a6e3a1;
-            --warning: #fab387;
-            --danger: #f38ba8;
-            --info: #89b4fa;
-        }
-
-        /* Solarized Light - Classic light theme with optimal contrast */
-        [data-theme="solarized-light"] {
-            --bg-gradient-1: #268bd2;
-            --bg-gradient-2: #2aa198;
-            --bg-page: #eee8d5;
-            --bg-card: #fdf6e3;
-            --bg-card-hover: #e4ddc8;
-            --bg-item: #eee8d5;
-            --bg-item-complete: #d5e8d4;
-            --border-color: #d3cbb7;
-            --text-primary: #073642;
-            --text-secondary: #586e75;
-            --text-muted: #93a1a1;
-            --accent: #268bd2;
-            --success: #859900;
-            --warning: #cb4b16;
-            --danger: #dc322f;
-            --info: #2aa198;
-        }
-
-        /* Nord - Arctic-inspired dark theme */
-        [data-theme="nord"] {
-            --bg-gradient-1: #88c0d0;
-            --bg-gradient-2: #5e81ac;
-            --bg-page: #2e3440;
-            --bg-card: #3b4252;
-            --bg-card-hover: #434c5e;
-            --bg-item: #434c5e;
-            --bg-item-complete: #3d4a3d;
-            --border-color: #4c566a;
-            --text-primary: #eceff4;
-            --text-secondary: #d8dee9;
-            --text-muted: #a3be8c;
-            --accent: #88c0d0;
-            --success: #a3be8c;
-            --warning: #ebcb8b;
-            --danger: #bf616a;
-            --info: #81a1c1;
-        }
-
-        /* Gruvbox - Retro earth-toned theme */
-        [data-theme="gruvbox"] {
-            --bg-gradient-1: #d79921;
-            --bg-gradient-2: #98971a;
-            --bg-page: #282828;
-            --bg-card: #3c3836;
-            --bg-card-hover: #504945;
-            --bg-item: #504945;
-            --bg-item-complete: #3d4220;
-            --border-color: #665c54;
-            --text-primary: #ebdbb2;
-            --text-secondary: #d5c4a1;
-            --text-muted: #a89984;
-            --accent: #d79921;
-            --success: #b8bb26;
-            --warning: #fe8019;
-            --danger: #fb4934;
-            --info: #83a598;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -189,17 +72,17 @@
         }
 
         .connection-status.connected {
-            color: #76ff76;
+            color: var(--success);
         }
 
         .connection-status.disconnected {
-            color: #ff6b6b;
+            color: var(--danger);
         }
 
         .tabs {
             display: flex;
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--overlay-controls-bg);
+            border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
         }
 
@@ -208,7 +91,7 @@
             padding: 10px;
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--overlay-tab-text);
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
@@ -216,19 +99,19 @@
         }
 
         .tab-btn:hover {
-            color: rgba(255, 255, 255, 0.9);
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--overlay-tab-hover);
+            background: var(--overlay-item-bg);
         }
 
         .tab-btn.active {
-            color: #a8b2ff;
+            color: var(--accent);
             border-bottom-color: var(--accent);
         }
 
         .controls {
             padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--overlay-controls-bg);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             gap: 8px;
             align-items: center;
@@ -237,10 +120,10 @@
 
         .view-selector {
             flex: 1;
-            background: rgb(45, 45, 55);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--overlay-input-bg);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            color: rgb(255, 255, 255);
+            color: var(--text-primary);
             padding: 6px 10px;
             font-size: 12px;
             cursor: pointer;
@@ -248,15 +131,15 @@
         }
 
         .view-selector option {
-            background: #2a2a3a;
-            color: white;
+            background: var(--overlay-input-bg);
+            color: var(--text-primary);
         }
 
         .region-selector {
-            background: rgb(45, 45, 55);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--overlay-input-bg);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            color: rgb(255, 255, 255);
+            color: var(--text-primary);
             padding: 6px 10px;
             font-size: 12px;
             cursor: pointer;
@@ -265,15 +148,15 @@
         }
 
         .region-selector option {
-            background: #2a2a3a;
-            color: white;
+            background: var(--overlay-input-bg);
+            color: var(--text-primary);
         }
 
         .content {
             padding: 10px;
             flex: 1;
             overflow-y: auto;
-            background: rgb(20, 20, 30);
+            background: var(--overlay-content-bg);
             min-height: 0;
         }
 
@@ -282,19 +165,20 @@
         }
 
         .content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--overlay-item-bg);
             border-radius: 3px;
         }
 
         .content::-webkit-scrollbar-thumb {
-            background: rgba(102, 126, 234, 0.5);
+            background: var(--accent);
+            opacity: 0.5;
             border-radius: 3px;
         }
 
         /* Quest styles */
         .quest-group {
             margin-bottom: 12px;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--overlay-item-bg);
             border-radius: 6px;
             padding: 10px;
             border-left: 3px solid var(--accent);
@@ -302,12 +186,22 @@
 
         .quest-group.ready {
             border-left-color: var(--success);
-            background: rgba(76, 175, 80, 0.1);
+            background: var(--success-light);
         }
 
         .quest-group.buyable {
             border-left-color: var(--warning);
-            background: rgba(255, 152, 0, 0.1);
+            background: var(--warning-light);
+        }
+
+        .quest-group.needs-favor {
+            border-left-color: var(--favor);
+            background: var(--favor-light);
+        }
+
+        .quest-group.craftable {
+            border-left-color: #17a2b8;
+            background: rgba(23, 162, 184, 0.1);
         }
 
         .quest-name {
@@ -329,33 +223,33 @@
             justify-content: space-between;
             align-items: center;
             padding: 6px 8px;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--overlay-item-bg);
             border-radius: 4px;
             font-size: 12px;
         }
 
         .item.completed {
-            background: rgba(76, 175, 80, 0.15);
+            background: var(--success-light);
         }
 
         .item-name {
             flex: 1;
-            color: #b0b0b0;
+            color: var(--overlay-item-text);
             min-width: 120px;
         }
 
         .item.completed .item-name {
-            color: #70d070;
+            color: var(--success);
         }
 
         .item-progress {
             font-weight: 600;
-            color: #ffaa66;
+            color: var(--warning);
             font-size: 11px;
         }
 
         .item.completed .item-progress {
-            color: #70d070;
+            color: var(--success);
         }
 
         .item-details {
@@ -364,7 +258,7 @@
             color: var(--accent);
             margin-top: 4px;
             padding-top: 4px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid var(--border-color);
         }
 
         .vendor-info {
@@ -372,10 +266,24 @@
             font-size: 10px;
         }
 
+        .vendor-info.needs-favor {
+            color: var(--favor);
+        }
+
+        .craft-info {
+            color: #17a2b8;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .craft-info.no-skill {
+            color: #6c757d;
+        }
+
         /* Recipe/Crafting styles */
         .recipe-group {
             margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--overlay-item-bg);
             border-radius: 6px;
             padding: 10px;
             border-left: 3px solid var(--accent);
@@ -383,12 +291,17 @@
 
         .recipe-group.ready {
             border-left-color: var(--success);
-            background: rgba(76, 175, 80, 0.1);
+            background: var(--success-light);
         }
 
         .recipe-group.buyable {
             border-left-color: var(--warning);
-            background: rgba(255, 152, 0, 0.1);
+            background: var(--warning-light);
+        }
+
+        .recipe-group.needs-favor {
+            border-left-color: var(--favor);
+            background: var(--favor-light);
         }
 
         .recipe-header {
@@ -407,20 +320,20 @@
         .recipe-qty {
             font-size: 11px;
             color: var(--accent);
-            background: rgba(102, 126, 234, 0.2);
+            background: var(--accent-light);
             padding: 2px 8px;
             border-radius: 10px;
         }
 
         .recipe-skill {
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
         }
 
         /* Shopping cart styles */
         .shopping-item {
             margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--overlay-item-bg);
             border-radius: 6px;
             padding: 10px;
             border-left: 3px solid var(--accent);
@@ -428,7 +341,7 @@
 
         .shopping-item.buyable {
             border-left-color: var(--warning);
-            background: rgba(255, 152, 0, 0.1);
+            background: var(--warning-light);
         }
 
         .shopping-header {
@@ -446,13 +359,13 @@
 
         .shopping-header .item-progress {
             font-size: 11px;
-            color: #ff6b6b;
+            color: var(--danger);
             font-weight: 600;
         }
 
         .item-recipes {
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--text-muted);
             margin-top: 4px;
             font-style: italic;
         }
@@ -463,7 +376,7 @@
             align-items: center;
             padding: 8px 12px;
             margin-bottom: 10px;
-            background: rgba(255, 152, 0, 0.2);
+            background: var(--warning-light);
             border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
@@ -471,14 +384,14 @@
         }
 
         .shopping-total {
-            color: #ffcc00;
+            color: var(--warning);
         }
 
         /* Empty/Error states */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
             font-size: 13px;
         }
 
@@ -487,20 +400,140 @@
             margin-bottom: 10px;
         }
 
+        .empty-state-hint {
+            font-size: 11px;
+            margin-top: 8px;
+            color: var(--text-muted);
+        }
+
         .error-state {
             text-align: center;
             padding: 30px 20px;
-            color: #ff6b6b;
+            color: var(--danger);
             font-size: 12px;
             line-height: 1.5;
         }
 
+        /* Character panel styles */
+        .character-header {
+            padding: 10px;
+            background: var(--overlay-item-bg);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .character-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .section-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 8px 10px;
+            background: var(--overlay-item-bg);
+            border-radius: 6px 6px 0 0;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header:first-child {
+            margin-top: 0;
+        }
+
+        .section-count {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .skill-list, .favor-list {
+            background: var(--overlay-item-bg);
+            border-radius: 0 0 6px 6px;
+            padding: 6px;
+        }
+
+        .skill-item, .favor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .skill-item:hover, .favor-item:hover {
+            background: var(--overlay-content-bg);
+        }
+
+        .skill-name, .favor-npc {
+            color: var(--overlay-item-text);
+            flex: 1;
+        }
+
+        .skill-level {
+            font-weight: 600;
+            color: var(--accent);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .skill-level .bonus {
+            color: var(--success);
+            font-size: 10px;
+        }
+
+        .favor-level {
+            font-weight: 600;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .favor-level.neutral { background: var(--overlay-content-bg); color: var(--text-muted); }
+        .favor-level.comfortable { background: #e8f5e9; color: #2e7d32; }
+        .favor-level.friends { background: #e3f2fd; color: #1565c0; }
+        .favor-level.close-friends { background: #e1f5fe; color: #0277bd; }
+        .favor-level.best-friends { background: #f3e5f5; color: #7b1fa2; }
+        .favor-level.like-family { background: #fce4ec; color: #c2185b; }
+        .favor-level.soul-mates { background: #fff3e0; color: #e65100; }
+
+        /* Dark theme favor colors */
+        [data-theme="dark"] .favor-level.comfortable { background: rgba(76, 175, 80, 0.2); color: #81c784; }
+        [data-theme="dark"] .favor-level.friends { background: rgba(33, 150, 243, 0.2); color: #64b5f6; }
+        [data-theme="dark"] .favor-level.close-friends { background: rgba(3, 169, 244, 0.2); color: #4fc3f7; }
+        [data-theme="dark"] .favor-level.best-friends { background: rgba(156, 39, 176, 0.2); color: #ba68c8; }
+        [data-theme="dark"] .favor-level.like-family { background: rgba(233, 30, 99, 0.2); color: #f06292; }
+        [data-theme="dark"] .favor-level.soul-mates { background: rgba(255, 152, 0, 0.2); color: #ffb74d; }
+
+        .search-box {
+            width: 100%;
+            background: var(--overlay-input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-primary);
+            padding: 6px 10px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .search-box::placeholder {
+            color: var(--text-muted);
+        }
+
         .status-bar {
             padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--overlay-controls-bg);
+            border-top: 1px solid var(--border-color);
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
             display: flex;
             justify-content: space-between;
             flex-shrink: 0;
@@ -529,6 +562,7 @@
         <div class="tabs">
             <button class="tab-btn active" id="questsTab" data-tab="quests">Quests</button>
             <button class="tab-btn" id="craftingTab" data-tab="crafting">Crafting</button>
+            <button class="tab-btn" id="characterTab" data-tab="character">Character</button>
         </div>
 
         <div class="controls" id="questControls">
@@ -547,6 +581,15 @@
                 <option value="pinned">Pinned</option>
                 <option value="ready">Ready</option>
             </select>
+        </div>
+
+        <div class="controls" id="characterControls" style="display: none;">
+            <select class="view-selector" id="characterViewSelector">
+                <option value="skills">Skills</option>
+                <option value="favor">NPC Favor</option>
+                <option value="both">Both</option>
+            </select>
+            <input type="text" class="search-box" id="characterSearch" placeholder="Search...">
         </div>
 
         <div class="content" id="content">
@@ -602,10 +645,13 @@
         let currentView = 'all';
         let currentRegion = '';
         let craftingView = 'all';
+        let characterView = 'skills';
+        let characterSearch = '';
         let lastUpdateTime = Date.now();
         let isConnected = true;
         let allQuests = [];
         let allRecipes = [];
+        let characterData = null;
         // Pinned quests - synced from main window
         let pinnedQuests = new Set(JSON.parse(localStorage.getItem('pinnedQuests') || '[]'));
 
@@ -615,13 +661,15 @@
         if (savedPrefs.view) currentView = savedPrefs.view;
         if (savedPrefs.region) currentRegion = savedPrefs.region;
         if (savedPrefs.craftingView) craftingView = savedPrefs.craftingView;
+        if (savedPrefs.characterView) characterView = savedPrefs.characterView;
 
         function savePrefs() {
             localStorage.setItem('overlayPrefs', JSON.stringify({
                 tab: currentTab,
                 view: currentView,
                 region: currentRegion,
-                craftingView: craftingView
+                craftingView: craftingView,
+                characterView: characterView
             }));
         }
 
@@ -643,6 +691,7 @@
 
             document.getElementById('questControls').style.display = tab === 'quests' ? 'flex' : 'none';
             document.getElementById('craftingControls').style.display = tab === 'crafting' ? 'flex' : 'none';
+            document.getElementById('characterControls').style.display = tab === 'character' ? 'flex' : 'none';
 
             loadData();
         }
@@ -666,6 +715,19 @@
             craftingView = e.target.value;
             savePrefs();
             renderCraftingView();
+        });
+
+        // Character view selector change
+        document.getElementById('characterViewSelector').addEventListener('change', (e) => {
+            characterView = e.target.value;
+            savePrefs();
+            renderCharacterView();
+        });
+
+        // Character search input
+        document.getElementById('characterSearch').addEventListener('input', (e) => {
+            characterSearch = e.target.value.toLowerCase();
+            renderCharacterView();
         });
 
         function escapeHtml(text) {
@@ -702,8 +764,10 @@
             try {
                 if (currentTab === 'quests') {
                     await loadQuestData();
-                } else {
+                } else if (currentTab === 'crafting') {
                     await loadCraftingData();
+                } else if (currentTab === 'character') {
+                    await loadCharacterData();
                 }
 
                 isConnected = true;
@@ -747,13 +811,22 @@
             if (currentView === 'pinned') {
                 quests = quests.filter(q => pinnedQuests.has(q.internal_name));
             } else if (currentView === 'ready') {
-                // Ready = completable (have all items) OR purchasable (can buy missing items)
+                // Ready = completable (have all items) OR can obtain missing items
+                // Items can be obtained via: purchase (with favor), crafting (with skill)
                 quests = quests.filter(q => {
                     const isCompletable = q.items.every(item => item.have >= item.need);
-                    const isPurchasable = !isCompletable && q.items.every(item =>
-                        item.have >= item.need || item.vendor_info
-                    );
-                    return isCompletable || isPurchasable;
+                    if (isCompletable) return true;
+
+                    // Check if all missing items can be obtained
+                    const canObtainAll = q.items.every(item => {
+                        if (item.have >= item.need) return true;
+                        // Can buy with favor
+                        if (item.is_buyable && item.favor_met) return true;
+                        // Can craft with skill
+                        if (item.is_craftable && item.recipe?.has_skill) return true;
+                        return false;
+                    });
+                    return canObtainAll;
                 });
             }
 
@@ -785,8 +858,19 @@
 
             const questsHtml = quests.map(quest => {
                 const isReady = quest.items.every(item => item.have >= item.need);
-                const isBuyable = !isReady && quest.items.some(item => item.vendor_info);
-                const questClass = isReady ? 'quest-group ready' : (isBuyable ? 'quest-group buyable' : 'quest-group');
+                // Buyable = has vendor AND player has favor
+                const isBuyable = !isReady && quest.items.some(item => item.is_buyable && item.favor_met);
+                // Craftable = can craft missing items with current skills
+                const isCraftable = !isReady && !isBuyable && quest.items.some(item =>
+                    item.have < item.need && item.is_craftable && item.recipe?.has_skill
+                );
+                // Needs favor = has vendor but player lacks favor for all vendors
+                const needsFavor = !isReady && !isBuyable && !isCraftable && quest.items.some(item => item.needs_favor);
+                let questClass = 'quest-group';
+                if (isReady) questClass = 'quest-group ready';
+                else if (isBuyable) questClass = 'quest-group buyable';
+                else if (isCraftable) questClass = 'quest-group craftable';
+                else if (needsFavor) questClass = 'quest-group needs-favor';
 
                 const itemsHtml = quest.items.map(item => {
                     const isCompleted = item.have >= item.need;
@@ -812,8 +896,19 @@
                             detailsHtml += `<div class="item-details">${locationParts.join(' • ')}</div>`;
                         }
                     }
+                    // Show craftable info if item is craftable and not completed
+                    if (item.is_craftable && !isCompleted && item.recipe) {
+                        const recipe = item.recipe;
+                        const skillClass = recipe.has_skill ? 'craft-info' : 'craft-info no-skill';
+                        const skillInfo = recipe.has_skill
+                            ? `${recipe.skill} ${recipe.level}`
+                            : `${recipe.skill} ${recipe.level} (need +${recipe.skill_gap})`;
+                        detailsHtml += `<div class="${skillClass}">🔨 ${escapeHtml(recipe.name)} - ${skillInfo}</div>`;
+                    }
+                    // Show vendor info if buyable and not completed
                     if (item.vendor_info && !isCompleted) {
-                        detailsHtml += `<div class="vendor-info">🛒 ${escapeHtml(item.vendor_info)}</div>`;
+                        const vendorClass = item.needs_favor ? 'vendor-info needs-favor' : 'vendor-info';
+                        detailsHtml += `<div class="${vendorClass}">🛒 ${escapeHtml(item.vendor_info)}</div>`;
                     }
 
                     return `
@@ -855,7 +950,7 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">🔨</div>
                         <p>No recipes pinned</p>
-                        <p style="font-size: 11px; margin-top: 8px; color: rgba(255,255,255,0.4);">
+                        <p class="empty-state-hint">
                             Pin recipes in the main app to see them here
                         </p>
                     </div>
@@ -904,7 +999,8 @@
                         }
                     }
                     if (mat.vendor_info && !isCompleted) {
-                        detailsHtml += `<div class="vendor-info">🛒 ${escapeHtml(mat.vendor_info)}</div>`;
+                        const vendorClass = mat.needs_favor ? 'vendor-info needs-favor' : 'vendor-info';
+                        detailsHtml += `<div class="${vendorClass}">🛒 ${escapeHtml(mat.vendor_info)}</div>`;
                     }
 
                     return `
@@ -917,8 +1013,14 @@
                 }).join('');
 
                 const isReady = recipe.materials.every(mat => mat.have >= mat.need);
-                const isBuyable = !isReady && recipe.materials.some(mat => mat.vendor_info);
-                const recipeClass = isReady ? 'recipe-group ready' : (isBuyable ? 'recipe-group buyable' : 'recipe-group');
+                // Buyable = has vendor AND player has favor
+                const isBuyable = !isReady && recipe.materials.some(mat => mat.vendor_info && !mat.needs_favor);
+                // Needs favor = has vendor but player lacks favor
+                const needsFavor = !isReady && !isBuyable && recipe.materials.some(mat => mat.needs_favor);
+                let recipeClass = 'recipe-group';
+                if (isReady) recipeClass = 'recipe-group ready';
+                else if (isBuyable) recipeClass = 'recipe-group buyable';
+                else if (needsFavor) recipeClass = 'recipe-group needs-favor';
 
                 return `
                     <div class="${recipeClass}">
@@ -946,7 +1048,7 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">📦</div>
                         <p>No recipes ready to craft</p>
-                        <p style="font-size: 11px; margin-top: 8px; color: rgba(255,255,255,0.4);">
+                        <p class="empty-state-hint">
                             Gather more materials to craft these recipes
                         </p>
                     </div>
@@ -1012,7 +1114,7 @@
                     <div class="empty-state">
                         <div class="empty-state-icon">🛒</div>
                         <p>Shopping cart is empty</p>
-                        <p style="font-size: 11px; margin-top: 8px; color: rgba(255,255,255,0.4);">
+                        <p class="empty-state-hint">
                             No vendor-purchasable materials needed
                         </p>
                     </div>
@@ -1066,6 +1168,128 @@
             document.getElementById('itemCount').textContent = `${items.length} item${items.length !== 1 ? 's' : ''} to buy`;
         }
 
+        async function loadCharacterData() {
+            const response = await fetch('/api/character_info');
+
+            if (!response.ok) throw new Error('Server not responding');
+
+            const data = await response.json();
+            characterData = data.data || {};
+            renderCharacterView();
+        }
+
+        function renderCharacterView() {
+            const content = document.getElementById('content');
+
+            if (!characterData || (!characterData.skills && !characterData.favor)) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>No character data available</p>
+                        <p class="empty-state-hint">Export your character from the game</p>
+                    </div>
+                `;
+                document.getElementById('itemCount').textContent = 'No data';
+                return;
+            }
+
+            let html = '';
+
+            // Character header
+            html += `
+                <div class="character-header">
+                    <div class="character-name">${escapeHtml(characterData.character || 'Unknown')}</div>
+                </div>
+            `;
+
+            const showSkills = characterView === 'skills' || characterView === 'both';
+            const showFavor = characterView === 'favor' || characterView === 'both';
+
+            // Skills section
+            if (showSkills && characterData.skills) {
+                const skills = Object.entries(characterData.skills)
+                    .filter(([name, data]) => {
+                        if (!characterSearch) return true;
+                        return name.toLowerCase().includes(characterSearch);
+                    })
+                    .sort((a, b) => b[1].effectiveLevel - a[1].effectiveLevel);
+
+                html += `
+                    <div class="section-header">
+                        Skills
+                        <span class="section-count">${skills.length} skills</span>
+                    </div>
+                    <div class="skill-list">
+                `;
+
+                if (skills.length === 0) {
+                    html += `<div class="empty-state" style="padding: 20px;">No matching skills</div>`;
+                } else {
+                    for (const [name, data] of skills) {
+                        const bonusText = data.bonusLevels > 0 ? `<span class="bonus">+${data.bonusLevels}</span>` : '';
+                        html += `
+                            <div class="skill-item">
+                                <span class="skill-name">${escapeHtml(name)}</span>
+                                <span class="skill-level">${data.level}${bonusText}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                html += `</div>`;
+            }
+
+            // Favor section
+            if (showFavor && characterData.favor) {
+                const favorLevels = characterData.favor_levels || [];
+                const favor = Object.entries(characterData.favor)
+                    .filter(([npc, data]) => {
+                        if (!characterSearch) return true;
+                        return npc.toLowerCase().includes(characterSearch) ||
+                               data.level.toLowerCase().includes(characterSearch);
+                    })
+                    .sort((a, b) => b[1].rank - a[1].rank);
+
+                html += `
+                    <div class="section-header">
+                        NPC Favor
+                        <span class="section-count">${favor.length} NPCs</span>
+                    </div>
+                    <div class="favor-list">
+                `;
+
+                if (favor.length === 0) {
+                    html += `<div class="empty-state" style="padding: 20px;">No matching NPCs</div>`;
+                } else {
+                    for (const [npc, data] of favor) {
+                        const levelClass = data.level.toLowerCase().replace(/\s+/g, '-');
+                        html += `
+                            <div class="favor-item">
+                                <span class="favor-npc">${escapeHtml(npc)}</span>
+                                <span class="favor-level ${levelClass}">${escapeHtml(data.level)}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                html += `</div>`;
+            }
+
+            content.innerHTML = html;
+
+            // Update item count
+            const skillCount = showSkills && characterData.skills ? Object.keys(characterData.skills).length : 0;
+            const favorCount = showFavor && characterData.favor ? Object.keys(characterData.favor).length : 0;
+
+            if (showSkills && showFavor) {
+                document.getElementById('itemCount').textContent = `${skillCount} skills, ${favorCount} NPCs`;
+            } else if (showSkills) {
+                document.getElementById('itemCount').textContent = `${skillCount} skills`;
+            } else {
+                document.getElementById('itemCount').textContent = `${favorCount} NPCs`;
+            }
+        }
+
         function updateTimestamp() {
             const secondsAgo = Math.floor((Date.now() - lastUpdateTime) / 1000);
             let text;
@@ -1082,6 +1306,7 @@
         // Initialize
         document.getElementById('viewSelector').value = currentView;
         document.getElementById('craftingViewSelector').value = craftingView;
+        document.getElementById('characterViewSelector').value = characterView;
         switchTab(currentTab);
 
         // Auto-refresh every 3 seconds
