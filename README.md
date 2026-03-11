@@ -9,7 +9,7 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 - **Quest Pinning** - Pin up to 20 quests for quick access
 - **Inventory Detection** - Reads exported Storage/Character JSON to track collected items
 - **Color-Coded Progress** - Green (ready), orange (buyable from vendor), purple (needs favor), gray (gather)
-- **Storage Location Tracking** - Shows where items are stored (Inventory, Bank, Saddlebag, Dream World Chest)
+- **Storage Location Tracking** - Shows where items are stored (Inventory, Bank, Saddlebag, Dream World Chest, Community Chest)
 - **Vendor Information** - Displays vendors, prices, and favor requirements for purchasable items
 - **Favor Tracking** - Reads NPC favor levels from Character JSON to show which vendor items you can access
 - **Wiki Links** - Quick links to Project Gorgon Wiki for items that need to be farmed/gathered
