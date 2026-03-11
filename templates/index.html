@@ -199,6 +199,11 @@
             background: linear-gradient(135deg, #d79921 0%, #98971a 100%);
         }
 
+        .theme-btn[data-theme="high-contrast"] {
+            background: linear-gradient(135deg, #ffffff 0%, #000000 50%, #ffff00 100%);
+            border: 2px solid #ffff00;
+        }
+
         .sidebar {
             background: var(--bg-card);
             padding: 20px;
@@ -495,6 +500,7 @@
                         <button class="theme-btn" data-theme="solarized-light" onclick="setTheme('solarized-light')" title="Solarized Light"></button>
                         <button class="theme-btn" data-theme="nord" onclick="setTheme('nord')" title="Nord"></button>
                         <button class="theme-btn" data-theme="gruvbox" onclick="setTheme('gruvbox')" title="Gruvbox"></button>
+                        <button class="theme-btn" data-theme="high-contrast" onclick="setTheme('high-contrast')" title="High Contrast (Accessibility)"></button>
                     </div>
                     <button class="overlay-btn" onclick="openOverlay()" title="Open compact overlay window">
                         Pop Out Overlay
@@ -1099,7 +1105,24 @@
                 return;
             }
 
-            // Group ready quests by location
+            // Count completable vs purchasable
+            const completableCount = readyQuests.filter(q => completableQuestSet.has(q.internal_name)).length;
+            const purchasableOnlyCount = readyQuests.filter(q =>
+                !completableQuestSet.has(q.internal_name) && purchasableQuestSet.has(q.internal_name)
+            ).length;
+
+            // Build summary header for left panel
+            let listHtml = `
+                <div style="background: var(--bg-item-complete); border: 2px solid #4caf50; padding: 14px; margin-bottom: 16px; border-radius: 6px;">
+                    <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">✨ ${readyQuests.length} Ready Quest${readyQuests.length !== 1 ? 's' : ''}</div>
+                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                        ${completableCount > 0 ? `${completableCount} completable` : ''}${completableCount > 0 && purchasableOnlyCount > 0 ? ' · ' : ''}${purchasableOnlyCount > 0 ? `${purchasableOnlyCount} purchasable` : ''}
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Click to pin/unpin for Pinned tab</div>
+            `;
+
+            // Group ready quests by location for left panel summary
             const questsByLocation = {};
             for (const quest of readyQuests) {
                 const loc = quest.location || 'Unknown';
@@ -1109,22 +1132,6 @@
                 questsByLocation[loc].push(quest);
             }
 
-            // Count completable vs purchasable
-            const completableCount = readyQuests.filter(q => completableQuestSet.has(q.internal_name)).length;
-            const purchasableOnlyCount = readyQuests.filter(q =>
-                !completableQuestSet.has(q.internal_name) && purchasableQuestSet.has(q.internal_name)
-            ).length;
-
-            // Build center panel: grouped by location like crafting
-            let listHtml = `
-                <div style="background: var(--bg-item-complete); border: 2px solid #4caf50; padding: 14px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <div style="font-weight: bold; color: #2e7d32; margin-bottom: 6px; font-size: 14px;">✨ Ready Quests</div>
-                    <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
-                        ${completableCount > 0 ? `${completableCount} completable` : ''}${completableCount > 0 && purchasableOnlyCount > 0 ? ' · ' : ''}${purchasableOnlyCount > 0 ? `${purchasableOnlyCount} purchasable` : ''}
-                    </div>
-                </div>
-            `;
-
             // Sort locations alphabetically
             const sortedLocations = Object.keys(questsByLocation).sort();
 
@@ -1132,8 +1139,8 @@
                 const quests = questsByLocation[location];
 
                 listHtml += `
-                    <div style="margin-bottom: 20px;">
-                        <div style="font-weight: bold; color: var(--accent); margin-bottom: 10px; font-size: 16px;">${location} (${quests.length} quest${quests.length !== 1 ? 's' : ''})</div>
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-weight: bold; color: var(--accent); margin-bottom: 8px; font-size: 14px;">${location}</div>
                 `;
 
                 for (const quest of quests) {
@@ -1154,16 +1161,13 @@
                     if (isCompletable) {
                         statusBadge = `<span style="font-size: 11px; color: #4caf50; margin-left: 8px;">✓ Ready</span>`;
                     } else if (isPurchasable) {
-                        statusBadge = `<span style="font-size: 11px; color: var(--warning); margin-left: 8px;">🛒 Purchasable</span>`;
-                    } else if (isNeedsFavor) {
-                        statusBadge = `<span style="font-size: 11px; color: var(--favor); margin-left: 8px;">⭐ Needs Favor</span>`;
+                        statusBadge = `<span style="font-size: 11px; color: var(--warning); margin-left: 8px;">🛒 Buy</span>`;
                     }
 
                     listHtml += `
                         <div class="${classes.join(' ')}"
                              onclick="toggleQuestPin('${quest.internal_name}'); renderReadyQuestsView();">
                             <div class="quest-item-name">${isPinned ? '📌 ' : ''}${quest.name}${statusBadge}</div>
-                            <div class="quest-item-location">${quest.location}</div>
                         </div>
                     `;
                 }
@@ -1173,53 +1177,199 @@
 
             container.innerHTML = listHtml;
 
-            // Show pinned quest details in right panel if any quests are pinned
-            if (pinnedQuests.size > 0) {
-                await renderPinnedQuestDetails();
-            } else {
-                // Show help content in the right panel
-                detailContainer.innerHTML = `
-                    <div style="padding: 20px;">
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <div style="font-size: 36px; margin-bottom: 10px;">✨</div>
-                            <h3 style="color: var(--text-primary); margin-bottom: 8px;">Ready Quests</h3>
-                            <p style="color: var(--text-secondary); font-size: 13px;">Quests you can complete or purchase items for</p>
-                        </div>
+            // Right panel: Show ALL ready quests with full details (not just pinned)
+            await renderReadyQuestDetails(readyQuests);
+        }
 
-                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                            <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">How to Use</h4>
-                            <ol style="margin: 0 0 0 20px; padding: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
-                                <li>Click any quest to pin/unpin it</li>
-                                <li>Pinned quest items will show here</li>
-                                <li>View where items are stored and how to get them</li>
-                                <li>Green quests have all items ready</li>
-                                <li>Orange quests need vendor purchases</li>
-                            </ol>
-                        </div>
+        // Render full details for all ready quests in the right panel
+        async function renderReadyQuestDetails(readyQuests) {
+            const detailContainer = document.getElementById('questDetail');
 
-                        <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
-                            <h4 style="color: var(--accent); margin-bottom: 12px; font-size: 14px;">Quest Color Legend</h4>
-                            <div style="font-size: 12px; line-height: 1.6;">
-                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-complete); border-left: 3px solid #4caf50; border-radius: 3px; margin-right: 10px; font-weight: 600; color: #2e7d32; font-size: 11px;">Green</div>
-                                    <div style="color: var(--text-secondary);">Ready to turn in (have all items)</div>
-                                </div>
-                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--accent-light); border-left: 3px solid var(--warning); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--warning); font-size: 11px;">Orange</div>
-                                    <div style="color: var(--text-secondary);">Missing items can be purchased from vendor</div>
-                                </div>
-                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item-favor); border-left: 3px solid var(--favor); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--favor); font-size: 11px;">Purple</div>
-                                    <div style="color: var(--text-secondary);">Vendor available but needs more favor</div>
-                                </div>
-                                <div style="display: flex; align-items: center;">
-                                    <div style="min-width: 70px; padding: 5px 8px; background: var(--bg-item); border-left: 3px solid var(--border-color); border-radius: 3px; margin-right: 10px; font-weight: 600; color: var(--text-muted); font-size: 11px;">Default</div>
-                                    <div style="color: var(--text-secondary);">Items still needed (farm/gather)</div>
-                                </div>
-                            </div>
-                        </div>
+            if (readyQuests.length === 0) {
+                detailContainer.innerHTML = '<p class="empty-state">No ready quests to show</p>';
+                return;
+            }
+
+            // Fetch details for all ready quests
+            try {
+                const questDetails = await Promise.all(
+                    readyQuests.map(async (quest) => {
+                        const response = await fetch(`/api/quest/${quest.internal_name}`);
+                        const data = await response.json();
+                        if (data.success) {
+                            return { id: quest.internal_name, location: quest.location, ...data.data };
+                        }
+                        return null;
+                    })
+                );
+
+                const validQuests = questDetails.filter(q => q !== null);
+
+                if (validQuests.length === 0) {
+                    detailContainer.innerHTML = '<p class="empty-state">Failed to load quest details</p>';
+                    return;
+                }
+
+                // Group quests by location for organized display
+                const questsByLocation = {};
+                for (const quest of validQuests) {
+                    const loc = quest.location || 'Unknown';
+                    if (!questsByLocation[loc]) {
+                        questsByLocation[loc] = [];
+                    }
+                    questsByLocation[loc].push(quest);
+                }
+
+                const sortedLocations = Object.keys(questsByLocation).sort();
+
+                let html = `
+                    <div class="quest-detail-header">
+                        <div class="quest-detail-name">Ready Quests Checklist</div>
+                        <div class="quest-detail-description">${validQuests.length} quest${validQuests.length !== 1 ? 's' : ''} ready to complete or purchase</div>
                     </div>
                 `;
+
+                // Render each quest with its items grouped by location
+                for (const location of sortedLocations) {
+                    const quests = questsByLocation[location];
+
+                    html += `<div style="margin-bottom: 24px;">
+                        <div style="font-weight: bold; color: var(--accent); margin-bottom: 12px; font-size: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">📍 ${location}</div>
+                    `;
+
+                    for (const quest of quests) {
+                        const isCompletable = completableQuestSet.has(quest.id);
+                        const isPurchasable = purchasableQuestSet.has(quest.id);
+                        const isPinned = pinnedQuests.has(quest.id);
+
+                        // Determine status colors
+                        let bgColor = 'var(--bg-item)';
+                        let statusText = '';
+                        if (isCompletable) {
+                            bgColor = 'var(--bg-item-complete)';
+                            statusText = `<span style="color: var(--success);">✓ Ready to turn in</span>`;
+                        } else if (isPurchasable) {
+                            bgColor = 'var(--accent-light)';
+                            statusText = `<span style="color: var(--warning);">🛒 Items available from vendor</span>`;
+                        }
+
+                        html += `
+                            <div style="margin-bottom: 20px; padding: 16px; background: ${bgColor}; border-radius: 8px; border: 1px solid var(--border-color);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--text-primary); font-size: 15px;">${isPinned ? '📌 ' : ''}${quest.quest_name}</div>
+                                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">${statusText}</div>
+                                    </div>
+                                    <button onclick="event.stopPropagation(); toggleQuestPin('${quest.id}'); renderReadyQuestsView();"
+                                            style="padding: 6px 12px; border: 1px solid ${isPinned ? '#f44336' : 'var(--accent)'}; border-radius: 4px; background: var(--bg-card); color: ${isPinned ? '#f44336' : 'var(--accent)'}; cursor: pointer; font-size: 12px; font-weight: 500;">
+                                        ${isPinned ? '✕ Unpin' : '📌 Pin'}
+                                    </button>
+                                </div>
+                                <div class="checklist-items" style="margin-top: 12px;">
+                        `;
+
+                        // Render items for this quest
+                        for (const item of quest.items || []) {
+                            const name = item.display_name;
+                            const needed = item.required || 0;
+                            const inInventory = item.in_inventory || 0;
+                            const inStorage = item.in_storage || 0;
+                            const totalHave = inInventory + inStorage;
+                            const storageLocations = item.storage_locations || {};
+                            const missing = Math.max(0, needed - totalHave);
+                            const isComplete = missing === 0;
+
+                            // Build location info - each location on its own line
+                            let locationLines = [];
+                            if (inInventory > 0) {
+                                locationLines.push(`<div>📦 Inventory: ${inInventory}</div>`);
+                            }
+                            if (storageLocations && Object.keys(storageLocations).length > 0) {
+                                for (const [loc, count] of Object.entries(storageLocations)) {
+                                    let icon = '🏦';
+                                    if (loc.toLowerCase().includes('dream')) icon = '💤';
+                                    else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
+                                    locationLines.push(`<div>${icon} ${loc}: ${count}</div>`);
+                                }
+                            }
+                            const locationInfo = locationLines.length > 0
+                                ? `<div style="font-size: 13px; color: var(--accent); margin: 8px 0; line-height: 1.8;">${locationLines.join('')}</div>`
+                                : '';
+
+                            // Determine retrieval method
+                            let retrievalMethod = '';
+                            let methodColor = '#999';
+                            let itemClass = 'checklist-item';
+
+                            if (isComplete) {
+                                let retrieveFrom = [];
+                                if (inInventory > 0) retrieveFrom.push(`Inventory (${inInventory})`);
+                                if (storageLocations && Object.keys(storageLocations).length > 0) {
+                                    for (const [loc, count] of Object.entries(storageLocations)) {
+                                        retrieveFrom.push(`${loc} (${count})`);
+                                    }
+                                }
+                                if (retrieveFrom.length > 0) {
+                                    retrievalMethod = `✓ Ready - retrieve from: ${retrieveFrom.join(', ')}`;
+                                } else {
+                                    retrievalMethod = '✓ Have materials';
+                                }
+                                methodColor = 'var(--success)';
+                                itemClass += ' complete';
+                            } else {
+                                const category = categorizeMaterial(name, needed, totalHave);
+
+                                if (category.source === 'craft') {
+                                    const craftInfo = category.info;
+                                    retrievalMethod = `🔨 Craft: ${craftInfo.recipeName} (${craftInfo.skill})`;
+                                    if (craftInfo.craftsNeeded > 1) retrievalMethod += ` x${craftInfo.craftsNeeded}`;
+                                    methodColor = 'var(--success)';
+                                    itemClass += ' craftable';
+                                } else if (category.source === 'buy') {
+                                    const vendors = category.info;
+                                    const firstVendor = vendors[0];
+                                    const price = firstVendor.price || 0;
+                                    const totalCost = price * missing;
+                                    retrievalMethod = `🛒 Buy from ${firstVendor.vendor} (${firstVendor.location})`;
+                                    if (price > 0) retrievalMethod += ` - ${missing}x @ ${price.toFixed(0)} = ${totalCost.toFixed(0)} councils`;
+                                    methodColor = 'var(--warning)';
+                                    itemClass += ' buyable';
+                                } else if (category.source === 'buy_needs_favor') {
+                                    const vendors = category.info;
+                                    const firstVendor = vendors[0];
+                                    retrievalMethod = `❤️ Need ${firstVendor.favor || 'Unknown'} favor with ${firstVendor.vendor}`;
+                                    methodColor = 'var(--favor)';
+                                    itemClass += ' needs-favor';
+                                } else {
+                                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(name)}`;
+                                    retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;">📖 Wiki</a>`;
+                                    methodColor = 'var(--accent)';
+                                }
+                            }
+
+                            const progressLine = `Need: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}`;
+
+                            html += `
+                                <div class="${itemClass}" style="padding: 16px; margin-bottom: 14px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <div style="font-weight: 600; color: var(--text-primary); font-size: 15px; margin-bottom: 8px;">${name}</div>
+                                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">${progressLine}</div>
+                                    ${locationInfo}
+                                    <div style="font-size: 13px; color: ${methodColor}; font-weight: 500; margin-top: 10px;">${retrievalMethod}</div>
+                                </div>
+                            `;
+                        }
+
+                        html += `</div></div>`;
+                    }
+
+                    html += `</div>`;
+                }
+
+                detailContainer.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error fetching ready quest details:', error);
+                detailContainer.innerHTML = `<p class="empty-state">Error loading quest details</p>`;
             }
         }
 

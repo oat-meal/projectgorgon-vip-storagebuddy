@@ -34,7 +34,8 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 - **Auto-Refresh** - Updates every 3 seconds
 
 ### Themes
-- **6 Color Themes** - Sepia, Catppuccin Latte, Catppuccin Mocha, Solarized Light, Nord, Gruvbox
+- **7 Color Themes** - Sepia, Catppuccin Latte, Catppuccin Mocha, Solarized Light, Nord, Gruvbox, High Contrast
+- **High Contrast Mode** - Accessibility theme with maximum contrast, larger text, and bold colors for users with visual impairment
 - **Persistent Selection** - Theme choice saved to browser
 - **Synced Overlay** - Pop-out overlay matches main window theme
 

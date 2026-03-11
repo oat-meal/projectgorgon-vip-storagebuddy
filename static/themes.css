@@ -311,3 +311,139 @@
     --overlay-item-text: #ebdbb2;
     --is-light-theme: 0;
 }
+
+/* High Contrast - Accessibility theme for visual impairment */
+[data-theme="high-contrast"] {
+    --bg-gradient-1: #0066cc;
+    --bg-gradient-2: #004499;
+    --bg-page: #000000;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #2a2a2a;
+    --bg-item: #1a1a1a;
+    --bg-item-hover: #333333;
+    --bg-item-complete: #003300;
+    --bg-item-complete-hover: #004400;
+    --bg-item-purchasable: #4a3300;
+    --bg-item-purchasable-hover: #5c4000;
+    --bg-item-favor: #330044;
+    --bg-item-favor-hover: #440055;
+    --bg-item-disabled: #2a2a2a;
+    --bg-input: #000000;
+    --bg-tab: #2a2a2a;
+    --bg-tab-active: #0066cc;
+    --border-color: #666666;
+    --border-active: #ffffff;
+    --border-pinned: #ffff00;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-muted: #b0b0b0;
+    --text-on-accent: #ffffff;
+    --accent: #0088ff;
+    --accent-hover: #00aaff;
+    --accent-light: rgba(0, 136, 255, 0.3);
+    --success: #00ff00;
+    --success-light: #003300;
+    --warning: #ffaa00;
+    --warning-light: #4a3300;
+    --danger: #ff3333;
+    --info: #00ccff;
+    --favor: #ff66ff;
+    --favor-light: #330044;
+    --disabled: #888888;
+    --shadow: rgba(0, 0, 0, 0.5);
+    --pinned-glow: rgba(255, 255, 0, 0.5);
+    --focus-ring: rgba(0, 136, 255, 0.7);
+    /* Overlay-specific */
+    --overlay-controls-bg: #1a1a1a;
+    --overlay-content-bg: #000000;
+    --overlay-input-bg: #2a2a2a;
+    --overlay-tab-text: #ffffff;
+    --overlay-tab-hover: #00aaff;
+    --overlay-item-bg: rgba(255, 255, 255, 0.1);
+    --overlay-item-text: #ffffff;
+    --is-light-theme: 0;
+    /* High contrast specific - larger text and bolder elements */
+    --hc-font-weight: 600;
+    --hc-border-width: 2px;
+}
+
+/* High Contrast Mode - Enhanced readability styles */
+[data-theme="high-contrast"] body {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+[data-theme="high-contrast"] h1,
+[data-theme="high-contrast"] h2,
+[data-theme="high-contrast"] h3,
+[data-theme="high-contrast"] h4 {
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+[data-theme="high-contrast"] .quest-item,
+[data-theme="high-contrast"] .recipe-item {
+    border-width: 2px;
+    font-weight: 500;
+}
+
+[data-theme="high-contrast"] .quest-item-name,
+[data-theme="high-contrast"] .recipe-name {
+    font-weight: 600;
+    font-size: 1.05em;
+}
+
+[data-theme="high-contrast"] .tab-btn {
+    font-weight: 700;
+    border: 2px solid var(--border-color);
+}
+
+[data-theme="high-contrast"] .tab-btn.active {
+    border-color: var(--text-primary);
+}
+
+[data-theme="high-contrast"] input,
+[data-theme="high-contrast"] select {
+    border-width: 2px;
+    font-weight: 500;
+}
+
+[data-theme="high-contrast"] .search-box {
+    font-size: 16px;
+}
+
+[data-theme="high-contrast"] .item-details,
+[data-theme="high-contrast"] .material-item {
+    font-size: 0.95em;
+}
+
+[data-theme="high-contrast"] .status-have {
+    color: #00ff00 !important;
+    font-weight: 600;
+}
+
+[data-theme="high-contrast"] .status-buy {
+    color: #ffaa00 !important;
+    font-weight: 600;
+}
+
+[data-theme="high-contrast"] .status-favor {
+    color: #ff66ff !important;
+    font-weight: 600;
+}
+
+[data-theme="high-contrast"] .status-gather {
+    color: #00ccff !important;
+    font-weight: 600;
+}
+
+/* High contrast focus states - extra visible */
+[data-theme="high-contrast"] :focus-visible {
+    outline: 3px solid #ffff00 !important;
+    outline-offset: 3px;
+}
+
+[data-theme="high-contrast"] button:focus-visible,
+[data-theme="high-contrast"] .tab-btn:focus-visible {
+    box-shadow: 0 0 0 4px #ffff00 !important;
+}

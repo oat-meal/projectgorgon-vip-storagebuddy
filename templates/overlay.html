@@ -513,6 +513,41 @@
         [data-theme="dark"] .favor-level.like-family { background: rgba(233, 30, 99, 0.2); color: #f06292; }
         [data-theme="dark"] .favor-level.soul-mates { background: rgba(255, 152, 0, 0.2); color: #ffb74d; }
 
+        /* High contrast accessibility theme */
+        [data-theme="high-contrast"] .favor-level.comfortable { background: #003300; color: #00ff00; border: 1px solid #00ff00; }
+        [data-theme="high-contrast"] .favor-level.friends { background: #001144; color: #00aaff; border: 1px solid #00aaff; }
+        [data-theme="high-contrast"] .favor-level.close-friends { background: #002255; color: #00ccff; border: 1px solid #00ccff; }
+        [data-theme="high-contrast"] .favor-level.best-friends { background: #330044; color: #ff66ff; border: 1px solid #ff66ff; }
+        [data-theme="high-contrast"] .favor-level.like-family { background: #440022; color: #ff88aa; border: 1px solid #ff88aa; }
+        [data-theme="high-contrast"] .favor-level.soul-mates { background: #442200; color: #ffaa00; border: 1px solid #ffaa00; }
+
+        [data-theme="high-contrast"] .quest-item,
+        [data-theme="high-contrast"] .recipe-item,
+        [data-theme="high-contrast"] .material-item {
+            font-weight: 600;
+            border: 2px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        [data-theme="high-contrast"] .quest-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        [data-theme="high-contrast"] .tab-btn {
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+        }
+
+        [data-theme="high-contrast"] .tab-btn.active {
+            border-color: #ffff00;
+        }
+
+        [data-theme="high-contrast"] .status-have { color: #00ff00 !important; }
+        [data-theme="high-contrast"] .status-buy { color: #ffaa00 !important; }
+        [data-theme="high-contrast"] .status-favor { color: #ff66ff !important; }
+        [data-theme="high-contrast"] .status-gather { color: #00ccff !important; }
+
         .search-box {
             width: 100%;
             background: var(--overlay-input-bg);
