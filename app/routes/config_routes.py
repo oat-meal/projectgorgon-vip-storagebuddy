@@ -129,3 +129,87 @@ def heartbeat():
 
     current_app.last_heartbeat = datetime.now()
     return api_response(data={'status': 'ok'})
+
+
+@config_bp.route('/check_update')
+def check_update():
+    """
+    Check GitHub for newer major release (release with .exe asset).
+    Returns update info if a newer version with exe is available.
+    """
+    import urllib.request
+    import json
+    import re
+
+    GITHUB_API_URL = "https://api.github.com/repos/oat-meal/projectgorgon-vip-storagebuddy/releases"
+
+    try:
+        # Fetch releases from GitHub
+        req = urllib.request.Request(
+            GITHUB_API_URL,
+            headers={'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'StorageBuddy'}
+        )
+        with urllib.request.urlopen(req, timeout=10) as response:
+            releases = json.loads(response.read().decode('utf-8'))
+
+        if not releases:
+            return api_response(data={'update_available': False})
+
+        # Find latest release with an .exe asset (major release)
+        latest_major = None
+        for release in releases:
+            if release.get('draft') or release.get('prerelease'):
+                continue
+            assets = release.get('assets', [])
+            has_exe = any(a['name'].endswith('.exe') for a in assets)
+            if has_exe:
+                latest_major = release
+                break
+
+        if not latest_major:
+            return api_response(data={'update_available': False})
+
+        # Extract version from tag (e.g., "v0.6.3" -> "0.6.3")
+        latest_tag = latest_major.get('tag_name', '')
+        latest_version = latest_tag.lstrip('v')
+
+        # Compare versions
+        def parse_version(v):
+            """Parse version string to tuple of ints for comparison"""
+            match = re.match(r'(\d+)\.(\d+)\.(\d+)', v)
+            if match:
+                return tuple(int(x) for x in match.groups())
+            return (0, 0, 0)
+
+        current = parse_version(__version__)
+        latest = parse_version(latest_version)
+
+        if latest > current:
+            # Find the Windows exe download URL
+            exe_asset = next(
+                (a for a in latest_major.get('assets', []) if a['name'].endswith('.exe')),
+                None
+            )
+            download_url = exe_asset['browser_download_url'] if exe_asset else latest_major.get('html_url')
+
+            return api_response(data={
+                'update_available': True,
+                'current_version': __version__,
+                'latest_version': latest_version,
+                'release_url': latest_major.get('html_url'),
+                'download_url': download_url,
+                'release_name': latest_major.get('name', f'v{latest_version}')
+            })
+
+        return api_response(data={
+            'update_available': False,
+            'current_version': __version__,
+            'latest_version': latest_version
+        })
+
+    except Exception as e:
+        logger.warning(f"Failed to check for updates: {e}")
+        return api_response(data={
+            'update_available': False,
+            'error': str(e)
+        })

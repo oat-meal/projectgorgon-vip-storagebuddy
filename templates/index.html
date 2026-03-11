@@ -90,6 +90,26 @@
             font-size: 12px;
         }
 
+        .update-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 10px;
+            margin-left: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .update-badge:hover {
+            background: #c0392b;
+        }
+
         .update-btn {
             padding: 6px 12px;
             background: var(--accent);
@@ -461,7 +481,7 @@
         <header>
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <h1>Project Gorgon VIP StorageBuddy <span style="font-size: 12px; font-weight: 500; color: #fff; background: rgba(102, 126, 234, 0.8); padding: 4px 10px; border-radius: 12px; margin-left: 10px; vertical-align: middle;">v{{ version }}</span></h1>
+                    <h1>Project Gorgon VIP StorageBuddy <span style="font-size: 12px; font-weight: 500; color: #fff; background: rgba(102, 126, 234, 0.8); padding: 4px 10px; border-radius: 12px; margin-left: 10px; vertical-align: middle;">v{{ version }}</span><span id="headerUpdateBadge"></span></h1>
                     <p class="subtitle">
                         <span class="status-indicator"></span>
                         Auto-updating from chat logs
@@ -563,7 +583,7 @@
 
         <footer>
             <div class="version-info">
-                Quest Helper <span id="appVersion">...</span>
+                Quest Helper <span id="appVersion">...</span><span id="footerUpdateBadge"></span>
                 <span id="logFileInfo" style="margin-left: 10px; opacity: 0.7;"></span>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
@@ -3426,6 +3446,32 @@
             }
         }
 
+        // Check for updates from GitHub releases
+        async function checkForUpdate() {
+            try {
+                const response = await fetch('/api/check_update');
+                const data = await response.json();
+
+                if (data.data?.update_available) {
+                    const latestVersion = data.data.latest_version;
+                    const releaseUrl = data.data.release_url;
+
+                    // Create the update badge HTML
+                    const badgeHtml = `<a href="${releaseUrl}" target="_blank" class="update-badge" title="Click to download v${latestVersion}">Update Available: v${latestVersion}</a>`;
+
+                    // Add to header
+                    document.getElementById('headerUpdateBadge').innerHTML = badgeHtml;
+
+                    // Add to footer
+                    document.getElementById('footerUpdateBadge').innerHTML = badgeHtml;
+
+                    console.log(`[StorageBuddy] Update available: v${latestVersion}`);
+                }
+            } catch (error) {
+                console.error('Failed to check for updates:', error);
+            }
+        }
+
         // Send heartbeat to server so it knows browser is still open
         async function sendHeartbeat() {
             try {
@@ -3513,6 +3559,7 @@
 
         // Initialize
         loadVersion();
+        checkForUpdate();
 
         // Send heartbeat every 2 seconds for fast shutdown detection
         setInterval(sendHeartbeat, 2000);
