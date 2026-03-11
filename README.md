@@ -31,6 +31,7 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 - **Always-On-Top** - Keep visible over your game using PowerToys (Windows) or window manager (Linux)
 - **Theme Sync** - Automatically matches your selected theme
 - **Pinned Sync** - Pinned quests and recipes sync from main page
+- **Aggregated Materials** - Shows all materials with storage locations, source info, and recipe associations
 - **Auto-Refresh** - Updates every 3 seconds
 
 ### Themes
