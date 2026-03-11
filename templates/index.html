@@ -1,7 +1,11 @@
 <!DOCTYPE html>
+<!-- Cache bust: 2026-03-11T02:30 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Gorgon VIP StorageBuddy</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
@@ -1279,22 +1283,20 @@
                             const missing = Math.max(0, needed - totalHave);
                             const isComplete = missing === 0;
 
-                            // Build location info - each location on its own line
-                            let locationLines = [];
+                            // Build location info - compact format like overlay
+                            let locationParts = [];
                             if (inInventory > 0) {
-                                locationLines.push(`<div>📦 Inventory: ${inInventory}</div>`);
+                                locationParts.push(`📦 Inventory: ${inInventory}`);
                             }
                             if (storageLocations && Object.keys(storageLocations).length > 0) {
                                 for (const [loc, count] of Object.entries(storageLocations)) {
                                     let icon = '🏦';
                                     if (loc.toLowerCase().includes('dream')) icon = '💤';
                                     else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
-                                    locationLines.push(`<div>${icon} ${loc}: ${count}</div>`);
+                                    locationParts.push(`${icon} ${loc}: ${count}`);
                                 }
                             }
-                            const locationInfo = locationLines.length > 0
-                                ? `<div style="font-size: 13px; color: var(--accent); margin: 8px 0; line-height: 1.8;">${locationLines.join('')}</div>`
-                                : '';
+                            const hasLocations = locationParts.length > 0;
 
                             // Determine retrieval method
                             let retrievalMethod = '';
@@ -1347,14 +1349,32 @@
                                 }
                             }
 
-                            const progressLine = `Need: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}`;
+                            // Format: match overlay's clean 2-row layout
+                            const progressText = `${totalHave}/${needed}`;
+
+                            // Build simple storage line like overlay (small icon + location: count)
+                            let storageLine = '';
+                            if (storageLocations && Object.keys(storageLocations).length > 0) {
+                                let storageParts = [];
+                                for (const [loc, count] of Object.entries(storageLocations)) {
+                                    let icon = '🏦';
+                                    if (loc.toLowerCase().includes('dream')) icon = '💤';
+                                    else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
+                                    else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                                    storageParts.push(`${icon} ${loc}: ${count}`);
+                                }
+                                storageLine = storageParts.join(' &nbsp;•&nbsp; ');
+                            }
 
                             html += `
-                                <div class="${itemClass}" style="padding: 16px; margin-bottom: 14px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color);">
-                                    <div style="font-weight: 600; color: var(--text-primary); font-size: 15px; margin-bottom: 8px;">${name}</div>
-                                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">${progressLine}</div>
-                                    ${locationInfo}
-                                    <div style="font-size: 13px; color: ${methodColor}; font-weight: 500; margin-top: 10px;">${retrievalMethod}</div>
+                                <div class="${itemClass}" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${name}</td>
+                                            <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine ? '6px' : '0'};">${progressText}</td>
+                                        </tr>
+                                        ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center;">${storageLine}</td></tr>` : ''}
+                                    </table>
                                 </div>
                             `;
                         }
