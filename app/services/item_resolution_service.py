@@ -186,15 +186,29 @@ class ItemResolutionService:
 
         # Get location details
         details = inventory_details.get(item_name, {})
-        in_inventory = details.get('in_inventory', 0) if isinstance(details, dict) else 0
+        in_inventory = 0
         in_storage = 0
         storage_locations = {}
 
         if isinstance(details, dict):
-            for k, v in details.items():
-                if k not in ['total', 'in_inventory'] and isinstance(v, (int, float)) and v > 0:
-                    in_storage += int(v)
-                    storage_locations[k] = int(v)
+            # Handle both formats:
+            # Format 1: { 'inventory': X, 'storage': { 'Location': Y }, 'total': Z }
+            # Format 2: { 'in_inventory': X, 'Location1': Y, 'Location2': Z }
+            if 'inventory' in details:
+                in_inventory = details.get('inventory', 0)
+                storage_dict = details.get('storage', {})
+                if isinstance(storage_dict, dict):
+                    for loc, count in storage_dict.items():
+                        if isinstance(count, (int, float)) and count > 0:
+                            storage_locations[loc] = int(count)
+                            in_storage += int(count)
+            else:
+                # Legacy format
+                in_inventory = details.get('in_inventory', 0)
+                for k, v in details.items():
+                    if k not in ['total', 'in_inventory'] and isinstance(v, (int, float)) and v > 0:
+                        in_storage += int(v)
+                        storage_locations[k] = int(v)
 
         resolution = ItemResolution(
             item_name=item_name,
