@@ -25,20 +25,12 @@ from flask import Flask, render_template, jsonify, request
 from config import get_config
 from version import __version__
 from data_updater import ensure_quest_data
+from app.utils.paths import get_bundled_path
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description='Project Gorgon VIP StorageBuddy')
 parser.add_argument('--debug', action='store_true', help='Enable debug logging')
 args, unknown = parser.parse_known_args()
-
-
-def get_bundled_path(relative_path):
-    """Get the path to a bundled resource (works for PyInstaller and normal execution)"""
-    if getattr(sys, 'frozen', False):
-        base_path = Path(sys._MEIPASS)
-    else:
-        base_path = Path(__file__).parent
-    return base_path / relative_path
 
 
 def create_app(debug: bool = False) -> Flask:

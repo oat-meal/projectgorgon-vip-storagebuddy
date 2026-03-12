@@ -208,6 +208,48 @@ class VendorService:
         """Get ordered list of favor levels"""
         return FAVOR_LEVELS.copy()
 
+    def get_vendor_items_as_dicts(self) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        Get vendor item lookup as raw dicts (for backward compatibility).
+
+        Returns dict mapping item_name -> list of vendor dicts with:
+        - vendor: vendor name
+        - location: vendor location
+        - favor: required favor level
+        - price: item price
+        """
+        def build_lookup():
+            vendor_data = self._load_vendor_data()
+            vendors_dict = vendor_data.get('vendors', vendor_data)
+
+            items_lookup: Dict[str, List[Dict[str, Any]]] = {}
+
+            for vendor_name, vendor_info in vendors_dict.items():
+                if not isinstance(vendor_info, dict) or 'items' not in vendor_info:
+                    continue
+
+                location = vendor_info.get('location', 'Unknown')
+
+                for item_name, item_data in vendor_info.get('items', {}).items():
+                    if item_name not in items_lookup:
+                        items_lookup[item_name] = []
+
+                    items_lookup[item_name].append({
+                        'vendor': vendor_name,
+                        'location': location,
+                        'favor': item_data.get('favor', 'Unknown') if isinstance(item_data, dict) else 'Unknown',
+                        'price': item_data.get('price', 0) if isinstance(item_data, dict) else 0
+                    })
+
+            return items_lookup
+
+        return self._cache.get_or_compute(
+            'vendors:items_dict_lookup',
+            build_lookup,
+            ttl=60.0,
+            file_path=self._vendor_file
+        )
+
 
 # Module-level singleton for easy access
 _vendor_service: Optional[VendorService] = None

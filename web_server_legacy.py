@@ -885,6 +885,189 @@ def shopping_list():
         return jsonify({'error': str(e), 'recipes': []}), 500
 
 
+@app.route('/api/ready_recipes')
+def get_ready_recipes():
+    """Get all recipes that are ready to craft (have all materials or can craft sub-components)"""
+    global inventory_parser
+
+    try:
+        # Load player skills from Character JSON
+        player_skills = {}
+        reports_dir = config.get_reports_dir()
+        if reports_dir:
+            report_files = list(reports_dir.glob('Character_*.json'))
+            if report_files:
+                latest_char_file = max(report_files, key=lambda p: p.stat().st_mtime)
+                with open(latest_char_file, 'r') as f:
+                    char_data = json.load(f)
+                raw_skills = char_data.get('Skills', {})
+                for skill_name, skill_data in raw_skills.items():
+                    level = skill_data.get('Level', 0)
+                    bonus = skill_data.get('BonusLevels', 0)
+                    player_skills[skill_name] = level + bonus
+
+        # Load recipes
+        recipes_file = get_bundled_path('recipes.json')
+        if not recipes_file.exists():
+            return jsonify({'recipes': [], 'error': 'Recipes file not found'})
+
+        with open(recipes_file, 'r') as f:
+            all_recipes = json.load(f)
+
+        # Build recipes-by-output lookup for craftability checks
+        recipes_by_output = {}
+        for recipe in all_recipes:
+            for result in recipe.get('results', []):
+                output_name = result.get('item', '')
+                if output_name:
+                    if output_name not in recipes_by_output:
+                        recipes_by_output[output_name] = []
+                    recipes_by_output[output_name].append({
+                        'recipe': recipe,
+                        'output_qty': result.get('quantity', 1)
+                    })
+
+        # Get player inventory
+        player_inventory = {}
+        inventory_details = {}
+        if inventory_parser:
+            items_file = inventory_parser.get_latest_items_file()
+            if items_file:
+                inventory_data = inventory_parser.parse_items(items_file)
+                for name, data in inventory_data.items():
+                    player_inventory[name] = data['total']
+                    inventory_details[name] = data
+
+        # Load vendor data
+        vendor_items = {}
+        vendor_file = get_bundled_path('vendor_inventory.json')
+        if vendor_file.exists():
+            with open(vendor_file, 'r') as f:
+                vendor_data = json.load(f)
+                vendors_dict = vendor_data.get('vendors', vendor_data)
+                for vendor_name, vendor_info in vendors_dict.items():
+                    if isinstance(vendor_info, dict) and 'items' in vendor_info:
+                        location = vendor_info.get('location', '')
+                        for item_name, item_data in vendor_info.get('items', {}).items():
+                            if item_name not in vendor_items:
+                                vendor_items[item_name] = []
+                            vendor_items[item_name].append({
+                                'vendor': vendor_name,
+                                'location': location,
+                                'favor': item_data.get('favor', 'Unknown') if isinstance(item_data, dict) else 'Unknown',
+                                'price': item_data.get('price', 0) if isinstance(item_data, dict) else 0
+                            })
+
+        def can_craft_item(item_name, qty_needed, available_inventory, skills, depth=0, visited=None):
+            """Recursively check if an item can be crafted."""
+            if visited is None:
+                visited = set()
+            if item_name in visited or depth > 3:
+                return False, None
+            visited.add(item_name)
+
+            if item_name not in recipes_by_output:
+                return False, None
+
+            for recipe_info in recipes_by_output[item_name]:
+                recipe = recipe_info['recipe']
+                output_qty = recipe_info['output_qty']
+                recipe_skill = recipe.get('skill', '')
+                recipe_level = recipe.get('level', 0)
+                player_level = skills.get(recipe_skill, 0)
+                if player_level < recipe_level:
+                    continue
+
+                crafts_needed = (qty_needed + output_qty - 1) // output_qty
+                can_make = True
+
+                for ingredient in recipe.get('ingredients', []):
+                    ing_name = ingredient.get('item') or ingredient.get('name', '')
+                    ing_qty = ingredient.get('quantity', 1) * crafts_needed
+                    ing_have = available_inventory.get(ing_name, 0)
+
+                    if ing_have >= ing_qty:
+                        continue
+
+                    missing = ing_qty - ing_have
+                    sub_can_craft, _ = can_craft_item(
+                        ing_name, missing, available_inventory, skills, depth + 1, visited.copy()
+                    )
+                    if not sub_can_craft:
+                        can_make = False
+                        break
+
+                if can_make:
+                    return True, {'recipe_name': recipe.get('name'), 'skill': recipe.get('skill')}
+
+            return False, None
+
+        # Check each recipe for readiness
+        ready_recipes = []
+        for idx, recipe in enumerate(all_recipes):
+            recipe_skill = recipe.get('skill', '')
+            recipe_level = recipe.get('level', 0)
+            player_level = player_skills.get(recipe_skill, 0)
+
+            # Skip if player lacks skill
+            if player_level < recipe_level:
+                continue
+
+            # Check all ingredients
+            all_ready = True
+            materials = []
+
+            for ingredient in recipe.get('ingredients', []):
+                mat_name = ingredient.get('item') or ingredient.get('name', 'Unknown')
+                mat_qty = ingredient.get('quantity', 1)
+                mat_have = player_inventory.get(mat_name, 0)
+
+                # Get storage details
+                details = inventory_details.get(mat_name, {})
+                in_inventory = details.get('in_inventory', 0) if isinstance(details, dict) else 0
+                in_storage = 0
+                storage_locations = {}
+                if isinstance(details, dict):
+                    for k, v in details.items():
+                        if k not in ['total', 'in_inventory'] and isinstance(v, (int, float)) and v > 0:
+                            in_storage += v
+                            storage_locations[k] = v
+
+                mat_result = {
+                    'name': mat_name,
+                    'need': mat_qty,
+                    'have': min(mat_have, mat_qty),
+                    'in_inventory': in_inventory,
+                    'in_storage': in_storage,
+                    'storage_locations': storage_locations
+                }
+                materials.append(mat_result)
+
+                if mat_have < mat_qty:
+                    # Check if can craft missing amount
+                    missing = mat_qty - mat_have
+                    can_craft, _ = can_craft_item(mat_name, missing, player_inventory, player_skills)
+                    if not can_craft:
+                        all_ready = False
+
+            if all_ready:
+                recipe_id = f"{recipe.get('skill', 'Unknown')}_{recipe.get('name', 'Unknown')}_{idx}"
+                ready_recipes.append({
+                    'id': recipe_id,
+                    'name': recipe.get('name', 'Unknown'),
+                    'skill': recipe_skill,
+                    'level': recipe_level,
+                    'quantity': 1,
+                    'materials': materials,
+                    'status': 'ready'
+                })
+
+        return jsonify({'recipes': ready_recipes})
+    except Exception as e:
+        logger.error(f"Error getting ready recipes: {e}")
+        return jsonify({'error': str(e), 'recipes': []}), 500
+
+
 @app.route('/recipes.json')
 def get_recipes():
     """Serve recipes.json file for crafting tab"""

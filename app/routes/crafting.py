@@ -4,17 +4,16 @@ Crafting and recipe API routes
 
 import json
 import logging
+import threading
 from flask import Blueprint, request, g
 
 from config import get_config
 from ..utils.responses import api_response, api_error, not_found
 from ..utils.validation import validate_recipe_selections, ValidationError
-from ..utils.paths import get_bundled_path
-from ..utils.security import safe_read_json
 from ..utils.constants import MAX_CRAFTING_DEPTH
 from ..services.character_service import CharacterService
-from ..services.cache_service import get_cache
 from ..services.vendor_service import get_vendor_service
+from ..services.item_resolution_service import get_item_resolution_service
 from .decorators import require_configured
 
 logger = logging.getLogger(__name__)
@@ -23,6 +22,7 @@ crafting_bp = Blueprint('crafting', __name__)
 
 # In-memory store for recipe selections (synced from web app)
 _recipe_selections = {}
+_recipe_selections_lock = threading.Lock()
 
 
 @crafting_bp.route('/shopping_list', methods=['GET', 'POST'])
@@ -37,11 +37,13 @@ def shopping_list():
                 return api_error("No data provided", status_code=400)
 
             validated = validate_recipe_selections(data.get('recipes', {}))
-            _recipe_selections.clear()
-            _recipe_selections.update(validated)
+            with _recipe_selections_lock:
+                _recipe_selections.clear()
+                _recipe_selections.update(validated)
+                count = len(_recipe_selections)
 
             return api_response(
-                data={'count': len(_recipe_selections)},
+                data={'count': count},
                 message="Recipe selections updated"
             )
         except ValidationError as e:
@@ -54,45 +56,22 @@ def shopping_list():
 def _build_shopping_list():
     """Build shopping list from current recipe selections"""
     config = get_config()
-    cache = get_cache()
 
     # Get player skills and favor
     char_service = CharacterService(config.get_reports_dir())
     player_skills = char_service.get_effective_skill_levels()
     player_favor = char_service.get_favor()
 
-    # Load recipes (cached)
-    recipes_file = get_bundled_path('recipes.json')
-    if not recipes_file.exists():
-        return api_response(data={'recipes': []}, message="No recipes file found")
-
-    all_recipes = cache.get_or_compute(
-        'recipes:all',
-        lambda: safe_read_json(recipes_file),
-        ttl=60.0,
-        file_path=recipes_file
-    )
+    # Load recipes via ItemResolutionService (consolidated, cached)
+    item_resolution = get_item_resolution_service()
+    all_recipes = item_resolution.get_all_recipes()
 
     if not all_recipes:
         return api_response(data={'recipes': []})
 
-    # Build lookups
-    recipe_lookup = {}
-    recipes_by_output = {}
-
-    for idx, recipe in enumerate(all_recipes):
-        recipe_id = f"{recipe.get('skill', 'Unknown')}_{recipe.get('name', 'Unknown')}_{idx}"
-        recipe_lookup[recipe_id] = recipe
-
-        for result in recipe.get('results', []):
-            output_name = result.get('item', '')
-            if output_name:
-                if output_name not in recipes_by_output:
-                    recipes_by_output[output_name] = []
-                recipes_by_output[output_name].append({
-                    'recipe': recipe,
-                    'output_qty': result.get('quantity', 1)
-                })
+    # Get lookups from ItemResolutionService (consolidated)
+    recipe_lookup = item_resolution.get_recipe_lookup()
+    recipes_by_output = item_resolution.get_recipes_by_output()
 
     # Get player inventory
     player_inventory = {}
@@ -118,7 +97,11 @@ def _build_shopping_list():
     # Build shopping list
     result_recipes = []
 
-    for recipe_id, quantity in _recipe_selections.items():
+    # Copy selections under lock to avoid race conditions
+    with _recipe_selections_lock:
+        selections_copy = dict(_recipe_selections)
+
+    for recipe_id, quantity in selections_copy.items():
         recipe = recipe_lookup.get(recipe_id)
         if not recipe:
             continue
@@ -340,39 +323,9 @@ def _can_craft_item(
 
 
 def _load_vendor_items():
-    """Load vendor item data"""
-    vendor_file = get_bundled_path('vendor_inventory.json')
-    if not vendor_file.exists():
-        return {}
-
-    cache = get_cache()
-    vendor_data = cache.get_or_compute(
-        'vendors:all',
-        lambda: safe_read_json(vendor_file),
-        ttl=60.0,
-        file_path=vendor_file
-    )
-
-    if not vendor_data:
-        return {}
-
-    vendor_items = {}
-    vendors_dict = vendor_data.get('vendors', vendor_data)
-
-    for vendor_name, vendor_info in vendors_dict.items():
-        if isinstance(vendor_info, dict) and 'items' in vendor_info:
-            location = vendor_info.get('location', '')
-            for item_name, item_data in vendor_info.get('items', {}).items():
-                if item_name not in vendor_items:
-                    vendor_items[item_name] = []
-                vendor_items[item_name].append({
-                    'vendor': vendor_name,
-                    'location': location,
-                    'favor': item_data.get('favor', 'Unknown') if isinstance(item_data, dict) else 'Unknown',
-                    'price': item_data.get('price', 0) if isinstance(item_data, dict) else 0
-                })
-
-    return vendor_items
+    """Load vendor item data via VendorService (consolidated)"""
+    vendor_service = get_vendor_service()
+    return vendor_service.get_vendor_items_as_dicts()
 
 
 @crafting_bp.route('/skills')
@@ -469,40 +422,21 @@ def get_player_inventory():
 def get_ready_recipes():
     """Get all recipes that are ready to craft or buyable (have all materials, can craft, or can buy with favor)"""
     config = get_config()
-    cache = get_cache()
 
     # Get player skills and favor
     char_service = CharacterService(config.get_reports_dir())
     player_skills = char_service.get_effective_skill_levels()
     player_favor = char_service.get_favor()
 
-    # Load recipes (cached)
-    recipes_file = get_bundled_path('recipes.json')
-    if not recipes_file.exists():
-        return api_response(data={'recipes': []}, message="No recipes file found")
-
-    all_recipes = cache.get_or_compute(
-        'recipes:all',
-        lambda: safe_read_json(recipes_file),
-        ttl=60.0,
-        file_path=recipes_file
-    )
+    # Load recipes via ItemResolutionService (consolidated, cached)
+    item_resolution = get_item_resolution_service()
+    all_recipes = item_resolution.get_all_recipes()
 
     if not all_recipes:
         return api_response(data={'recipes': []})
 
-    # Build recipes-by-output lookup
-    recipes_by_output = {}
-    for recipe in all_recipes:
-        for result in recipe.get('results', []):
-            output_name = result.get('item', '')
-            if output_name:
-                if output_name not in recipes_by_output:
-                    recipes_by_output[output_name] = []
-                recipes_by_output[output_name].append({
-                    'recipe': recipe,
-                    'output_qty': result.get('quantity', 1)
-                })
+    # Get recipes-by-output lookup from ItemResolutionService (consolidated)
+    recipes_by_output = item_resolution.get_recipes_by_output()
 
     # Get player inventory
     player_inventory = {}

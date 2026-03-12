@@ -657,25 +657,63 @@
     </div>
 
     <script>
+        // Storage icon utility
+        function getStorageIcon(location) {
+            const loc = location.toLowerCase();
+            if (loc.includes('dream')) return '💤';
+            if (loc.includes('saddlebag')) return '🎒';
+            if (loc.includes('community')) return '🏠';
+            return '🏦';
+        }
+
+        function getStorageShortName(location) {
+            const loc = location.toLowerCase();
+            if (loc.includes('saddlebag')) return 'Saddlebag';
+            if (loc.includes('dream')) return 'Dream';
+            if (loc.includes('community')) return 'Community';
+            return location;
+        }
+
+        // Aggregate materials across recipes (shared by pinned and ready views)
+        function aggregateMaterials(recipes) {
+            const aggregated = {};
+            for (const recipe of recipes) {
+                for (const mat of recipe.materials) {
+                    if (!aggregated[mat.name]) {
+                        aggregated[mat.name] = {
+                            name: mat.name,
+                            need: 0,
+                            have: 0,
+                            in_inventory: mat.in_inventory || 0,
+                            in_storage: mat.in_storage || 0,
+                            storage_locations: mat.storage_locations || {},
+                            vendor_info: mat.vendor_info,
+                            needs_favor: mat.needs_favor,
+                            recipes: []
+                        };
+                    }
+                    aggregated[mat.name].need += mat.need;
+                    const totalHave = (mat.in_inventory || 0) + (mat.in_storage || 0);
+                    aggregated[mat.name].have = totalHave;
+                    aggregated[mat.name].recipes.push(`${recipe.name} (×${recipe.quantity})`);
+                }
+            }
+            return aggregated;
+        }
+
         // Theme Management - synced with main page
         function loadTheme() {
             const savedTheme = localStorage.getItem('storagebuddy-theme') || 'sepia';
             document.documentElement.setAttribute('data-theme', savedTheme);
         }
 
-        // Check for theme changes periodically (sync with main window)
-        function checkThemeSync() {
+        // Sync theme from main window via storage event (replaces polling)
+        function syncTheme() {
             const savedTheme = localStorage.getItem('storagebuddy-theme') || 'sepia';
             if (document.documentElement.getAttribute('data-theme') !== savedTheme) {
                 document.documentElement.setAttribute('data-theme', savedTheme);
             }
         }
-
-        // Load theme immediately
-        loadTheme();
-
-        // Check for theme sync every second
-        setInterval(checkThemeSync, 1000);
 
         // Sync pinned quests from main window
         function syncPinnedQuests() {
@@ -689,7 +727,21 @@
                 }
             }
         }
-        setInterval(syncPinnedQuests, 1000);
+
+        // Load theme immediately
+        loadTheme();
+
+        // Use storage event listener instead of polling (fires when another tab changes localStorage)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'storagebuddy-theme') {
+                syncTheme();
+            } else if (e.key === 'pinnedQuests') {
+                syncPinnedQuests();
+            } else if (e.key === 'pinnedRecipes') {
+                // Trigger data reload when recipes are pinned/unpinned
+                loadData();
+            }
+        });
 
         let currentTab = 'quests';
         let currentView = 'all';
@@ -781,10 +833,19 @@
             renderCharacterView();
         });
 
+        // HTML entity map for escapeHtml (avoids creating DOM element per call)
+        const _htmlEscapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+        const _htmlEscapeRegex = /[&<>"']/g;
+
         function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            if (typeof text !== 'string') return '';
+            return text.replace(_htmlEscapeRegex, char => _htmlEscapeMap[char]);
         }
 
         function updateRegionSelector(quests) {
@@ -850,7 +911,6 @@
 
             const data = await response.json();
             allQuests = data.data?.quests || [];
-            updateRegionSelector(allQuests);
             renderFilteredQuests();
         }
 
@@ -858,7 +918,7 @@
             const content = document.getElementById('content');
             let quests = allQuests;
 
-            // Filter by view type
+            // Filter by view type first (before region filter)
             if (currentView === 'pinned') {
                 quests = quests.filter(q => pinnedQuests.has(q.internal_name));
             } else if (currentView === 'ready') {
@@ -880,6 +940,9 @@
                     return canObtainAll;
                 });
             }
+
+            // Update region selector with regions from current view-filtered quests
+            updateRegionSelector(quests);
 
             // Filter by region
             if (currentRegion) {
@@ -934,12 +997,8 @@
                         if (item.in_inventory) locationParts.push(`📦 Inventory: ${item.in_inventory}`);
                         if (item.storage_locations) {
                             for (const [location, count] of Object.entries(item.storage_locations)) {
-                                let icon = '🏦';
-                                let shortName = location;
-                                if (location.toLowerCase().includes('saddlebag')) {
-                                    icon = '🎒';
-                                    shortName = 'Saddlebag';
-                                }
+                                const icon = getStorageIcon(location);
+                                const shortName = getStorageShortName(location);
                                 locationParts.push(`${icon} ${shortName}: ${count}`);
                             }
                         }
@@ -1070,31 +1129,8 @@
         }
 
         function renderPinnedRecipes(content) {
-            // Aggregate all materials across all pinned recipes
-            const aggregatedMaterials = {};
-
-            for (const recipe of allRecipes) {
-                for (const mat of recipe.materials) {
-                    if (!aggregatedMaterials[mat.name]) {
-                        aggregatedMaterials[mat.name] = {
-                            name: mat.name,
-                            need: 0,
-                            have: 0,
-                            in_inventory: mat.in_inventory || 0,
-                            in_storage: mat.in_storage || 0,
-                            storage_locations: mat.storage_locations || {},
-                            vendor_info: mat.vendor_info,
-                            needs_favor: mat.needs_favor,
-                            recipes: []
-                        };
-                    }
-                    aggregatedMaterials[mat.name].need += mat.need;
-                    // have is capped at need per-recipe, so we use max of storage totals
-                    const totalHave = (mat.in_inventory || 0) + (mat.in_storage || 0);
-                    aggregatedMaterials[mat.name].have = totalHave;
-                    aggregatedMaterials[mat.name].recipes.push(`${recipe.name} (×${recipe.quantity})`);
-                }
-            }
+            // Use shared aggregation utility
+            const aggregatedMaterials = aggregateMaterials(allRecipes);
 
             // Sort: incomplete items first, then by name
             const materials = Object.values(aggregatedMaterials).sort((a, b) => {
@@ -1115,16 +1151,8 @@
                     if (mat.in_inventory) locationParts.push(`📦 Inventory: ${mat.in_inventory}`);
                     if (mat.storage_locations && Object.keys(mat.storage_locations).length > 0) {
                         for (const [location, count] of Object.entries(mat.storage_locations)) {
-                            let icon = '🏦';
-                            let shortName = location;
-                            if (location.toLowerCase().includes('saddlebag')) {
-                                icon = '🎒';
-                                shortName = 'Saddlebag';
-                            } else if (location.toLowerCase().includes('dream')) {
-                                icon = '💤';
-                            } else if (location.toLowerCase().includes('community')) {
-                                icon = '🏠';
-                            }
+                            const icon = getStorageIcon(location);
+                            const shortName = getStorageShortName(location);
                             locationParts.push(`${icon} ${shortName}: ${count}`);
                         }
                     } else if (mat.in_storage) {
@@ -1170,30 +1198,8 @@
         }
 
         function renderReadyRecipes(content) {
-            // For Ready view, aggregate all materials across all ready recipes
-            const aggregatedMaterials = {};
-
-            for (const recipe of allRecipes) {
-                for (const mat of recipe.materials) {
-                    if (!aggregatedMaterials[mat.name]) {
-                        aggregatedMaterials[mat.name] = {
-                            name: mat.name,
-                            need: 0,
-                            have: 0,
-                            in_inventory: mat.in_inventory || 0,
-                            in_storage: mat.in_storage || 0,
-                            storage_locations: mat.storage_locations || {},
-                            vendor_info: mat.vendor_info,
-                            needs_favor: mat.needs_favor,
-                            recipes: []
-                        };
-                    }
-                    aggregatedMaterials[mat.name].need += mat.need;
-                    const totalHave = (mat.in_inventory || 0) + (mat.in_storage || 0);
-                    aggregatedMaterials[mat.name].have = totalHave;
-                    aggregatedMaterials[mat.name].recipes.push(`${recipe.name} (×${recipe.quantity})`);
-                }
-            }
+            // Use shared aggregation utility
+            const aggregatedMaterials = aggregateMaterials(allRecipes);
 
             // Sort alphabetically for ready view
             const materials = Object.values(aggregatedMaterials).sort((a, b) =>
@@ -1222,16 +1228,8 @@
                     if (mat.in_inventory) locationParts.push(`📦 Inventory: ${mat.in_inventory}`);
                     if (mat.storage_locations && Object.keys(mat.storage_locations).length > 0) {
                         for (const [location, count] of Object.entries(mat.storage_locations)) {
-                            let icon = '🏦';
-                            let shortName = location;
-                            if (location.toLowerCase().includes('saddlebag')) {
-                                icon = '🎒';
-                                shortName = 'Saddlebag';
-                            } else if (location.toLowerCase().includes('dream')) {
-                                icon = '💤';
-                            } else if (location.toLowerCase().includes('community')) {
-                                icon = '🏠';
-                            }
+                            const icon = getStorageIcon(location);
+                            const shortName = getStorageShortName(location);
                             locationParts.push(`${icon} ${shortName}: ${count}`);
                         }
                     } else if (mat.in_storage) {
@@ -1501,8 +1499,35 @@
         document.getElementById('characterViewSelector').value = characterView;
         switchTab(currentTab);
 
-        // Auto-refresh every 3 seconds
-        setInterval(loadData, 3000);
+        // Auto-refresh with visibility-aware scheduling
+        let refreshIntervalId = null;
+        const REFRESH_INTERVAL = 5000; // 5 seconds (reduced from 3s)
+
+        function startRefreshInterval() {
+            if (!refreshIntervalId) {
+                refreshIntervalId = setInterval(loadData, REFRESH_INTERVAL);
+            }
+        }
+
+        function stopRefreshInterval() {
+            if (refreshIntervalId) {
+                clearInterval(refreshIntervalId);
+                refreshIntervalId = null;
+            }
+        }
+
+        // Pause data loading when page is hidden (saves CPU/battery)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopRefreshInterval();
+            } else {
+                loadData(); // Refresh immediately when visible
+                startRefreshInterval();
+            }
+        });
+
+        // Start refresh interval
+        startRefreshInterval();
 
         // Update timestamp every second
         setInterval(updateTimestamp, 1000);

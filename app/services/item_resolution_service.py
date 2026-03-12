@@ -116,42 +116,12 @@ class ItemResolutionService:
                     })
 
     def _load_vendor_items(self) -> Dict[str, List[Dict]]:
-        """Load vendor item data"""
+        """Load vendor item data via VendorService (consolidated)"""
         if self._vendor_items is not None:
             return self._vendor_items
 
-        vendor_file = get_bundled_path('vendor_inventory.json')
-        if not vendor_file.exists():
-            self._vendor_items = {}
-            return self._vendor_items
-
-        vendor_data = self._cache.get_or_compute(
-            'vendors:all',
-            lambda: safe_read_json(vendor_file),
-            ttl=60.0,
-            file_path=vendor_file
-        )
-
-        if not vendor_data:
-            self._vendor_items = {}
-            return self._vendor_items
-
-        self._vendor_items = {}
-        vendors_dict = vendor_data.get('vendors', vendor_data)
-
-        for vendor_name, vendor_info in vendors_dict.items():
-            if isinstance(vendor_info, dict) and 'items' in vendor_info:
-                location = vendor_info.get('location', '')
-                for item_name, item_data in vendor_info.get('items', {}).items():
-                    if item_name not in self._vendor_items:
-                        self._vendor_items[item_name] = []
-                    self._vendor_items[item_name].append({
-                        'vendor': vendor_name,
-                        'location': location,
-                        'favor': item_data.get('favor', 'Unknown') if isinstance(item_data, dict) else 'Unknown',
-                        'price': item_data.get('price', 0) if isinstance(item_data, dict) else 0
-                    })
-
+        vendor_service = get_vendor_service()
+        self._vendor_items = vendor_service.get_vendor_items_as_dicts()
         return self._vendor_items
 
     def resolve_item(
@@ -339,6 +309,21 @@ class ItemResolutionService:
         """Find all recipes that produce an item"""
         self._load_recipes()
         return self._recipes_by_output.get(item_name, [])
+
+    def get_all_recipes(self) -> List[Dict]:
+        """Get all recipes (cached)"""
+        self._load_recipes()
+        return self._recipes
+
+    def get_recipe_lookup(self) -> Dict[str, Dict]:
+        """Get recipe_id -> recipe lookup dict"""
+        self._load_recipes()
+        return self._recipe_lookup
+
+    def get_recipes_by_output(self) -> Dict[str, List[Dict]]:
+        """Get output_item -> list of recipe info lookup dict"""
+        self._load_recipes()
+        return self._recipes_by_output
 
 
 # Module-level singleton

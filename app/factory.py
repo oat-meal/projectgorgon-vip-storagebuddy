@@ -87,7 +87,7 @@ def _setup_logging(app: Flask, config, debug: bool) -> None:
         level=log_level,
         format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
         handlers=[
-            logging.FileHandler(log_file, mode='w', encoding='utf-8'),
+            logging.FileHandler(log_file, mode='a', encoding='utf-8'),
             logging.StreamHandler(sys.stdout)
         ]
     )

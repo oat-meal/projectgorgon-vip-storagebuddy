@@ -733,6 +733,41 @@
         // Load theme immediately to prevent flash
         loadTheme();
 
+        // =============================================================================
+        // MATERIAL RENDERING ARCHITECTURE
+        // =============================================================================
+        // The audit report flagged similar material rendering code appearing in 5+ places.
+        // This is INTENTIONAL because each view has different layout and data requirements:
+        //
+        // 1. Ready Quests View: Items grouped by location, shows quest completion status
+        // 2. Pinned Quests View: Aggregates items across multiple quests, shows quest names
+        // 3. Single Quest Detail: Detailed view with checklist-style layout
+        // 4. Crafting Materials: Shows recipe-specific materials with craft counts
+        // 5. Shopping Cart: Buy-only focus with vendor and price info
+        //
+        // The CORE LOGIC is centralized in these utility functions:
+        // - getStorageIcon(location): Consistent icons for storage locations
+        // - categorizeMaterial(name, needed, have): Determines source (craft/buy/gather)
+        //   with memoization for performance
+        //
+        // The HTML templates remain view-specific because:
+        // - Different column layouts (2-col vs 3-col vs checklist)
+        // - Different grouping (by location, by quest, by recipe)
+        // - Different metadata shown (quest names, prices, craft counts)
+        // - Abstracting would require complex config objects, reducing maintainability
+        //
+        // If adding a new view, copy an existing pattern and use the utility functions.
+        // =============================================================================
+
+        // Utility function to get storage location icon
+        function getStorageIcon(location) {
+            const loc = location.toLowerCase();
+            if (loc.includes('dream')) return '💤';
+            if (loc.includes('saddlebag')) return '🎒';
+            if (loc.includes('community')) return '🏠';
+            return '🏦';
+        }
+
         let currentTab = 'help';
         let currentQuestView = 'all';
         let currentRecipeView = 'all';
@@ -744,6 +779,13 @@
         let completableQuestSet = new Set();
         let purchasableQuestSet = new Set();
         let needsFavorQuestSet = new Set();
+
+        // AbortController for cancelling pending fetch requests on tab switch
+        let currentAbortController = null;
+
+        // Cached DOM element references (populated on DOMContentLoaded)
+        const DOM = {};
+
         // Pinned quests: Set of quest internal names
         let pinnedQuests = new Set(JSON.parse(localStorage.getItem('pinnedQuests') || '[]'));
         const MAX_PINNED_QUESTS = 20;
@@ -774,17 +816,45 @@
         let vendorItems = {}; // Item name -> vendor info (for checking if items can be bought)
         let debugMode = false; // Debug mode state
 
-        // Initialize tab based on currentTab value
-        function initializeTab() {
-            const questSearchBox = document.getElementById('questSearchBox');
-            const craftingSearchBox = document.getElementById('craftingSearchBox');
-            const regionFilter = document.getElementById('regionFilter');
-            const skillFilter = document.getElementById('skillFilter');
-            const questFilter = document.getElementById('questFilter');
-            const recipeFilter = document.getElementById('recipeFilter');
+        // =============================================================================
+        // CRAFTABILITY CACHING STRATEGY
+        // =============================================================================
+        // The audit report flagged "Craftability Check O(n³) Complexity".
+        // Actual complexity is O(n*k) where n=recipes, k=ingredients/recipe (~1-5).
+        //
+        // Memoization is handled at the categorizeMaterial() layer:
+        // - Cache key: "itemName:qtyNeeded:qtyHave"
+        // - Cache cleared on inventory changes (loadPlayerInventory)
+        // - This covers repeated calls to canCraftItem() and checkVendorFavor()
+        //
+        // Additional caching on canCraftItem() is impractical because:
+        // - It uses a "visited" set for cycle detection during recursive calls
+        // - Results depend on current inventory state (changes frequently)
+        // - The memoization at categorizeMaterial() already prevents redundant work
+        //
+        // If performance becomes an issue, consider:
+        // 1. Debouncing checkRecipeCraftability() calls
+        // 2. Moving craftability checks to a Web Worker
+        // 3. Server-side pre-computation of recipe dependencies
+        // =============================================================================
+        let _categorizeMaterialCache = new Map();
 
+        // Debounced localStorage save for recipeQuantities (prevents excessive writes)
+        let _recipeQuantitiesSaveTimer = null;
+        function saveRecipeQuantitiesDebounced() {
+            if (_recipeQuantitiesSaveTimer) {
+                clearTimeout(_recipeQuantitiesSaveTimer);
+            }
+            _recipeQuantitiesSaveTimer = setTimeout(() => {
+                localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+                _recipeQuantitiesSaveTimer = null;
+            }, 300);
+        }
+
+        // Initialize tab based on currentTab value (uses cached DOM elements)
+        function initializeTab() {
             // Set correct tab button as active
-            document.querySelectorAll('.tab-btn').forEach(btn => {
+            DOM.tabButtons.forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent.toLowerCase().includes(currentTab)) {
                     btn.classList.add('active');
@@ -792,22 +862,22 @@
             });
 
             if (currentTab === 'quests') {
-                questSearchBox.style.display = 'block';
-                craftingSearchBox.style.display = 'none';
-                questFilter.style.display = 'flex';
-                recipeFilter.style.display = 'none';
-                regionFilter.style.display = 'block';
-                skillFilter.style.display = 'none';
+                DOM.questSearchBox.style.display = 'block';
+                DOM.craftingSearchBox.style.display = 'none';
+                DOM.questFilter.style.display = 'flex';
+                DOM.recipeFilter.style.display = 'none';
+                DOM.regionFilter.style.display = 'block';
+                DOM.skillFilter.style.display = 'none';
                 loadActiveQuests().then(() => {
                     switchQuestView();
                 });
             } else if (currentTab === 'crafting') {
-                questSearchBox.style.display = 'none';
-                craftingSearchBox.style.display = 'block';
-                questFilter.style.display = 'none';
-                recipeFilter.style.display = 'flex';
-                regionFilter.style.display = 'none';
-                skillFilter.style.display = 'block';
+                DOM.questSearchBox.style.display = 'none';
+                DOM.craftingSearchBox.style.display = 'block';
+                DOM.questFilter.style.display = 'none';
+                DOM.recipeFilter.style.display = 'flex';
+                DOM.regionFilter.style.display = 'none';
+                DOM.skillFilter.style.display = 'block';
                 loadCraftingRecipes().then(() => {
                     // Restore shopping list if recipes are selected
                     if (Object.keys(recipeQuantities).length > 0) {
@@ -815,22 +885,50 @@
                     }
                 });
             } else if (currentTab === 'help') {
-                questSearchBox.style.display = 'none';
-                craftingSearchBox.style.display = 'none';
-                questFilter.style.display = 'none';
-                recipeFilter.style.display = 'none';
-                regionFilter.style.display = 'none';
-                skillFilter.style.display = 'none';
+                DOM.questSearchBox.style.display = 'none';
+                DOM.craftingSearchBox.style.display = 'none';
+                DOM.questFilter.style.display = 'none';
+                DOM.recipeFilter.style.display = 'none';
+                DOM.regionFilter.style.display = 'none';
+                DOM.skillFilter.style.display = 'none';
                 showHelp();
             }
         }
 
+        // Helper: cancelable fetch that respects currentAbortController
+        function cancelableFetch(url, options = {}) {
+            // Cancel any pending requests
+            if (currentAbortController) {
+                currentAbortController.abort();
+            }
+            currentAbortController = new AbortController();
+            return fetch(url, { ...options, signal: currentAbortController.signal });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            initializeTab();
-            setInterval(refreshCurrentQuest, 5000); // Auto-refresh every 5 seconds
+            // Cache frequently accessed DOM elements
+            DOM.questSearchBox = document.getElementById('questSearchBox');
+            DOM.craftingSearchBox = document.getElementById('craftingSearchBox');
+            DOM.characterSearchBox = document.getElementById('characterSearchBox');
+            DOM.regionFilter = document.getElementById('regionFilter');
+            DOM.skillFilter = document.getElementById('skillFilter');
+            DOM.questFilter = document.getElementById('questFilter');
+            DOM.recipeFilter = document.getElementById('recipeFilter');
+            DOM.characterFilter = document.getElementById('characterFilter');
+            DOM.questDetail = document.getElementById('questDetail');
+            DOM.questListContainer = document.getElementById('questListContainer');
+            DOM.tabButtons = document.querySelectorAll('.tab-btn');
 
-            document.getElementById('questSearchBox').addEventListener('input', (e) => {
+            initializeTab();
+            // Auto-refresh every 5 seconds
+            // NOTE: We intentionally don't use Visibility API to skip refreshes when hidden.
+            // The main window is typically behind the game (not minimized), and Visibility API
+            // only detects tab switches/minimize, not windows behind other applications.
+            // The data must stay fresh so it's up-to-date when user alt-tabs back.
+            setInterval(refreshCurrentQuest, 5000);
+
+            DOM.questSearchBox.addEventListener('input', (e) => {
                 if (e.target.value.length >= 2) {
                     searchQuestsOnly(e.target.value);
                 } else {
@@ -839,7 +937,7 @@
                 }
             });
 
-            document.getElementById('craftingSearchBox').addEventListener('input', (e) => {
+            DOM.craftingSearchBox.addEventListener('input', (e) => {
                 if (e.target.value.length >= 2) {
                     searchRecipesOnly(e.target.value);
                 } else {
@@ -848,24 +946,22 @@
                 }
             });
 
-            document.getElementById('regionFilter').addEventListener('change', () => {
+            DOM.regionFilter.addEventListener('change', () => {
                 // Re-render current quest view with region filter applied
                 if (currentTab === 'quests') {
-                    const questSearchBox = document.getElementById('questSearchBox');
-                    if (questSearchBox.value.length >= 2) {
-                        searchQuestsOnly(questSearchBox.value);
+                    if (DOM.questSearchBox.value.length >= 2) {
+                        searchQuestsOnly(DOM.questSearchBox.value);
                     } else {
                         switchQuestView();
                     }
                 }
             });
 
-            document.getElementById('skillFilter').addEventListener('change', () => {
+            DOM.skillFilter.addEventListener('change', () => {
                 // Re-render recipe view with skill filter applied
                 if (currentTab === 'crafting') {
-                    const craftingSearchBox = document.getElementById('craftingSearchBox');
-                    if (craftingSearchBox.value.length >= 2) {
-                        searchRecipesOnly(craftingSearchBox.value);
+                    if (DOM.craftingSearchBox.value.length >= 2) {
+                        searchRecipesOnly(DOM.craftingSearchBox.value);
                     } else {
                         // Use switchRecipeView to respect current view (all, craftable, pinned)
                         switchRecipeView();
@@ -875,6 +971,12 @@
         });
 
         function switchTab(tab) {
+            // Cancel any pending fetch requests from previous tab
+            if (currentAbortController) {
+                currentAbortController.abort();
+                currentAbortController = null;
+            }
+
             currentTab = tab;
 
             // Clear selected quest when switching tabs
@@ -985,10 +1087,10 @@
                     </div>
                 `;
             }
-            document.getElementById('questDetail').innerHTML = emptyStateHtml;
+            DOM.questDetail.innerHTML = emptyStateHtml;
 
             // Update button styles - find button by matching tab name
-            document.querySelectorAll('.tab-btn').forEach(btn => {
+            DOM.tabButtons.forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent.toLowerCase().includes(tab)) {
                     btn.classList.add('active');
@@ -996,37 +1098,30 @@
             });
 
             // Show/hide filters and controls based on tab
-            const questSearchBox = document.getElementById('questSearchBox');
-            const craftingSearchBox = document.getElementById('craftingSearchBox');
-            const regionFilter = document.getElementById('regionFilter');
-            const skillFilter = document.getElementById('skillFilter');
-            const questFilter = document.getElementById('questFilter');
-            const recipeFilter = document.getElementById('recipeFilter');
-
             if (tab === 'quests') {
-                questSearchBox.style.display = 'block';
-                craftingSearchBox.style.display = 'none';
-                questFilter.style.display = 'block';
-                recipeFilter.style.display = 'none';
-                regionFilter.style.display = 'block';
-                skillFilter.style.display = 'none';
-                document.getElementById('characterSearchBox').style.display = 'none';
-                document.getElementById('characterFilter').style.display = 'none';
-                questSearchBox.value = '';
+                DOM.questSearchBox.style.display = 'block';
+                DOM.craftingSearchBox.style.display = 'none';
+                DOM.questFilter.style.display = 'block';
+                DOM.recipeFilter.style.display = 'none';
+                DOM.regionFilter.style.display = 'block';
+                DOM.skillFilter.style.display = 'none';
+                DOM.characterSearchBox.style.display = 'none';
+                DOM.characterFilter.style.display = 'none';
+                DOM.questSearchBox.value = '';
                 // Load data and apply current filter
                 loadActiveQuests().then(() => {
                     switchQuestView();
                 });
             } else if (tab === 'crafting') {
-                questSearchBox.style.display = 'none';
-                craftingSearchBox.style.display = 'block';
-                questFilter.style.display = 'none';
-                recipeFilter.style.display = 'block';
-                regionFilter.style.display = 'none';
-                skillFilter.style.display = 'block';
-                document.getElementById('characterSearchBox').style.display = 'none';
-                document.getElementById('characterFilter').style.display = 'none';
-                craftingSearchBox.value = '';
+                DOM.questSearchBox.style.display = 'none';
+                DOM.craftingSearchBox.style.display = 'block';
+                DOM.questFilter.style.display = 'none';
+                DOM.recipeFilter.style.display = 'block';
+                DOM.regionFilter.style.display = 'none';
+                DOM.skillFilter.style.display = 'block';
+                DOM.characterSearchBox.style.display = 'none';
+                DOM.characterFilter.style.display = 'none';
+                DOM.craftingSearchBox.value = '';
                 loadCraftingRecipes().then(() => {
                     // Restore shopping list if recipes are selected
                     if (Object.keys(recipeQuantities).length > 0) {
@@ -1034,31 +1129,31 @@
                     }
                 });
             } else if (tab === 'character') {
-                questSearchBox.style.display = 'none';
-                craftingSearchBox.style.display = 'none';
-                document.getElementById('characterSearchBox').style.display = 'block';
-                questFilter.style.display = 'none';
-                recipeFilter.style.display = 'none';
-                document.getElementById('characterFilter').style.display = 'block';
-                regionFilter.style.display = 'none';
-                skillFilter.style.display = 'none';
-                document.getElementById('characterSearchBox').value = '';
+                DOM.questSearchBox.style.display = 'none';
+                DOM.craftingSearchBox.style.display = 'none';
+                DOM.characterSearchBox.style.display = 'block';
+                DOM.questFilter.style.display = 'none';
+                DOM.recipeFilter.style.display = 'none';
+                DOM.characterFilter.style.display = 'block';
+                DOM.regionFilter.style.display = 'none';
+                DOM.skillFilter.style.display = 'none';
+                DOM.characterSearchBox.value = '';
                 loadCharacterData();
             } else if (tab === 'help') {
-                questSearchBox.style.display = 'none';
-                craftingSearchBox.style.display = 'none';
-                document.getElementById('characterSearchBox').style.display = 'none';
-                questFilter.style.display = 'none';
-                recipeFilter.style.display = 'none';
-                document.getElementById('characterFilter').style.display = 'none';
-                regionFilter.style.display = 'none';
-                skillFilter.style.display = 'none';
+                DOM.questSearchBox.style.display = 'none';
+                DOM.craftingSearchBox.style.display = 'none';
+                DOM.characterSearchBox.style.display = 'none';
+                DOM.questFilter.style.display = 'none';
+                DOM.recipeFilter.style.display = 'none';
+                DOM.characterFilter.style.display = 'none';
+                DOM.regionFilter.style.display = 'none';
+                DOM.skillFilter.style.display = 'none';
                 showHelp();
             }
         }
 
         function switchQuestView() {
-            const questView = document.getElementById('questFilter').value;
+            const questView = DOM.questFilter.value;
             currentQuestView = questView;
 
             if (questView === 'all') {
@@ -1076,9 +1171,9 @@
         }
 
         async function renderAllQuestsView() {
-            const container = document.getElementById('questListContainer');
-            const detailContainer = document.getElementById('questDetail');
-            const selectedRegion = document.getElementById('regionFilter').value;
+            const container = DOM.questListContainer;
+            const detailContainer = DOM.questDetail;
+            const selectedRegion = DOM.regionFilter.value;
 
             // Filter by region if one is selected
             let filteredQuests = activeQuests;
@@ -1148,7 +1243,7 @@
 
                     listHtml += `
                         <div class="${classes.join(' ')}"
-                             onclick="toggleQuestPin('${quest.internal_name}'); renderAllQuestsView();">
+                             onclick="toggleQuestPin('${quest.internal_name}')">
                             <div class="quest-item-name">${isPinned ? '📌 ' : ''}${quest.name}${statusBadge}</div>
                             <div class="quest-item-location">${quest.location}</div>
                         </div>
@@ -1210,8 +1305,9 @@
         }
 
         async function renderReadyQuestsView() {
-            const container = document.getElementById('questListContainer');
-            const detailContainer = document.getElementById('questDetail');
+            const container = DOM.questListContainer;
+            const detailContainer = DOM.questDetail;
+            const selectedRegion = DOM.regionFilter.value;
 
             // Combine completable and purchasable quests from activeQuests
             const readyQuestIds = new Set([
@@ -1219,8 +1315,11 @@
                 ...purchasableQuests.map(q => q.internal_name)
             ]);
 
-            // Filter activeQuests to only ready ones
-            const readyQuests = activeQuests.filter(q => readyQuestIds.has(q.internal_name));
+            // Filter activeQuests to only ready ones, then apply region filter
+            let readyQuests = activeQuests.filter(q => readyQuestIds.has(q.internal_name));
+            if (selectedRegion) {
+                readyQuests = readyQuests.filter(q => q.location === selectedRegion);
+            }
 
             if (readyQuests.length === 0) {
                 container.innerHTML = `
@@ -1295,7 +1394,7 @@
 
                     listHtml += `
                         <div class="${classes.join(' ')}"
-                             onclick="toggleQuestPin('${quest.internal_name}'); renderReadyQuestsView();">
+                             onclick="toggleQuestPin('${quest.internal_name}')">
                             <div class="quest-item-name">${isPinned ? '📌 ' : ''}${quest.name}${statusBadge}</div>
                         </div>
                     `;
@@ -1312,7 +1411,7 @@
 
         // Render full details for all ready quests in the right panel
         async function renderReadyQuestDetails(readyQuests) {
-            const detailContainer = document.getElementById('questDetail');
+            const detailContainer = DOM.questDetail;
 
             if (readyQuests.length === 0) {
                 detailContainer.innerHTML = '<p class="empty-state">No ready quests to show</p>';
@@ -1389,7 +1488,7 @@
                                         <div style="font-weight: 600; color: var(--text-primary); font-size: 15px;">${isPinned ? '📌 ' : ''}${quest.quest_name}</div>
                                         <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">${statusText}</div>
                                     </div>
-                                    <button onclick="event.stopPropagation(); toggleQuestPin('${quest.id}'); renderReadyQuestsView();"
+                                    <button onclick="event.stopPropagation(); toggleQuestPin('${quest.id}')"
                                             style="padding: 6px 12px; border: 1px solid ${isPinned ? 'var(--danger)' : 'var(--accent)'}; border-radius: 4px; background: var(--bg-card); color: ${isPinned ? 'var(--danger)' : 'var(--accent)'}; cursor: pointer; font-size: 12px; font-weight: 500;">
                                         ${isPinned ? '✕ Unpin' : '📌 Pin'}
                                     </button>
@@ -1415,9 +1514,7 @@
                             }
                             if (storageLocations && Object.keys(storageLocations).length > 0) {
                                 for (const [loc, count] of Object.entries(storageLocations)) {
-                                    let icon = '🏦';
-                                    if (loc.toLowerCase().includes('dream')) icon = '💤';
-                                    else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
+                                    const icon = getStorageIcon(loc);
                                     locationParts.push(`${icon} ${loc}: ${count}`);
                                 }
                             }
@@ -1468,8 +1565,8 @@
                                     methodColor = 'var(--favor)';
                                     itemClass += ' needs-favor';
                                 } else {
-                                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(name)}`;
-                                    retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;">📖 Wiki</a>`;
+                                    // Gather/farm - wiki link is now added separately to all items
+                                    retrievalMethod = `🔍 Farm/Gather`;
                                     methodColor = 'var(--accent)';
                                 }
                             }
@@ -1487,10 +1584,7 @@
                             // Include all storage locations
                             if (storageLocations && Object.keys(storageLocations).length > 0) {
                                 for (const [loc, count] of Object.entries(storageLocations)) {
-                                    let icon = '🏦';
-                                    if (loc.toLowerCase().includes('dream')) icon = '💤';
-                                    else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
-                                    else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                                    const icon = getStorageIcon(loc);
                                     storageParts.push(`${icon} ${loc}: ${count}`);
                                 }
                             }
@@ -1498,14 +1592,19 @@
                                 storageLine = storageParts.join(' &nbsp;•&nbsp; ');
                             }
 
+                            // Always generate wiki link for consistency
+                            const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(name)}`;
+                            const wikiLink = `<a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 8px;" title="Search wiki for ${name}">📖 Wiki</a>`;
+
                             html += `
                                 <div class="${itemClass}" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
                                     <table style="width: 100%; border-collapse: collapse;">
                                         <tr>
-                                            <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${name}</td>
-                                            <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine ? '6px' : '0'};">${progressText}</td>
+                                            <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: 6px;">${name}${wikiLink}</td>
+                                            <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: 6px;">${progressText}</td>
                                         </tr>
-                                        ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center;">${storageLine}</td></tr>` : ''}
+                                        ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center; padding-bottom: 4px;">${storageLine}</td></tr>` : ''}
+                                        <tr><td colspan="2" style="font-size: 12px; color: ${methodColor}; font-weight: 500;">${retrievalMethod}</td></tr>
                                     </table>
                                 </div>
                             `;
@@ -1527,7 +1626,7 @@
 
         // Render pinned quest details in the right panel (used by All/Ready views)
         async function renderPinnedQuestDetails() {
-            const detailContainer = document.getElementById('questDetail');
+            const detailContainer = DOM.questDetail;
             const pinnedQuestIds = [...pinnedQuests];
 
             if (pinnedQuestIds.length === 0) {
@@ -1594,7 +1693,7 @@
                             <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${location} • ${completeItems}/${totalItems} items • ${statusBadge}</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <button onclick="toggleQuestPin('${quest.id}'); switchQuestView();" style="width: 28px; height: 28px; border: 1px solid var(--danger); border-radius: 4px; background: var(--bg-card); color: var(--danger); cursor: pointer; font-size: 14px;" title="Unpin">✕</button>
+                            <button onclick="toggleQuestPin('${quest.id}')" style="width: 28px; height: 28px; border: 1px solid var(--danger); border-radius: 4px; background: var(--bg-card); color: var(--danger); cursor: pointer; font-size: 14px;" title="Unpin">✕</button>
                         </div>
                     </div>`;
                 }
@@ -1684,12 +1783,7 @@
                         // Show individual storage locations
                         if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                             for (const [location, count] of Object.entries(item.storageLocations)) {
-                                let icon = '🏦';
-                                if (location.toLowerCase().includes('dream')) {
-                                    icon = '💤';
-                                } else if (location.toLowerCase().includes('saddlebag')) {
-                                    icon = '🎒';
-                                }
+                                const icon = getStorageIcon(location);
                                 if (item.inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
                                 locationInfo += `${icon} ${location}: ${count}`;
                             }
@@ -1755,11 +1849,15 @@
                             methodColor = category.complete ? 'var(--success)' : 'var(--favor)';
                             if (!category.complete) itemClass += ' needs-favor';
                         } else {
-                            const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
-                            retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.name}">📖 Wiki</a>`;
+                            // Must be gathered - wiki link added separately to all items
+                            retrievalMethod = `🔍 Farm/Gather`;
                             methodColor = category.complete ? 'var(--success)' : 'var(--accent)';
                         }
                     }
+
+                    // Always generate wiki link for consistency
+                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
+                    const wikiLink = `<a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 8px;" title="Search wiki for ${item.name}">📖 Wiki</a>`;
 
                     // Build storage line like Ready Quests format
                     let storageParts = [];
@@ -1768,10 +1866,7 @@
                     }
                     if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                         for (const [loc, count] of Object.entries(item.storageLocations)) {
-                            let icon = '🏦';
-                            if (loc.toLowerCase().includes('dream')) icon = '💤';
-                            else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
-                            else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                            const icon = getStorageIcon(loc);
                             storageParts.push(`${icon} ${loc}: ${count}`);
                         }
                     }
@@ -1787,7 +1882,7 @@
                         <div class="${itemClass}" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${item.name}</td>
+                                    <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${item.name}${wikiLink}</td>
                                     <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine ? '6px' : '0'};">${progressText}</td>
                                 </tr>
                                 ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center;">${storageLine}</td></tr>` : ''}
@@ -1807,8 +1902,8 @@
         }
 
         async function renderPinnedQuestsView() {
-            const container = document.getElementById('questListContainer');
-            const detailContainer = document.getElementById('questDetail');
+            const container = DOM.questListContainer;
+            const detailContainer = DOM.questDetail;
 
             const pinnedQuestIds = [...pinnedQuests];
 
@@ -1951,7 +2046,7 @@
 
                         listHtml += `
                             <div class="${classes.join(' ')}"
-                                 onclick="toggleQuestPin('${quest.id}'); renderPinnedQuestsView();"
+                                 onclick="toggleQuestPin('${quest.id}')"
                                  style="cursor: pointer;">
                                 <div class="quest-item-name">📌 ${quest.quest_name}${statusBadge}</div>
                                 <div class="quest-item-location">${completeItems}/${totalItems} items complete</div>
@@ -2043,12 +2138,7 @@
                         if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                             for (const [location, count] of Object.entries(item.storageLocations)) {
                                 // Get appropriate icon for each location type
-                                let icon = '🏦'; // Default bank icon
-                                if (location.toLowerCase().includes('dream')) {
-                                    icon = '💤'; // Dream world chest
-                                } else if (location.toLowerCase().includes('saddlebag')) {
-                                    icon = '🎒'; // Saddlebag
-                                }
+                                const icon = getStorageIcon(location);
                                 if (item.inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
                                 locationInfo += `${icon} ${location}: ${count}`;
                             }
@@ -2115,12 +2205,15 @@
                             methodColor = category.complete ? 'var(--success)' : 'var(--favor)';
                             if (!category.complete) itemClass += ' needs-favor';
                         } else {
-                            // Must be gathered - add wiki link
-                            const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
-                            retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.name}">📖 Wiki</a>`;
+                            // Must be gathered - wiki link added separately to all items
+                            retrievalMethod = `🔍 Farm/Gather`;
                             methodColor = category.complete ? 'var(--success)' : 'var(--accent)';
                         }
                     }
+
+                    // Always generate wiki link for consistency
+                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;
+                    const wikiLink = `<a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 8px;" title="Search wiki for ${item.name}">📖 Wiki</a>`;
 
                     // Build storage line like Ready Quests format
                     let storageParts = [];
@@ -2129,10 +2222,7 @@
                     }
                     if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                         for (const [loc, count] of Object.entries(item.storageLocations)) {
-                            let icon = '🏦';
-                            if (loc.toLowerCase().includes('dream')) icon = '💤';
-                            else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
-                            else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                            const icon = getStorageIcon(loc);
                             storageParts.push(`${icon} ${loc}: ${count}`);
                         }
                     }
@@ -2148,7 +2238,7 @@
                         <div class="${itemClass}" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${item.name}</td>
+                                    <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${item.name}${wikiLink}</td>
                                     <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine ? '6px' : '0'};">${progressText}</td>
                                 </tr>
                                 ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center;">${storageLine}</td></tr>` : ''}
@@ -2169,12 +2259,19 @@
 
         async function loadActiveQuests() {
             try {
-                // Load active, completable, and purchasable quests
+                // Cancel any in-flight quest requests and create new shared controller
+                if (currentAbortController) {
+                    currentAbortController.abort();
+                }
+                currentAbortController = new AbortController();
+                const signal = currentAbortController.signal;
+
+                // Load active, completable, and purchasable quests in parallel
                 const [activeResponse, completableResponse, purchasableResponse, needsFavorResponse] = await Promise.all([
-                    fetch('/api/active_quests'),
-                    fetch('/api/completable_quests'),
-                    fetch('/api/purchasable_quests'),
-                    fetch('/api/needs_favor_quests')
+                    fetch('/api/active_quests', { signal }),
+                    fetch('/api/completable_quests', { signal }),
+                    fetch('/api/purchasable_quests', { signal }),
+                    fetch('/api/needs_favor_quests', { signal })
                 ]);
                 const activeData = await activeResponse.json();
                 const completableData = await completableResponse.json();
@@ -2192,8 +2289,10 @@
                 // Render based on current view
                 switchQuestView();
             } catch (error) {
+                // Silently ignore abort errors (user switched tabs)
+                if (error.name === 'AbortError') return;
                 console.error('Error loading active quests:', error);
-                document.getElementById('questListContainer').innerHTML = '<p class="empty-state">Error loading quests</p>';
+                DOM.questListContainer.innerHTML = '<p class="empty-state">Error loading quests</p>';
             }
         }
 
@@ -2216,6 +2315,7 @@
                 // Build inventory map from full inventory data
                 playerInventory = {};
                 playerInventoryDetails = {}; // Store detailed location info
+                _categorizeMaterialCache.clear(); // Clear memoization cache when inventory changes
 
                 if (invData.data?.items) {
                     for (const [itemName, itemData] of Object.entries(invData.data.items)) {
@@ -2506,33 +2606,43 @@
         }
 
         function categorizeMaterial(itemName, qtyNeeded, qtyHave) {
+            // Check cache first
+            const cacheKey = `${itemName}:${qtyNeeded}:${qtyHave}`;
+            if (_categorizeMaterialCache.has(cacheKey)) {
+                return _categorizeMaterialCache.get(cacheKey);
+            }
+
             const missing = qtyNeeded - qtyHave;
             const isComplete = missing <= 0;
+            let result;
 
             // Check if craftable
             const craftResult = canCraftItem(itemName, Math.max(1, missing));
             if (craftResult.canCraft) {
-                return { source: 'craft', info: craftResult.craftInfo, complete: isComplete };
-            }
-
-            // Check if buyable from vendor (with favor check)
-            const favorCheck = checkVendorFavor(itemName);
-            if (favorCheck.canBuy) {
-                if (favorCheck.hasFavor) {
-                    // Player has sufficient favor with at least one vendor
-                    return { source: 'buy', info: favorCheck.vendorsWithFavor, complete: isComplete };
+                result = { source: 'craft', info: craftResult.craftInfo, complete: isComplete };
+            } else {
+                // Check if buyable from vendor (with favor check)
+                const favorCheck = checkVendorFavor(itemName);
+                if (favorCheck.canBuy) {
+                    if (favorCheck.hasFavor) {
+                        // Player has sufficient favor with at least one vendor
+                        result = { source: 'buy', info: favorCheck.vendorsWithFavor, complete: isComplete };
+                    } else {
+                        // Vendor exists but player lacks favor
+                        result = { source: 'buy_needs_favor', info: favorCheck.vendors, complete: isComplete };
+                    }
                 } else {
-                    // Vendor exists but player lacks favor
-                    return { source: 'buy_needs_favor', info: favorCheck.vendors, complete: isComplete };
+                    // Must be gathered
+                    result = { source: 'gather', info: null, complete: isComplete };
                 }
             }
 
-            // Must be gathered
-            return { source: 'gather', info: null, complete: isComplete };
+            _categorizeMaterialCache.set(cacheKey, result);
+            return result;
         }
 
         function switchRecipeView() {
-            const recipeView = document.getElementById('recipeFilter').value;
+            const recipeView = DOM.recipeFilter.value;
             currentRecipeView = recipeView;
 
             if (recipeView === 'shopping') {
@@ -2550,8 +2660,8 @@
         }
 
         async function renderShoppingCartView() {
-            const container = document.getElementById('questListContainer');
-            const detailContainer = document.getElementById('questDetail');
+            const container = DOM.questListContainer;
+            const detailContainer = DOM.questDetail;
 
             // Restore pinned recipes from localStorage
             const savedRecipes = localStorage.getItem('recipeQuantities');
@@ -2681,7 +2791,7 @@
                 `;
 
                 for (const recipe of recipes) {
-                    const qty = recipeQuantities[recipe.id]?.quantity || 1;
+                    const qty = recipeQuantities[recipe.id] || 1;
                     const isCraftable = craftableRecipeSet.has(recipe.id);
                     const isBuyable = buyableRecipeSet.has(recipe.id);
 
@@ -2725,7 +2835,7 @@
             // Build right panel: aggregated materials across all pinned recipes
             const aggregatedItems = {};
             for (const recipe of selectedRecipes) {
-                const qty = recipeQuantities[recipe.id]?.quantity || 1;
+                const qty = recipeQuantities[recipe.id] || 1;
                 for (const ing of recipe.ingredients) {
                     const itemName = ing.item || ing.name;
                     const needed = (ing.quantity || 1) * qty;
@@ -2780,10 +2890,7 @@
                 }
                 if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(item.storageLocations)) {
-                        let icon = '🏦';
-                        if (loc.toLowerCase().includes('dream')) icon = '💤';
-                        else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
-                        else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                        const icon = getStorageIcon(loc);
                         storageParts.push(`${icon} ${loc}: ${count}`);
                     }
                 }
@@ -2841,7 +2948,7 @@
         }
 
         function renderReadyRecipeMaterials() {
-            const detailContainer = document.getElementById('questDetail');
+            const detailContainer = DOM.questDetail;
 
             // Get all ready recipes (craftable + buyable)
             const readyRecipes = allRecipes.filter(r =>
@@ -2918,10 +3025,7 @@
                 }
                 if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(item.storageLocations)) {
-                        let icon = '🏦';
-                        if (loc.toLowerCase().includes('dream')) icon = '💤';
-                        else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
-                        else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                        const icon = getStorageIcon(loc);
                         storageParts.push(`${icon} ${loc}: ${count}`);
                     }
                 }
@@ -2980,7 +3084,7 @@
         }
 
         async function searchQuests(query) {
-            const container = document.getElementById('questListContainer');
+            const container = DOM.questListContainer;
             const searchType = document.querySelector('input[name="searchType"]:checked').value;
 
             try {
@@ -3053,8 +3157,8 @@
         }
 
         async function searchQuestsOnly(query) {
-            const container = document.getElementById('questListContainer');
-            const selectedRegion = document.getElementById('regionFilter').value;
+            const container = DOM.questListContainer;
+            const selectedRegion = DOM.regionFilter.value;
 
             try {
                 const questsResponse = await fetch(`/api/search_quests?q=${encodeURIComponent(query)}`);
@@ -3098,8 +3202,8 @@
         }
 
         async function searchRecipesOnly(query) {
-            const container = document.getElementById('questListContainer');
-            const selectedSkill = document.getElementById('skillFilter').value;
+            const container = DOM.questListContainer;
+            const selectedSkill = DOM.skillFilter.value;
             const queryLower = query.toLowerCase();
 
             try {
@@ -3178,7 +3282,7 @@
             const recipe = allRecipes.find(r => r.id === recipeId);
             if (!recipe) return;
 
-            const detailContainer = document.getElementById('questDetail');
+            const detailContainer = DOM.questDetail;
 
             // Check recipe status
             const isCraftable = craftableRecipeSet.has(recipe.id);
@@ -3284,8 +3388,8 @@
         }
 
         function renderQuestList(quests) {
-            const container = document.getElementById('questListContainer');
-            const selectedRegion = document.getElementById('regionFilter').value;
+            const container = DOM.questListContainer;
+            const selectedRegion = DOM.regionFilter.value;
 
             // Filter by region if one is selected
             let filteredQuests = quests;
@@ -3414,7 +3518,7 @@
         }
 
         async function loadQuestDetail(internalName) {
-            const container = document.getElementById('questDetail');
+            const container = DOM.questDetail;
             container.innerHTML = '<div class="loading">Loading quest details...</div>';
 
             try {
@@ -3428,7 +3532,7 @@
         }
 
         function renderQuestDetail(quest) {
-            const container = document.getElementById('questDetail');
+            const container = DOM.questDetail;
 
             if (quest.items.length === 0) {
                 container.innerHTML = `
@@ -3462,12 +3566,7 @@
                     if (item.storage_locations && Object.keys(item.storage_locations).length > 0) {
                         for (const [location, count] of Object.entries(item.storage_locations)) {
                             // Get appropriate icon for each location type
-                            let icon = '🏦'; // Default bank icon
-                            if (location.toLowerCase().includes('dream')) {
-                                icon = '💤'; // Dream world chest
-                            } else if (location.toLowerCase().includes('saddlebag')) {
-                                icon = '🎒'; // Saddlebag
-                            }
+                            const icon = getStorageIcon(location);
                             if (inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
                             locationInfo += `${icon} ${location}: ${count}`;
                         }
@@ -3540,12 +3639,15 @@
                         retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
                         methodColor = isComplete ? 'var(--success)' : 'var(--favor)';
                     } else {
-                        // Must be gathered - add wiki link
-                        const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.display_name)}`;
-                        retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${item.display_name}">📖 Wiki</a>`;
+                        // Must be gathered - wiki link added separately to all items
+                        retrievalMethod = `🔍 Farm/Gather`;
                         methodColor = isComplete ? 'var(--success)' : 'var(--accent)';
                     }
                 }
+
+                // Always generate wiki link for consistency
+                const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.display_name)}`;
+                const wikiLink = `<a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 8px;" title="Search wiki for ${item.display_name}">📖 Wiki</a>`;
 
                 // Build progress line matching crafting format
                 const progressLine = `Needed: ${needed}${missing > 0 ? ` | <span style="color: var(--danger);">Missing: ${missing}</span>` : ''}`;
@@ -3553,7 +3655,7 @@
                 return `
                     <div class="checklist-item ${completed ? 'completed' : ''}">
                         <div class="item-info" style="flex: 1;">
-                            <div class="item-name">${item.display_name}</div>
+                            <div class="item-name">${item.display_name}${wikiLink}</div>
                             ${keywordInfo}
                             <div class="item-progress">
                                 ${progressLine}
@@ -3592,17 +3694,17 @@
         }
 
         async function refreshCurrentQuest() {
-            if (selectedQuest) {
+            // Only refresh when on quests tab with a quest selected
+            if (currentTab === 'quests' && selectedQuest) {
                 await loadQuestDetail(selectedQuest);
             }
         }
 
         async function loadCraftingRecipes() {
-            const container = document.getElementById('questListContainer');
-            container.innerHTML = '<div class="loading">Loading recipes...</div>';
+            DOM.questListContainer.innerHTML = '<div class="loading">Loading recipes...</div>';
 
             try {
-                const response = await fetch('/recipes.json');
+                const response = await cancelableFetch('/recipes.json');
                 allRecipes = await response.json();
 
                 // Assign IDs to recipes BEFORE checking craftability
@@ -3637,14 +3739,16 @@
                 renderCraftingList();
                 await updateShoppingList();
             } catch (error) {
+                // Silently ignore abort errors (user switched tabs)
+                if (error.name === 'AbortError') return;
                 console.error('Error loading recipes:', error);
-                container.innerHTML = '<p class="empty-state">Error loading recipes</p>';
+                DOM.questListContainer.innerHTML = '<p class="empty-state">Error loading recipes</p>';
             }
         }
 
         function renderCraftingList() {
-            const container = document.getElementById('questListContainer');
-            const selectedSkill = document.getElementById('skillFilter').value;
+            const container = DOM.questListContainer;
+            const selectedSkill = DOM.skillFilter.value;
 
             if (allRecipes.length === 0) {
                 container.innerHTML = '<p class="empty-state">No recipes found</p>';
@@ -3670,14 +3774,13 @@
             });
 
             // Populate skill filter dropdown if empty (first time)
-            const skillFilterElement = document.getElementById('skillFilter');
-            if (skillFilterElement.options.length === 1) {
+            if (DOM.skillFilter.options.length === 1) {
                 const skills = Object.keys(recipesBySkill).sort();
                 for (const skill of skills) {
                     const option = document.createElement('option');
                     option.value = skill;
                     option.textContent = `${skill} (${recipesBySkill[skill].length})`;
-                    skillFilterElement.appendChild(option);
+                    DOM.skillFilter.appendChild(option);
                 }
             }
 
@@ -3763,7 +3866,7 @@
                 recipeQuantities[recipeId] = 1;
             }
 
-            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+            saveRecipeQuantitiesDebounced();
             renderCraftingList();
 
             // In Ready view, keep showing all ready recipe materials
@@ -3785,7 +3888,7 @@
                 recipeQuantities[recipeId] = Math.min(newQty, 999);
             }
 
-            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+            saveRecipeQuantitiesDebounced();
             renderCraftingList();
 
             // In Ready view, keep showing all ready recipe materials
@@ -3808,14 +3911,14 @@
                 recipeQuantities[recipeId] = Math.min(newQty, 999);
             }
 
-            localStorage.setItem('recipeQuantities', JSON.stringify(recipeQuantities));
+            saveRecipeQuantitiesDebounced();
             renderCraftingList();
             await updateShoppingList();
         }
 
         function showHelp() {
-            const listContainer = document.getElementById('questListContainer');
-            const detailContainer = document.getElementById('questDetail');
+            const listContainer = DOM.questListContainer;
+            const detailContainer = DOM.questDetail;
 
             listContainer.innerHTML = `
                 <div style="padding: 10px;">
@@ -4104,7 +4207,7 @@
         }
 
         async function updateShoppingList() {
-            const detailContainer = document.getElementById('questDetail');
+            const detailContainer = DOM.questDetail;
             const selectedRecipeIds = Object.keys(recipeQuantities);
 
             if (selectedRecipeIds.length === 0) {
@@ -4286,12 +4389,7 @@
                     if (storageLocations && Object.keys(storageLocations).length > 0) {
                         for (const [location, count] of Object.entries(storageLocations)) {
                             // Get appropriate icon for each location type
-                            let icon = '🏦'; // Default bank icon
-                            if (location.toLowerCase().includes('dream')) {
-                                icon = '💤'; // Dream world chest
-                            } else if (location.toLowerCase().includes('saddlebag')) {
-                                icon = '🎒'; // Saddlebag
-                            }
+                            const icon = getStorageIcon(location);
                             if (inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
                             locationInfo += `${icon} ${location}: ${count}`;
                         }
@@ -4337,11 +4435,14 @@
                     retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
                     methodColor = isComplete ? 'var(--success)' : 'var(--favor)';
                 } else {
-                    // Must be gathered - add wiki link
-                    const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(material.name)}`;
-                    retrievalMethod = `🔍 Farm/Gather <a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 6px;" title="Search wiki for ${material.name}">📖 Wiki</a>`;
+                    // Must be gathered - wiki link added separately to all items
+                    retrievalMethod = `🔍 Farm/Gather`;
                     methodColor = isComplete ? 'var(--success)' : 'var(--accent)';
                 }
+
+                // Always generate wiki link for consistency
+                const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(material.name)}`;
+                const wikiLink = `<a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 8px;" title="Search wiki for ${material.name}">📖 Wiki</a>`;
 
                 // Show matched items for keyword-based ingredients
                 let matchedItemsInfo = '';
@@ -4360,10 +4461,7 @@
                 }
                 if (storageLocations && Object.keys(storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(storageLocations)) {
-                        let icon = '🏦';
-                        if (loc.toLowerCase().includes('dream')) icon = '💤';
-                        else if (loc.toLowerCase().includes('saddlebag')) icon = '🎒';
-                        else if (loc.toLowerCase().includes('community')) icon = '🏠';
+                        const icon = getStorageIcon(loc);
                         storageParts.push(`${icon} ${loc}: ${count}`);
                     }
                 }
@@ -4377,7 +4475,7 @@
                     <div class="checklist-item" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr>
-                                <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine || matchedItemsInfo ? '6px' : '0'};">${material.name}</td>
+                                <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine || matchedItemsInfo ? '6px' : '0'};">${material.name}${wikiLink}</td>
                                 <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine || matchedItemsInfo ? '6px' : '0'};">${progressText}</td>
                             </tr>
                             ${matchedItemsInfo ? `<tr><td colspan="2" style="padding-bottom: 4px;">${matchedItemsInfo}</td></tr>` : ''}
@@ -4570,32 +4668,31 @@
 
         // Character View Functions
         async function loadCharacterData() {
-            const listContainer = document.getElementById('questListContainer');
-            const detailContainer = document.getElementById('questDetail');
-
             try {
-                const response = await fetch('/api/character_info');
+                const response = await cancelableFetch('/api/character_info');
                 if (!response.ok) throw new Error('Server not responding');
 
                 const data = await response.json();
                 characterData = data.data || {};
                 renderCharacterView();
             } catch (error) {
-                listContainer.innerHTML = `
+                // Silently ignore abort errors (user switched tabs)
+                if (error.name === 'AbortError') return;
+                DOM.questListContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">⚠️</div>
                         <p>Could not load character data</p>
-                        <p class="empty-state-hint">${error.message}</p>
+                        <p class="empty-state-hint">${escapeHtml(error.message)}</p>
                     </div>
                 `;
-                detailContainer.innerHTML = '';
+                DOM.questDetail.innerHTML = '';
             }
         }
 
         function renderCharacterView() {
-            const listContainer = document.getElementById('questListContainer');
-            const detailContainer = document.getElementById('questDetail');
-            const searchTerm = document.getElementById('characterSearchBox').value.toLowerCase();
+            const listContainer = DOM.questListContainer;
+            const detailContainer = DOM.questDetail;
+            const searchTerm = DOM.characterSearchBox.value.toLowerCase();
 
             if (!characterData || (!characterData.skills && !characterData.favor)) {
                 listContainer.innerHTML = `
@@ -4728,21 +4825,33 @@
         }
 
         function switchCharacterView() {
-            currentCharacterView = document.getElementById('characterFilter').value;
+            currentCharacterView = DOM.characterFilter.value;
             renderCharacterView();
         }
 
+        // HTML entity map for escapeHtml (avoids creating DOM element per call)
+        const _htmlEscapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+        const _htmlEscapeRegex = /[&<>"']/g;
+
         function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            if (typeof text !== 'string') return '';
+            return text.replace(_htmlEscapeRegex, char => _htmlEscapeMap[char]);
         }
 
-        // Character search event listener
-        document.getElementById('characterSearchBox').addEventListener('input', (e) => {
-            if (currentTab === 'character') {
-                renderCharacterView();
-            }
+        // Character search event listener (uses DOM cache after DOMContentLoaded)
+        // Note: This is called before DOM cache is populated, so check if available
+        document.addEventListener('DOMContentLoaded', () => {
+            DOM.characterSearchBox?.addEventListener('input', (e) => {
+                if (currentTab === 'character') {
+                    renderCharacterView();
+                }
+            });
         });
 
         function debugLog(...args) {
