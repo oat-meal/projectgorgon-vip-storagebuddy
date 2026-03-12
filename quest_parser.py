@@ -183,6 +183,35 @@ class InventoryParser:
             return None
         return max(item_files, key=lambda p: p.stat().st_mtime)
 
+    def get_latest_items_file_per_character(self) -> Dict[str, Path]:
+        """
+        Get the most recent items file for each character.
+
+        Returns:
+            Dict mapping character name to their latest items file path
+        """
+        item_files = list(self.reports_dir.glob('*_items_*.json'))
+        if not item_files:
+            return {}
+
+        # Group files by character name (first part of filename before _server_)
+        char_files = {}
+        for f in item_files:
+            # Filename format: CharName_ServerName_items_timestamp.json
+            parts = f.name.split('_')
+            if len(parts) >= 2:
+                char_name = parts[0]
+                if char_name not in char_files:
+                    char_files[char_name] = []
+                char_files[char_name].append(f)
+
+        # Get latest file for each character
+        latest_per_char = {}
+        for char_name, files in char_files.items():
+            latest_per_char[char_name] = max(files, key=lambda p: p.stat().st_mtime)
+
+        return latest_per_char
+
     def parse_items(self, items_file: Path) -> Dict[str, Dict]:
         """Parse items file and return inventory counts by location"""
         with open(items_file, 'r') as f:
@@ -218,6 +247,81 @@ class InventoryParser:
                 items_by_name[item_name]['storage'][location] += stack_size
 
         return items_by_name
+
+    def parse_all_characters(self) -> Dict[str, Dict]:
+        """
+        Parse items from all characters and aggregate with character attribution.
+
+        Returns:
+            Dict mapping item name to aggregated data:
+            {
+                'Iron Ore': {
+                    'total': 15,
+                    'byCharacter': {
+                        'Boricha': {
+                            'total': 10,
+                            'inventory': 5,
+                            'storage': {'Saddlebag': 3, 'NPC_Joe': 2}
+                        },
+                        'Bergheim': {
+                            'total': 5,
+                            'inventory': 5,
+                            'storage': {}
+                        }
+                    }
+                }
+            }
+        """
+        char_files = self.get_latest_items_file_per_character()
+        aggregated = {}
+
+        for char_name, items_file in char_files.items():
+            try:
+                with open(items_file, 'r') as f:
+                    data = json.load(f)
+
+                for item in data.get('Items', []):
+                    item_name = item.get('Name', 'Unknown')
+                    stack_size = item.get('StackSize', 1)
+
+                    # Determine location
+                    if 'StorageVault' in item:
+                        location = item['StorageVault']
+                    else:
+                        location = 'Inventory'
+
+                    # Initialize item entry
+                    if item_name not in aggregated:
+                        aggregated[item_name] = {
+                            'total': 0,
+                            'byCharacter': {}
+                        }
+
+                    # Initialize character entry for this item
+                    if char_name not in aggregated[item_name]['byCharacter']:
+                        aggregated[item_name]['byCharacter'][char_name] = {
+                            'total': 0,
+                            'inventory': 0,
+                            'storage': {}
+                        }
+
+                    char_data = aggregated[item_name]['byCharacter'][char_name]
+
+                    # Update counts
+                    aggregated[item_name]['total'] += stack_size
+                    char_data['total'] += stack_size
+
+                    if location == 'Inventory':
+                        char_data['inventory'] += stack_size
+                    else:
+                        if location not in char_data['storage']:
+                            char_data['storage'][location] = 0
+                        char_data['storage'][location] += stack_size
+
+            except (json.JSONDecodeError, IOError) as e:
+                logging.warning(f"Error parsing items file for {char_name}: {e}")
+
+        return aggregated
 
 
 class QuestTracker:
@@ -270,12 +374,25 @@ class QuestTracker:
         for item_name, qty, _ in items_collected:
             item_counts[item_name] = item_counts.get(item_name, 0) + qty
 
-        # Get inventory data if available
+        # Get inventory data if available - aggregate from all characters
         inventory_data = {}
         if self.inventory_parser:
-            items_file = self.inventory_parser.get_latest_items_file()
-            if items_file:
-                inventory_data = self.inventory_parser.parse_items(items_file)
+            aggregated = self.inventory_parser.parse_all_characters()
+            # Convert aggregated format to the expected format for checklist processing
+            for item_name, agg_data in aggregated.items():
+                total_inventory = 0
+                combined_storage = {}
+                for char_name, char_data in agg_data.get('byCharacter', {}).items():
+                    total_inventory += char_data.get('inventory', 0)
+                    for loc, count in char_data.get('storage', {}).items():
+                        # Prefix storage location with character name for clarity
+                        storage_key = f"{char_name}: {loc}"
+                        combined_storage[storage_key] = combined_storage.get(storage_key, 0) + count
+                inventory_data[item_name] = {
+                    'total': agg_data.get('total', 0),
+                    'inventory': total_inventory,
+                    'storage': combined_storage
+                }
 
         # Update checklist
         for item in checklist['items']:

@@ -19,6 +19,7 @@ including data sources, synchronization mechanisms, and design decisions.
 |-------|---------|--------|---------|-------------|
 | Pinned Recipes | `recipeQuantities` | `_recipe_selections` | via API | localStorage |
 | Pinned Quests | `pinnedQuests` | N/A | `pinnedQuests` | localStorage |
+| Selected Character | `storagebuddy-character` | via query param | synced from main | localStorage |
 | View Preferences | N/A | N/A | `overlayPrefs` | localStorage |
 | Inventory/Skills | via API | Computed | via API | Game files |
 
@@ -139,6 +140,12 @@ Materials are categorized in this priority order:
 ### Pinned Quests Sync
 - **Interval:** 1 second
 - **Action:** Syncs pinned quests from localStorage
+
+### Character Selection Sync (v0.7.1+)
+- **Source:** Main UI saves to `localStorage['storagebuddy-character']`
+- **Sync Method:** Overlay reads on each data refresh (5 second interval)
+- **Requirement:** Overlay requires character selection to display quest data
+- **Empty State:** Shows "No character selected" if no character in localStorage
 
 ## Known Limitations
 

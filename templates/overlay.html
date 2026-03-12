@@ -740,6 +740,10 @@
             } else if (e.key === 'pinnedRecipes') {
                 // Trigger data reload when recipes are pinned/unpinned
                 loadData();
+            } else if (e.key === 'storagebuddy-character') {
+                // Sync character selection from main page
+                selectedCharacter = e.newValue || null;
+                loadData();
             }
         });
 
@@ -756,6 +760,8 @@
         let characterData = null;
         // Pinned quests - synced from main window
         let pinnedQuests = new Set(JSON.parse(localStorage.getItem('pinnedQuests') || '[]'));
+        // Selected character - synced from main window
+        let selectedCharacter = localStorage.getItem('storagebuddy-character') || null;
 
         // Load saved preferences from localStorage
         const savedPrefs = JSON.parse(localStorage.getItem('overlayPrefs') || '{}');
@@ -873,6 +879,13 @@
             const content = document.getElementById('content');
             const statusEl = document.getElementById('connectionStatus');
 
+            // Always re-read character from localStorage on each refresh
+            // (storage event doesn't fire for same-tab changes, and popup may miss events)
+            const storedCharacter = localStorage.getItem('storagebuddy-character') || null;
+            if (storedCharacter !== selectedCharacter) {
+                selectedCharacter = storedCharacter;
+            }
+
             try {
                 if (currentTab === 'quests') {
                     await loadQuestData();
@@ -904,8 +917,25 @@
         }
 
         async function loadQuestData() {
-            // Always fetch active quests, filter client-side based on view
-            const response = await fetch(`/api/overlay_data?view=active`);
+            const content = document.getElementById('content');
+
+            // Require character to be selected (sync with main page behavior)
+            if (!selectedCharacter) {
+                allQuests = [];
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>No character selected</p>
+                        <p class="empty-state-hint">Select a character in the main app</p>
+                    </div>
+                `;
+                document.getElementById('itemCount').textContent = '0 quests';
+                return;
+            }
+
+            // Fetch active quests with character filter
+            const charParam = `&character=${encodeURIComponent(selectedCharacter)}`;
+            const response = await fetch(`/api/overlay_data?view=active${charParam}`);
 
             if (!response.ok) throw new Error('Server not responding');
 
@@ -922,23 +952,9 @@
             if (currentView === 'pinned') {
                 quests = quests.filter(q => pinnedQuests.has(q.internal_name));
             } else if (currentView === 'ready') {
-                // Ready = completable (have all items) OR can obtain missing items
-                // Items can be obtained via: purchase (with favor), crafting (with skill)
-                quests = quests.filter(q => {
-                    const isCompletable = q.items.every(item => item.have >= item.need);
-                    if (isCompletable) return true;
-
-                    // Check if all missing items can be obtained
-                    const canObtainAll = q.items.every(item => {
-                        if (item.have >= item.need) return true;
-                        // Can buy with favor
-                        if (item.is_buyable && item.favor_met) return true;
-                        // Can craft with skill
-                        if (item.is_craftable && item.recipe?.has_skill) return true;
-                        return false;
-                    });
-                    return canObtainAll;
-                });
+                // Ready = completable OR purchasable (using server-determined flags)
+                // This matches the main page's logic exactly
+                quests = quests.filter(q => q.is_completable || q.is_purchasable);
             }
 
             // Update region selector with regions from current view-filtered quests
@@ -971,18 +987,20 @@
             }
 
             const questsHtml = quests.map(quest => {
-                const isReady = quest.items.every(item => item.have >= item.need);
-                // Buyable = has vendor AND player has favor
-                const isBuyable = !isReady && quest.items.some(item => item.is_buyable && item.favor_met);
-                // Craftable = can craft missing items with current skills
-                const isCraftable = !isReady && !isBuyable && quest.items.some(item =>
+                // Use server-provided flags for consistent styling with main page
+                const isCompletable = quest.is_completable;
+                const isPurchasable = quest.is_purchasable && !quest.is_completable;
+                // Craftable = can craft missing items with current skills (still compute client-side)
+                const isCraftable = !isCompletable && !isPurchasable && quest.items.some(item =>
                     item.have < item.need && item.is_craftable && item.recipe?.has_skill
                 );
-                // Needs favor = has vendor but player lacks favor for all vendors
-                const needsFavor = !isReady && !isBuyable && !isCraftable && quest.items.some(item => item.needs_favor);
+                // Needs favor = has vendor but NO character has enough favor
+                const needsFavor = !isCompletable && !isPurchasable && !isCraftable && quest.items.some(item =>
+                    item.needs_favor && (!item.favor_check || !item.favor_check.can_buy)
+                );
                 let questClass = 'quest-group';
-                if (isReady) questClass = 'quest-group ready';
-                else if (isBuyable) questClass = 'quest-group buyable';
+                if (isCompletable) questClass = 'quest-group ready';
+                else if (isPurchasable) questClass = 'quest-group buyable';
                 else if (isCraftable) questClass = 'quest-group craftable';
                 else if (needsFavor) questClass = 'quest-group needs-favor';
 
@@ -1017,8 +1035,17 @@
                     }
                     // Always show source - where to get more of this item
                     if (item.vendor_info) {
-                        const vendorClass = item.needs_favor ? 'vendor-info needs-favor' : 'vendor-info';
-                        detailsHtml += `<div class="${vendorClass}">🛒 ${escapeHtml(item.vendor_info)}</div>`;
+                        // Check if another character can buy (multi-character favor)
+                        if (item.needs_favor && item.favor_check && item.favor_check.can_buy) {
+                            // Another character has the favor to buy
+                            const buyer = item.favor_check.buyer;
+                            const buyerFavor = item.favor_check.buyer_favor;
+                            const vendorName = item.favor_check.vendor_name;
+                            detailsHtml += `<div class="vendor-info">🛒 ${escapeHtml(buyer)} can buy (${escapeHtml(buyerFavor)} with ${escapeHtml(vendorName)})</div>`;
+                        } else {
+                            const vendorClass = item.needs_favor ? 'vendor-info needs-favor' : 'vendor-info';
+                            detailsHtml += `<div class="${vendorClass}">🛒 ${escapeHtml(item.vendor_info)}</div>`;
+                        }
                     } else if (!item.is_craftable) {
                         // Not craftable, not buyable - must be gathered, show wiki link
                         const wikiUrl = `https://wiki.projectgorgon.com/wiki/Special:Search?search=${encodeURIComponent(item.name)}`;

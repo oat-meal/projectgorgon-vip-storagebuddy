@@ -208,6 +208,132 @@ class VendorService:
         """Get ordered list of favor levels"""
         return FAVOR_LEVELS.copy()
 
+    def check_vendor_favor_all_characters(
+        self,
+        vendors: List[VendorInfo],
+        all_characters_favor: Dict[str, Dict[str, Dict[str, Any]]],
+        current_character: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Check if any character has favor with vendors.
+
+        Args:
+            vendors: List of VendorInfo for potential vendors
+            all_characters_favor: Dict mapping character name to their favor data
+            current_character: Name of the currently selected character (to prioritize)
+
+        Returns:
+            Dict with:
+            - can_buy: True if any character can buy
+            - current_can_buy: True if current character can buy
+            - buyer: Name of character who can buy (current character prioritized)
+            - buyer_favor: The favor level the buyer has with the vendor
+            - vendor_name: Name of the vendor they can buy from
+            - required_favor: The favor level required
+        """
+        if not vendors:
+            return {
+                'can_buy': False,
+                'current_can_buy': False,
+                'buyer': None,
+                'buyer_favor': None,
+                'vendor_name': None,
+                'required_favor': None
+            }
+
+        # First check if current character can buy
+        if current_character and current_character in all_characters_favor:
+            current_favor = all_characters_favor[current_character]
+            for vendor in vendors:
+                vendor_name = vendor.vendor
+                required_favor = vendor.favor
+
+                player_vendor_favor = current_favor.get(vendor_name, {})
+                player_favor_rank = player_vendor_favor.get('rank', -1)
+
+                try:
+                    required_rank = FAVOR_LEVELS.index(required_favor)
+                except ValueError:
+                    required_rank = 0
+
+                if player_favor_rank >= required_rank:
+                    return {
+                        'can_buy': True,
+                        'current_can_buy': True,
+                        'buyer': current_character,
+                        'buyer_favor': player_vendor_favor.get('level', 'Unknown'),
+                        'vendor_name': vendor_name,
+                        'required_favor': required_favor
+                    }
+
+        # Check other characters
+        for char_name, char_favor in all_characters_favor.items():
+            if char_name == current_character:
+                continue  # Already checked
+
+            for vendor in vendors:
+                vendor_name = vendor.vendor
+                required_favor = vendor.favor
+
+                player_vendor_favor = char_favor.get(vendor_name, {})
+                player_favor_rank = player_vendor_favor.get('rank', -1)
+
+                try:
+                    required_rank = FAVOR_LEVELS.index(required_favor)
+                except ValueError:
+                    required_rank = 0
+
+                if player_favor_rank >= required_rank:
+                    return {
+                        'can_buy': True,
+                        'current_can_buy': False,
+                        'buyer': char_name,
+                        'buyer_favor': player_vendor_favor.get('level', 'Unknown'),
+                        'vendor_name': vendor_name,
+                        'required_favor': required_favor
+                    }
+
+        # No character can buy
+        return {
+            'can_buy': False,
+            'current_can_buy': False,
+            'buyer': None,
+            'buyer_favor': None,
+            'vendor_name': vendors[0].vendor if vendors else None,
+            'required_favor': vendors[0].favor if vendors else None
+        }
+
+    def check_vendor_favor_all_characters_from_dicts(
+        self,
+        vendor_dicts: List[Dict[str, Any]],
+        all_characters_favor: Dict[str, Dict[str, Dict[str, Any]]],
+        current_character: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Check vendor favor across all characters from raw dict format.
+
+        Args:
+            vendor_dicts: List of vendor dicts
+            all_characters_favor: Dict mapping character name to their favor data
+            current_character: Name of the currently selected character
+
+        Returns:
+            Same as check_vendor_favor_all_characters
+        """
+        vendors = []
+        for v in vendor_dicts:
+            vendor_name = v.get('vendor') or v.get('name', '')
+            vendors.append(VendorInfo(
+                vendor=vendor_name,
+                location=v.get('location', 'Unknown'),
+                favor=v.get('favor', 'Neutral'),
+                price=v.get('price', 0)
+            ))
+
+        return self.check_vendor_favor_all_characters(
+            vendors, all_characters_favor, current_character
+        )
+
     def get_vendor_items_as_dicts(self) -> Dict[str, List[Dict[str, Any]]]:
         """
         Get vendor item lookup as raw dicts (for backward compatibility).

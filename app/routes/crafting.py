@@ -392,6 +392,40 @@ def get_character_info():
     })
 
 
+@crafting_bp.route('/characters')
+@require_configured
+def get_all_characters():
+    """Get list of all available characters"""
+    config = get_config()
+    char_service = CharacterService(config.get_reports_dir())
+
+    characters = char_service.get_all_characters()
+
+    return api_response(data={
+        'characters': characters
+    })
+
+
+@crafting_bp.route('/characters/<name>')
+@require_configured
+def get_character_details(name):
+    """Get detailed info for a specific character"""
+    from ..utils.constants import FAVOR_LEVELS
+
+    config = get_config()
+    char_service = CharacterService(config.get_reports_dir())
+
+    details = char_service.get_character_details(name)
+
+    if not details:
+        return api_error(f"Character '{name}' not found", code="NOT_FOUND", status_code=404)
+
+    # Include favor levels for UI
+    details['favor_levels'] = FAVOR_LEVELS
+
+    return api_response(data=details)
+
+
 @crafting_bp.route('/inventory')
 def get_player_inventory():
     """Get full player inventory with storage locations"""
@@ -415,6 +449,33 @@ def get_player_inventory():
         })
     except Exception as e:
         logger.error(f"Error loading inventory: {e}")
+        return api_error(str(e), status_code=500)
+
+
+@crafting_bp.route('/inventory/all')
+def get_all_characters_inventory():
+    """Get aggregated inventory across all characters with character attribution"""
+    try:
+        from .decorators import get_tracker_components
+        _, _, inventory_parser, _ = get_tracker_components()
+
+        if not inventory_parser:
+            return api_response(data={'items': {}, 'characters': []}, message="Inventory parser not initialized")
+
+        # Get aggregated inventory from all characters
+        aggregated_items = inventory_parser.parse_all_characters()
+
+        # Get list of characters that have inventory data
+        char_files = inventory_parser.get_latest_items_file_per_character()
+        characters = list(char_files.keys())
+
+        return api_response(data={
+            'items': aggregated_items,
+            'characters': characters,
+            'item_count': len(aggregated_items)
+        })
+    except Exception as e:
+        logger.error(f"Error loading aggregated inventory: {e}")
         return api_error(str(e), status_code=500)
 
 

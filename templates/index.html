@@ -153,6 +153,28 @@
             box-shadow: 0 4px 12px var(--shadow);
         }
 
+        /* Header Character Select */
+        .header-character-select {
+            padding: 8px 12px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            min-width: 160px;
+        }
+
+        .header-character-select:hover {
+            border-color: var(--accent);
+        }
+
+        .header-character-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
         /* Theme Toggle Buttons */
         .theme-toggle {
             display: flex;
@@ -608,6 +630,9 @@
                     </p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
+                    <select id="characterSelect" class="header-character-select" onchange="selectCharacter()">
+                        <option value="">Select Character...</option>
+                    </select>
                     <div class="theme-toggle" title="Select theme">
                         <button class="theme-btn active" data-theme="sepia" onclick="setTheme('sepia')" title="Sepia Wood"></button>
                         <button class="theme-btn" data-theme="ctp-latte" onclick="setTheme('ctp-latte')" title="Catppuccin Latte"></button>
@@ -650,12 +675,6 @@
                        id="characterSearchBox"
                        placeholder="Search skills or NPCs..."
                        style="display: none;">
-
-                <select class="search-box" id="characterFilter" style="display: none;" onchange="switchCharacterView()">
-                    <option value="skills">Skills</option>
-                    <option value="favor">NPC Favor</option>
-                    <option value="both">Both</option>
-                </select>
 
                 <select class="search-box" id="questFilter" style="display: none;" onchange="switchQuestView()">
                     <option value="all">All Quests</option>
@@ -703,14 +722,116 @@
                 <span id="logFileInfo" style="margin-left: 10px; opacity: 0.7;"></span>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
-                <button class="update-btn" id="updateBtn" onclick="updateGameData()" style="display: none;">
-                    Update Game Data
-                </button>
-                <button class="update-btn" id="debugBtn" onclick="toggleDebugMode()" style="background: #888;">
-                    Enable Debug
+                <button class="update-btn" id="debugBtn" onclick="openDebugWizard()" style="background: #888;">
+                    Report Issue
                 </button>
             </div>
         </footer>
+    </div>
+
+    <!-- Debug Recording Floating Indicator (visible during recording) -->
+    <div id="debugRecordingIndicator" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 99998; cursor: pointer;" onclick="showDebugWizardStep2()">
+        <div style="background: var(--danger); color: var(--text-on-accent); padding: 12px 20px; border-radius: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 10px; font-weight: 600; animation: pulse 2s infinite; border: 2px solid var(--border-color);">
+            <span style="width: 12px; height: 12px; background: var(--text-on-accent); border-radius: 50%; animation: blink 1s infinite;"></span>
+            Recording... (<span id="debugFloatingEventCount">0</span> events)
+            <span style="font-size: 12px; opacity: 0.9;">Click when done</span>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+
+    <!-- Debug Report Wizard Modal -->
+    <div id="debugWizardModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 99999; overflow: auto;">
+        <div style="min-height: 100%; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+            <div style="background: var(--bg-card); border-radius: 12px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.8); border: 2px solid var(--border-color);">
+            <!-- Step 1: Describe Issue -->
+            <div id="debugStep1" class="debug-step">
+                <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                    <h2 style="margin: 0; color: var(--text-primary); font-size: 18px;">Report an Issue</h2>
+                    <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 13px;">Step 1 of 3: Describe the problem</p>
+                </div>
+                <div style="padding: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500;">What's happening?</label>
+                    <textarea id="debugIssueInput" placeholder="Example: When I click on a quest in the Ready filter, the items show wrong counts..." style="width: 100%; height: 100px; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); font-family: inherit; font-size: 14px; resize: vertical; box-sizing: border-box;"></textarea>
+                    <p style="margin: 12px 0 0; color: var(--text-muted); font-size: 12px;">Be as specific as possible. What did you expect vs what actually happened?</p>
+                </div>
+                <div style="padding: 16px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+                    <button onclick="closeDebugWizard()" style="padding: 10px 20px; border: 1px solid var(--border-color); border-radius: 6px; background: transparent; color: var(--text-primary); cursor: pointer;">Cancel</button>
+                    <button onclick="debugWizardNext(1)" style="padding: 10px 20px; border: none; border-radius: 6px; background: var(--accent); color: white; cursor: pointer; font-weight: 500;">Next: Reproduce Issue</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Reproduce Issue -->
+            <div id="debugStep2" class="debug-step" style="display: none;">
+                <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                    <h2 style="margin: 0; color: var(--text-primary); font-size: 18px;">Reproduce the Issue</h2>
+                    <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 13px;">Step 2 of 3: Show us what's wrong</p>
+                </div>
+                <div style="padding: 20px;">
+                    <div style="background: var(--bg-item); border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 24px;">🔴</span>
+                            <div>
+                                <div style="color: var(--danger); font-weight: 600;">Recording Active</div>
+                                <div style="color: var(--text-muted); font-size: 12px;">Events captured: <span id="debugEventCount">0</span></div>
+                            </div>
+                        </div>
+                        <p style="margin: 0; color: var(--text-primary); font-size: 14px; line-height: 1.5;">
+                            <strong>Now click through to where you see the problem.</strong><br>
+                            Navigate to the tab, filter, or item that shows the issue. Your actions are being recorded.
+                        </p>
+                    </div>
+                    <div style="background: var(--accent-light); border-radius: 6px; padding: 12px; border-left: 3px solid var(--accent);">
+                        <p style="margin: 0; color: var(--text-primary); font-size: 13px;">
+                            <strong>Tip:</strong> Try to reproduce the exact steps that cause the problem. Click the same buttons/items you normally would.
+                        </p>
+                    </div>
+                </div>
+                <div style="padding: 16px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+                    <button onclick="debugWizardBack(2)" style="padding: 10px 20px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-item); color: var(--text-primary); cursor: pointer;">Back</button>
+                    <button onclick="debugWizardNext(2)" style="padding: 10px 20px; border: none; border-radius: 6px; background: var(--success); color: var(--text-on-accent); cursor: pointer; font-weight: 500;">Done - Generate Report</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Download Report -->
+            <div id="debugStep3" class="debug-step" style="display: none;">
+                <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                    <h2 style="margin: 0; color: var(--text-primary); font-size: 18px;">Your Debug Report</h2>
+                    <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 13px;">Step 3 of 3: Save and share</p>
+                </div>
+                <div style="padding: 20px;">
+                    <div style="background: var(--success); background: linear-gradient(135deg, var(--success), #2d8659); border-radius: 8px; padding: 16px; margin-bottom: 16px; text-align: center;">
+                        <span style="font-size: 32px;">✅</span>
+                        <div style="color: white; font-weight: 600; margin-top: 8px;">Report Generated!</div>
+                    </div>
+                    <p style="color: var(--text-primary); font-size: 14px; line-height: 1.5; margin-bottom: 16px;">
+                        Your debug report has been created. Download it and share with the developer to help diagnose your issue.
+                    </p>
+                    <button onclick="downloadDebugReport()" style="width: 100%; padding: 14px; border: none; border-radius: 8px; background: var(--accent); color: white; cursor: pointer; font-weight: 600; font-size: 15px; margin-bottom: 12px;">
+                        📥 Download Debug Report
+                    </button>
+                    <button onclick="copyDebugReport()" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: transparent; color: var(--text-primary); cursor: pointer; font-size: 14px;">
+                        📋 Copy to Clipboard
+                    </button>
+                    <p style="margin: 16px 0 0; color: var(--text-muted); font-size: 12px; text-align: center;">
+                        The report contains app state and your actions. No personal game data is included.
+                    </p>
+                </div>
+                <div style="padding: 16px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: center;">
+                    <button onclick="closeDebugWizard()" style="padding: 10px 24px; border: none; border-radius: 6px; background: var(--bg-card); color: var(--text-primary); cursor: pointer;">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -760,12 +881,35 @@
         // =============================================================================
 
         // Utility function to get storage location icon
+        // Handles new format "CharName:Location" as well as legacy "Location"
         function getStorageIcon(location) {
-            const loc = location.toLowerCase();
+            // Extract the actual storage location (after colon if present)
+            const actualLoc = location.includes(':') ? location.split(':')[1] : location;
+            const loc = actualLoc.toLowerCase();
+            if (loc.includes('inventory')) return '🎒';
             if (loc.includes('dream')) return '💤';
-            if (loc.includes('saddlebag')) return '🎒';
+            if (loc.includes('saddlebag')) return '🐴';
             if (loc.includes('community')) return '🏠';
+            if (loc.includes('npc_')) return '👤';
             return '🏦';
+        }
+
+        // Format storage location for display, showing character name if multi-character
+        // "Boricha:Saddlebag" -> "Boricha - Saddlebag"
+        // "Saddlebag" -> "Saddlebag" (legacy format)
+        function formatStorageLocation(location) {
+            if (location.includes(':')) {
+                const [charName, storageLoc] = location.split(':');
+                // Format NPC storage names more nicely
+                let displayLoc = storageLoc;
+                if (storageLoc.startsWith('NPC_')) {
+                    displayLoc = storageLoc.replace('NPC_', '') + ' (NPC)';
+                } else if (storageLoc === 'Inventory') {
+                    displayLoc = 'Inventory';
+                }
+                return `${charName}: ${displayLoc}`;
+            }
+            return location;
         }
 
         let currentTab = 'help';
@@ -812,9 +956,18 @@
         let favorLevels = []; // Ordered list of favor levels for comparison
         let itemKeywords = {}; // Keyword -> list of item names (e.g., "Bone" -> ["Femur", "Rib Bone", ...])
         let characterData = {}; // Full character data including skills, favor, character name
-        let currentCharacterView = 'skills'; // 'skills', 'favor', or 'both'
+        let allCharacters = []; // List of all available characters
+        let selectedCharacterName = null; // Currently selected character name
         let vendorItems = {}; // Item name -> vendor info (for checking if items can be bought)
         let debugMode = false; // Debug mode state
+        let debugEventLog = []; // Captured events during debug session
+        let debugNetworkLog = []; // Captured network requests during debug session
+        let debugConsoleErrors = []; // Captured console errors during debug session
+        let debugSessionStart = null; // When debug session started
+        let debugIssueDescription = ''; // User's description of the issue
+        const DEBUG_MAX_EVENTS = 500; // Max events to keep in buffer
+        const DEBUG_MAX_NETWORK = 100; // Max network requests to keep
+        const DEBUG_MAX_CONSOLE_ERRORS = 50; // Max console errors to keep
 
         // =============================================================================
         // CRAFTABILITY CACHING STRATEGY
@@ -902,7 +1055,51 @@
                 currentAbortController.abort();
             }
             currentAbortController = new AbortController();
-            return fetch(url, { ...options, signal: currentAbortController.signal });
+
+            const startTime = performance.now();
+            const method = options.method || 'GET';
+
+            return fetch(url, { ...options, signal: currentAbortController.signal })
+                .then(response => {
+                    // Log network request during debug mode
+                    if (debugMode) {
+                        const duration = Math.round(performance.now() - startTime);
+                        debugNetworkLog.push({
+                            timestamp: new Date().toISOString(),
+                            url: url,
+                            method: method,
+                            status: response.status,
+                            statusText: response.statusText,
+                            duration: duration,
+                            ok: response.ok
+                        });
+                        // Keep bounded
+                        if (debugNetworkLog.length > DEBUG_MAX_NETWORK) {
+                            debugNetworkLog.shift();
+                        }
+                    }
+                    return response;
+                })
+                .catch(error => {
+                    // Log failed requests during debug mode
+                    if (debugMode && error.name !== 'AbortError') {
+                        const duration = Math.round(performance.now() - startTime);
+                        debugNetworkLog.push({
+                            timestamp: new Date().toISOString(),
+                            url: url,
+                            method: method,
+                            status: 0,
+                            statusText: 'Network Error',
+                            duration: duration,
+                            ok: false,
+                            error: error.message
+                        });
+                        if (debugNetworkLog.length > DEBUG_MAX_NETWORK) {
+                            debugNetworkLog.shift();
+                        }
+                    }
+                    throw error;
+                });
         }
 
         // Initialize
@@ -915,12 +1112,14 @@
             DOM.skillFilter = document.getElementById('skillFilter');
             DOM.questFilter = document.getElementById('questFilter');
             DOM.recipeFilter = document.getElementById('recipeFilter');
-            DOM.characterFilter = document.getElementById('characterFilter');
+            DOM.characterSelect = document.getElementById('characterSelect');
             DOM.questDetail = document.getElementById('questDetail');
             DOM.questListContainer = document.getElementById('questListContainer');
             DOM.tabButtons = document.querySelectorAll('.tab-btn');
 
             initializeTab();
+            // Load character list for header dropdown
+            loadCharacterList();
             // Auto-refresh every 5 seconds
             // NOTE: We intentionally don't use Visibility API to skip refreshes when hidden.
             // The main window is typically behind the game (not minimized), and Visibility API
@@ -971,6 +1170,9 @@
         });
 
         function switchTab(tab) {
+            // Log tab switch for debug
+            logDebugEvent('tab_switch', { from: currentTab, to: tab });
+
             // Cancel any pending fetch requests from previous tab
             if (currentAbortController) {
                 currentAbortController.abort();
@@ -1106,7 +1308,6 @@
                 DOM.regionFilter.style.display = 'block';
                 DOM.skillFilter.style.display = 'none';
                 DOM.characterSearchBox.style.display = 'none';
-                DOM.characterFilter.style.display = 'none';
                 DOM.questSearchBox.value = '';
                 // Load data and apply current filter
                 loadActiveQuests().then(() => {
@@ -1120,7 +1321,6 @@
                 DOM.regionFilter.style.display = 'none';
                 DOM.skillFilter.style.display = 'block';
                 DOM.characterSearchBox.style.display = 'none';
-                DOM.characterFilter.style.display = 'none';
                 DOM.craftingSearchBox.value = '';
                 loadCraftingRecipes().then(() => {
                     // Restore shopping list if recipes are selected
@@ -1134,7 +1334,6 @@
                 DOM.characterSearchBox.style.display = 'block';
                 DOM.questFilter.style.display = 'none';
                 DOM.recipeFilter.style.display = 'none';
-                DOM.characterFilter.style.display = 'block';
                 DOM.regionFilter.style.display = 'none';
                 DOM.skillFilter.style.display = 'none';
                 DOM.characterSearchBox.value = '';
@@ -1145,7 +1344,6 @@
                 DOM.characterSearchBox.style.display = 'none';
                 DOM.questFilter.style.display = 'none';
                 DOM.recipeFilter.style.display = 'none';
-                DOM.characterFilter.style.display = 'none';
                 DOM.regionFilter.style.display = 'none';
                 DOM.skillFilter.style.display = 'none';
                 showHelp();
@@ -1153,7 +1351,14 @@
         }
 
         function switchQuestView() {
+            // Don't render quest views if no character is selected
+            if (!selectedCharacterName) {
+                return;
+            }
+
             const questView = DOM.questFilter.value;
+            const regionFilter = DOM.regionFilter.value;
+            logDebugEvent('quest_view_change', { view: questView, region: regionFilter });
             currentQuestView = questView;
 
             if (questView === 'all') {
@@ -1515,7 +1720,7 @@
                             if (storageLocations && Object.keys(storageLocations).length > 0) {
                                 for (const [loc, count] of Object.entries(storageLocations)) {
                                     const icon = getStorageIcon(loc);
-                                    locationParts.push(`${icon} ${loc}: ${count}`);
+                                    locationParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
                                 }
                             }
                             const hasLocations = locationParts.length > 0;
@@ -1530,7 +1735,7 @@
                                 if (inInventory > 0) retrieveFrom.push(`Inventory (${inInventory})`);
                                 if (storageLocations && Object.keys(storageLocations).length > 0) {
                                     for (const [loc, count] of Object.entries(storageLocations)) {
-                                        retrieveFrom.push(`${loc} (${count})`);
+                                        retrieveFrom.push(`${formatStorageLocation(loc)} (${count})`);
                                     }
                                 }
                                 if (retrieveFrom.length > 0) {
@@ -1585,7 +1790,7 @@
                             if (storageLocations && Object.keys(storageLocations).length > 0) {
                                 for (const [loc, count] of Object.entries(storageLocations)) {
                                     const icon = getStorageIcon(loc);
-                                    storageParts.push(`${icon} ${loc}: ${count}`);
+                                    storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
                                 }
                             }
                             if (storageParts.length > 0) {
@@ -1785,7 +1990,7 @@
                             for (const [location, count] of Object.entries(item.storageLocations)) {
                                 const icon = getStorageIcon(location);
                                 if (item.inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
-                                locationInfo += `${icon} ${location}: ${count}`;
+                                locationInfo += `${icon} ${formatStorageLocation(location)}: ${count}`;
                             }
                         }
 
@@ -1867,7 +2072,7 @@
                     if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                         for (const [loc, count] of Object.entries(item.storageLocations)) {
                             const icon = getStorageIcon(loc);
-                            storageParts.push(`${icon} ${loc}: ${count}`);
+                            storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
                         }
                     }
                     const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -2140,7 +2345,7 @@
                                 // Get appropriate icon for each location type
                                 const icon = getStorageIcon(location);
                                 if (item.inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
-                                locationInfo += `${icon} ${location}: ${count}`;
+                                locationInfo += `${icon} ${formatStorageLocation(location)}: ${count}`;
                             }
                         }
 
@@ -2223,7 +2428,7 @@
                     if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                         for (const [loc, count] of Object.entries(item.storageLocations)) {
                             const icon = getStorageIcon(loc);
-                            storageParts.push(`${icon} ${loc}: ${count}`);
+                            storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
                         }
                     }
                     const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -2258,6 +2463,26 @@
         }
 
         async function loadActiveQuests() {
+            // Require a character to be selected for quests
+            if (!selectedCharacterName) {
+                activeQuests = [];
+                completableQuests = [];
+                purchasableQuests = [];
+                needsFavorQuests = [];
+                completableQuestSet = new Set();
+                purchasableQuestSet = new Set();
+                needsFavorQuestSet = new Set();
+                DOM.questListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>Select a character</p>
+                        <p class="empty-state-hint">Use the character dropdown in the header to view quests</p>
+                    </div>
+                `;
+                DOM.questDetail.innerHTML = '';
+                return;
+            }
+
             try {
                 // Cancel any in-flight quest requests and create new shared controller
                 if (currentAbortController) {
@@ -2266,12 +2491,15 @@
                 currentAbortController = new AbortController();
                 const signal = currentAbortController.signal;
 
+                // Build character filter query string
+                const charParam = selectedCharacterName ? `?character=${encodeURIComponent(selectedCharacterName)}` : '';
+
                 // Load active, completable, and purchasable quests in parallel
                 const [activeResponse, completableResponse, purchasableResponse, needsFavorResponse] = await Promise.all([
-                    fetch('/api/active_quests', { signal }),
-                    fetch('/api/completable_quests', { signal }),
-                    fetch('/api/purchasable_quests', { signal }),
-                    fetch('/api/needs_favor_quests', { signal })
+                    fetch(`/api/active_quests${charParam}`, { signal }),
+                    fetch(`/api/completable_quests${charParam}`, { signal }),
+                    fetch(`/api/purchasable_quests${charParam}`, { signal }),
+                    fetch(`/api/needs_favor_quests${charParam}`, { signal })
                 ]);
                 const activeData = await activeResponse.json();
                 const completableData = await completableResponse.json();
@@ -2298,9 +2526,9 @@
 
         async function loadPlayerInventory() {
             try {
-                // Load full player inventory, keywords, vendor data, skills, and favor in parallel
+                // Load aggregated player inventory (all characters), keywords, vendor data, skills, and favor in parallel
                 const [invResponse, keywordsResponse, vendorsResponse, skillsResponse, favorResponse] = await Promise.all([
-                    fetch('/api/inventory'),
+                    fetch('/api/inventory/all'),
                     fetch('/api/keywords'),
                     fetch('/api/vendors'),
                     fetch('/api/skills'),
@@ -2312,9 +2540,9 @@
                 const skillsData = await skillsResponse.json();
                 const favorData = await favorResponse.json();
 
-                // Build inventory map from full inventory data
+                // Build inventory map from aggregated inventory data (all characters)
                 playerInventory = {};
-                playerInventoryDetails = {}; // Store detailed location info
+                playerInventoryDetails = {}; // Store detailed location info with character attribution
                 _categorizeMaterialCache.clear(); // Clear memoization cache when inventory changes
 
                 if (invData.data?.items) {
@@ -2322,10 +2550,35 @@
                         const totalCount = itemData.total || 0;
                         if (totalCount > 0) {
                             playerInventory[itemName] = totalCount;
+
+                            // Build storage map that includes character name
+                            // Format: { "Boricha:Saddlebag": 5, "Bergheim:Inventory": 3 }
+                            const storageWithCharacter = {};
+                            let totalInventory = 0;
+
+                            if (itemData.byCharacter) {
+                                for (const [charName, charData] of Object.entries(itemData.byCharacter)) {
+                                    // Add inventory items with character attribution
+                                    if (charData.inventory > 0) {
+                                        storageWithCharacter[`${charName}:Inventory`] = charData.inventory;
+                                        totalInventory += charData.inventory;
+                                    }
+                                    // Add storage items with character attribution
+                                    if (charData.storage) {
+                                        for (const [storageLoc, count] of Object.entries(charData.storage)) {
+                                            if (count > 0) {
+                                                storageWithCharacter[`${charName}:${storageLoc}`] = count;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             playerInventoryDetails[itemName] = {
-                                inventory: itemData.inventory || 0,
-                                storage: itemData.storage || {},
-                                total: totalCount
+                                inventory: totalInventory,
+                                storage: storageWithCharacter,
+                                total: totalCount,
+                                byCharacter: itemData.byCharacter || {}
                             };
                         }
                     }
@@ -2891,7 +3144,7 @@
                 if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(item.storageLocations)) {
                         const icon = getStorageIcon(loc);
-                        storageParts.push(`${icon} ${loc}: ${count}`);
+                        storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
                     }
                 }
                 const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -3026,7 +3279,7 @@
                 if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(item.storageLocations)) {
                         const icon = getStorageIcon(loc);
-                        storageParts.push(`${icon} ${loc}: ${count}`);
+                        storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
                     }
                 }
                 const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -3441,6 +3694,7 @@
         }
 
         async function selectQuest(internalName) {
+            logDebugEvent('quest_select', { quest: internalName });
             selectedQuest = internalName;
 
             // Used primarily for search results - load quest detail
@@ -3449,6 +3703,7 @@
 
         async function toggleQuestPin(internalName) {
             const isPinning = !pinnedQuests.has(internalName);
+            logDebugEvent('quest_pin_toggle', { quest: internalName, action: isPinning ? 'pin' : 'unpin' });
 
             if (isPinning) {
                 // Check pin limit before adding
@@ -3522,7 +3777,9 @@
             container.innerHTML = '<div class="loading">Loading quest details...</div>';
 
             try {
-                const response = await fetch(`/api/quest/${internalName}`);
+                // Pass character parameter for multi-character favor checking
+                const charParam = selectedCharacterName ? `?character=${encodeURIComponent(selectedCharacterName)}` : '';
+                const response = await fetch(`/api/quest/${internalName}${charParam}`);
                 const questResponse = await response.json();
                 renderQuestDetail(questResponse.data);
             } catch (error) {
@@ -3568,7 +3825,7 @@
                             // Get appropriate icon for each location type
                             const icon = getStorageIcon(location);
                             if (inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
-                            locationInfo += `${icon} ${location}: ${count}`;
+                            locationInfo += `${icon} ${formatStorageLocation(location)}: ${count}`;
                         }
                     }
 
@@ -3636,8 +3893,20 @@
                         const vendors = category.info;
                         const firstVendor = vendors[0];
                         const requiredFavor = firstVendor.favor || 'Unknown';
-                        retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
-                        methodColor = isComplete ? 'var(--success)' : 'var(--favor)';
+
+                        // Check if another character can buy this item
+                        if (item.favor_check && item.favor_check.can_buy && !item.favor_check.current_can_buy) {
+                            // Another character can buy!
+                            const buyer = item.favor_check.buyer;
+                            const buyerFavor = item.favor_check.buyer_favor;
+                            const vendorName = item.favor_check.vendor_name;
+                            retrievalMethod = `🛒 ${buyer} can buy (${buyerFavor} with ${vendorName})`;
+                            methodColor = isComplete ? 'var(--success)' : 'var(--warning)';
+                        } else {
+                            // No character can buy - show original message
+                            retrievalMethod = `❤️ Need ${requiredFavor} favor with ${firstVendor.vendor} (${firstVendor.location})`;
+                            methodColor = isComplete ? 'var(--success)' : 'var(--favor)';
+                        }
                     } else {
                         // Must be gathered - wiki link added separately to all items
                         retrievalMethod = `🔍 Farm/Gather`;
@@ -3701,6 +3970,21 @@
         }
 
         async function loadCraftingRecipes() {
+            // Require a character to be selected for crafting
+            if (!selectedCharacterName) {
+                allRecipes = [];
+                recipesByOutput = {};
+                DOM.questListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>Select a character</p>
+                        <p class="empty-state-hint">Use the character dropdown in the header to view recipes</p>
+                    </div>
+                `;
+                DOM.questDetail.innerHTML = '';
+                return;
+            }
+
             DOM.questListContainer.innerHTML = '<div class="loading">Loading recipes...</div>';
 
             try {
@@ -3855,6 +4139,9 @@
         const MAX_PINNED_RECIPES = 20;
 
         async function toggleRecipeSelection(recipeId) {
+            const action = recipeQuantities[recipeId] ? 'unpin' : 'pin';
+            logDebugEvent('recipe_toggle', { recipe: recipeId, action: action });
+
             if (recipeQuantities[recipeId]) {
                 delete recipeQuantities[recipeId];
             } else {
@@ -3966,12 +4253,14 @@
                     <div style="font-size: 13px; line-height: 1.8; text-align: left;">
                         <p style="margin-bottom: 10px;"><strong>Icons show where items are stored:</strong></p>
                         <div style="padding-left: 10px; margin-bottom: 8px;">
-                            <div style="margin-bottom: 8px;">📦 <strong>Inventory</strong> - Items on your character</div>
+                            <div style="margin-bottom: 8px;">🎒 <strong>Inventory</strong> - Items on your character</div>
                             <div style="margin-bottom: 8px;">💤 <strong>Dream Chest</strong> - Dream Realm storage</div>
-                            <div style="margin-bottom: 8px;">🎒 <strong>Saddlebag</strong> - Animal companion storage</div>
+                            <div style="margin-bottom: 8px;">🐴 <strong>Saddlebag</strong> - Animal companion storage</div>
                             <div style="margin-bottom: 8px;">🏠 <strong>Community</strong> - Shared guild storage</div>
+                            <div style="margin-bottom: 8px;">👤 <strong>NPC Storage</strong> - Items stored with NPCs</div>
                             <div style="margin-bottom: 8px;">🏦 <strong>Vault</strong> - Item vaults & storage chests</div>
                         </div>
+                        <p style="margin-top: 10px; color: var(--text-muted);"><strong>Multi-character:</strong> Locations show the character name (e.g., "Boricha: Saddlebag")</p>
                     </div>
 
                     <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
@@ -4120,6 +4409,35 @@
                         </div>
                     </div>
 
+                    <!-- Character Tab Section -->
+                    <div style="margin-bottom: 30px; padding: 20px; background: var(--bg-item); border-radius: 8px;">
+                        <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 16px;">👤 Character Tab</h3>
+                        <div style="font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
+                            <p style="margin-bottom: 10px;">View your characters' skills and NPC relationships.</p>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Multi-Character Support:</strong></p>
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
+                                    <li>Select any character from the dropdown</li>
+                                    <li>View skills sorted by level with bonus levels shown</li>
+                                    <li>Check NPC favor levels for vendor access requirements</li>
+                                    <li>Item locations show character names (e.g., "Boricha: Saddlebag")</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-left: 15px; margin-bottom: 12px;">
+                                <p style="margin-bottom: 6px;"><strong>Filters:</strong></p>
+                                <ul style="margin-left: 15px; color: var(--text-secondary);">
+                                    <li><strong>Skills</strong> — Show trained skills with effective levels</li>
+                                    <li><strong>Favor</strong> — Show NPC relationships by favor tier</li>
+                                    <li><strong>Both</strong> — Display skills and favor together</li>
+                                </ul>
+                            </div>
+
+                            <p style="color: var(--text-muted); font-size: 13px; margin-top: 10px;">Item locations in Quests and Crafting tabs aggregate across all characters, showing which character has each item.</p>
+                        </div>
+                    </div>
+
                     <!-- Vendor Tip -->
                     <div style="margin-bottom: 30px; padding: 15px; background: var(--accent-light); border-left: 4px solid var(--warning); border-radius: 0 8px 8px 0;">
                         <p style="font-weight: 600; color: var(--warning); margin-bottom: 6px;">Vendor Tip</p>
@@ -4179,18 +4497,18 @@
                         </ul>
                     </div>
 
-                    <!-- Debug Mode Section -->
+                    <!-- Troubleshooting Section -->
                     <div style="padding: 15px; background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px;">
                         <h3 style="color: var(--text-secondary); margin-bottom: 10px; font-size: 14px;">Troubleshooting</h3>
                         <div style="font-size: 13px; line-height: 1.7; color: var(--text-secondary);">
-                            <p style="margin-bottom: 8px;"><strong>Enable Debug</strong> (footer button) activates diagnostic features:</p>
+                            <p style="margin-bottom: 8px;"><strong>Report Issue</strong> (footer button) generates a debug report:</p>
                             <ul style="margin: 0 0 10px 15px; padding: 0;">
-                                <li>Logs app activity to browser console (F12 → Console)</li>
-                                <li>Shows the "Update Game Data" button to refresh quest/item/recipe data</li>
+                                <li>Describe what's happening</li>
+                                <li>Click through the app to reproduce the issue</li>
+                                <li>Download or copy the report to share with the developer</li>
                             </ul>
-                            <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 12px;">Share console output when reporting issues.</p>
-                            <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 12px;"><strong>Note:</strong> Quest, item, and recipe data is sourced from the <a href="https://wiki.projectgorgon.com" target="_blank" style="color: var(--accent);">Project Gorgon Wiki</a>.</p>
-                            <p style="margin: 0; color: var(--text-muted); font-size: 12px;"><strong>Please use "Update Game Data" sparingly</strong> — it scrapes the wiki and should only be used when data is outdated or missing.</p>
+                            <p style="margin: 0 0 8px 0; color: var(--text-muted); font-size: 12px;">The report captures your actions, network requests, and any errors — no personal game data is included.</p>
+                            <p style="margin: 0; color: var(--text-muted); font-size: 12px;"><strong>Note:</strong> Quest, item, and recipe data is sourced from the <a href="https://wiki.projectgorgon.com" target="_blank" style="color: var(--accent);">Project Gorgon Wiki</a>.</p>
                         </div>
                     </div>
 
@@ -4391,7 +4709,7 @@
                             // Get appropriate icon for each location type
                             const icon = getStorageIcon(location);
                             if (inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
-                            locationInfo += `${icon} ${location}: ${count}`;
+                            locationInfo += `${icon} ${formatStorageLocation(location)}: ${count}`;
                         }
                     }
 
@@ -4462,7 +4780,7 @@
                 if (storageLocations && Object.keys(storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(storageLocations)) {
                         const icon = getStorageIcon(loc);
-                        storageParts.push(`${icon} ${loc}: ${count}`);
+                        storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
                     }
                 }
                 const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -4597,84 +4915,433 @@
         }
 
         // Update game data from CDN
-        async function updateGameData() {
-            const btn = document.getElementById('updateBtn');
-            const originalText = btn.textContent;
 
-            btn.disabled = true;
-            btn.textContent = 'Updating...';
+        // =============================================================================
+        // DEBUG REPORT WIZARD
+        // =============================================================================
+        // Guided workflow for users to capture and report issues
+
+        function logDebugEvent(type, data) {
+            if (!debugMode) return;
+
+            const event = {
+                timestamp: new Date().toISOString(),
+                type: type,
+                data: data
+            };
+
+            debugEventLog.push(event);
+
+            // Keep buffer bounded
+            if (debugEventLog.length > DEBUG_MAX_EVENTS) {
+                debugEventLog.shift();
+            }
+
+            // Update event count in wizard and floating indicator
+            const countEl = document.getElementById('debugEventCount');
+            if (countEl) {
+                countEl.textContent = debugEventLog.length;
+            }
+            const floatingCountEl = document.getElementById('debugFloatingEventCount');
+            if (floatingCountEl) {
+                floatingCountEl.textContent = debugEventLog.length;
+            }
+        }
+
+        function openDebugWizard() {
+            // Reset state
+            debugEventLog = [];
+            debugNetworkLog = [];
+            debugConsoleErrors = [];
+            debugSessionStart = new Date().toISOString();
+            debugIssueDescription = '';
+            debugMode = false;
+
+            // Reset wizard to step 1
+            document.querySelectorAll('.debug-step').forEach(s => s.style.display = 'none');
+            document.getElementById('debugStep1').style.display = 'block';
+            document.getElementById('debugIssueInput').value = '';
+
+            // Show modal
+            document.getElementById('debugWizardModal').style.display = 'flex';
+        }
+
+        function closeDebugWizard() {
+            document.getElementById('debugWizardModal').style.display = 'none';
+            document.getElementById('debugRecordingIndicator').style.display = 'none';
+            debugMode = false;
+
+            // Clear debug logs
+            debugEventLog = [];
+            debugNetworkLog = [];
+            debugConsoleErrors = [];
+
+            // Reset button state
+            const debugBtn = document.getElementById('debugBtn');
+            debugBtn.textContent = 'Report Issue';
+            debugBtn.style.background = '#888';
+        }
+
+        function debugWizardNext(currentStep) {
+            if (currentStep === 1) {
+                // Save description and start recording
+                debugIssueDescription = document.getElementById('debugIssueInput').value.trim();
+                if (!debugIssueDescription) {
+                    alert('Please describe the issue you\'re experiencing.');
+                    return;
+                }
+
+                // Enable debug mode to start capturing
+                debugMode = true;
+                debugEventLog = [];
+                debugSessionStart = new Date().toISOString();
+
+                // Log initial state
+                logDebugEvent('session_start', {
+                    description: debugIssueDescription,
+                    initialState: getAppStateSnapshot()
+                });
+
+                // Update button to show recording
+                const debugBtn = document.getElementById('debugBtn');
+                debugBtn.textContent = 'Recording...';
+                debugBtn.style.background = 'var(--danger)';
+
+                // Show floating indicator
+                document.getElementById('debugRecordingIndicator').style.display = 'block';
+                document.getElementById('debugFloatingEventCount').textContent = debugEventLog.length;
+
+                // Close modal so user can interact with app
+                document.getElementById('debugWizardModal').style.display = 'none';
+
+            } else if (currentStep === 2) {
+                // Capture final state and show download
+                logDebugEvent('session_end', {
+                    finalState: getAppStateSnapshot()
+                });
+
+                debugMode = false;
+
+                // Hide floating indicator
+                document.getElementById('debugRecordingIndicator').style.display = 'none';
+
+                // Reset button
+                const debugBtn = document.getElementById('debugBtn');
+                debugBtn.textContent = 'Report Issue';
+                debugBtn.style.background = '#888';
+
+                // Show step 3
+                document.querySelectorAll('.debug-step').forEach(s => s.style.display = 'none');
+                document.getElementById('debugStep3').style.display = 'block';
+                document.getElementById('debugWizardModal').style.display = 'block';
+            }
+        }
+
+        function debugWizardBack(currentStep) {
+            if (currentStep === 2) {
+                debugMode = false;
+
+                // Hide floating indicator
+                document.getElementById('debugRecordingIndicator').style.display = 'none';
+
+                document.querySelectorAll('.debug-step').forEach(s => s.style.display = 'none');
+                document.getElementById('debugStep1').style.display = 'block';
+
+                // Reset button
+                const debugBtn = document.getElementById('debugBtn');
+                debugBtn.textContent = 'Report Issue';
+                debugBtn.style.background = '#888';
+            }
+        }
+
+        function showDebugWizardStep2() {
+            // Called when clicking the floating indicator - show step 2 to finish recording
+            document.querySelectorAll('.debug-step').forEach(s => s.style.display = 'none');
+            document.getElementById('debugStep2').style.display = 'block';
+            document.getElementById('debugEventCount').textContent = debugEventLog.length;
+            document.getElementById('debugWizardModal').style.display = 'block';
+        }
+
+        function getAppStateSnapshot() {
+            return {
+                currentTab,
+                currentQuestView,
+                currentRecipeView,
+                selectedQuest,
+                activeQuestsCount: activeQuests.length,
+                completableQuestsCount: completableQuests.length,
+                purchasableQuestsCount: purchasableQuests.length,
+                pinnedQuestsCount: pinnedQuests.size,
+                recipesCount: allRecipes.length,
+                pinnedRecipesCount: Object.keys(recipeQuantities).length,
+                inventoryItemCount: Object.keys(playerInventory).length,
+                vendorItemCount: Object.keys(vendorItems).length,
+                skillsCount: Object.keys(playerSkills).length,
+                favorCount: Object.keys(playerFavor).length
+            };
+        }
+
+        function generateDebugReport() {
+            // Compute network stats
+            const failedRequests = debugNetworkLog.filter(r => !r.ok);
+            const avgDuration = debugNetworkLog.length > 0
+                ? Math.round(debugNetworkLog.reduce((sum, r) => sum + r.duration, 0) / debugNetworkLog.length)
+                : 0;
+
+            const report = {
+                reportVersion: '1.1',
+                generatedAt: new Date().toISOString(),
+
+                // App info
+                app: {
+                    version: document.getElementById('appVersion')?.textContent || 'unknown',
+                    userAgent: navigator.userAgent,
+                    screenSize: `${window.innerWidth}x${window.innerHeight}`,
+                    theme: localStorage.getItem('storagebuddy-theme') || 'default'
+                },
+
+                // Issue description
+                issue: {
+                    description: debugIssueDescription,
+                    sessionStart: debugSessionStart,
+                    sessionDuration: debugSessionStart ?
+                        Math.round((new Date() - new Date(debugSessionStart)) / 1000) + 's' : 'unknown'
+                },
+
+                // Event log
+                events: debugEventLog,
+
+                // Network requests
+                network: {
+                    requests: debugNetworkLog,
+                    summary: {
+                        total: debugNetworkLog.length,
+                        failed: failedRequests.length,
+                        avgDuration: avgDuration + 'ms'
+                    }
+                },
+
+                // Console errors
+                consoleErrors: debugConsoleErrors,
+
+                // Summary stats
+                summary: {
+                    totalEvents: debugEventLog.length,
+                    eventTypes: [...new Set(debugEventLog.map(e => e.type))],
+                    errors: debugEventLog.filter(e => e.type === 'error').length,
+                    networkRequests: debugNetworkLog.length,
+                    networkErrors: failedRequests.length,
+                    consoleErrors: debugConsoleErrors.length
+                }
+            };
+
+            return report;
+        }
+
+        function formatReportAsText(report) {
+            let text = `StorageBuddy Debug Report
+============================
+Generated: ${report.generatedAt}
+App Version: ${report.app.version}
+Browser: ${report.app.userAgent}
+Screen: ${report.app.screenSize}
+Theme: ${report.app.theme}
+
+ISSUE DESCRIPTION
+-----------------
+${report.issue.description}
+
+Session Duration: ${report.issue.sessionDuration}
+
+SUMMARY
+-------
+Events Captured: ${report.summary.totalEvents}
+Network Requests: ${report.summary.networkRequests}
+Network Errors: ${report.summary.networkErrors}
+Console Errors: ${report.summary.consoleErrors}
+
+`;
+
+            // Console Errors section (show first if there are any - most important)
+            if (report.consoleErrors && report.consoleErrors.length > 0) {
+                text += `CONSOLE ERRORS
+--------------
+`;
+                for (const err of report.consoleErrors) {
+                    const time = new Date(err.timestamp).toLocaleTimeString();
+                    text += `[${time}] ${err.type}: ${err.message}`;
+                    if (err.filename) text += ` (${err.filename}:${err.lineno})`;
+                    if (err.reason) text += ` - ${err.reason}`;
+                    text += '\n';
+                }
+                text += '\n';
+            }
+
+            // Network Requests section
+            if (report.network && report.network.requests.length > 0) {
+                text += `NETWORK REQUESTS (${report.network.summary.total} total, ${report.network.summary.failed} failed, avg ${report.network.summary.avgDuration})
+----------------
+`;
+                for (const req of report.network.requests) {
+                    const time = new Date(req.timestamp).toLocaleTimeString();
+                    const status = req.ok ? '✓' : '✗';
+                    text += `[${time}] ${status} ${req.method} ${req.url} - ${req.status} ${req.statusText} (${req.duration}ms)`;
+                    if (req.error) text += ` ERROR: ${req.error}`;
+                    text += '\n';
+                }
+                text += '\n';
+            }
+
+            // Event Log
+            text += `EVENT LOG
+---------
+`;
+            for (const event of report.events) {
+                const time = new Date(event.timestamp).toLocaleTimeString();
+                text += `[${time}] ${event.type}`;
+                if (event.data && typeof event.data === 'object') {
+                    // Compact JSON for readability
+                    const dataStr = JSON.stringify(event.data);
+                    if (dataStr.length < 100) {
+                        text += `: ${dataStr}`;
+                    } else {
+                        text += `:\n  ${dataStr.substring(0, 200)}...`;
+                    }
+                }
+                text += '\n';
+            }
+
+            text += `
+============================
+End of Debug Report
+`;
+            return text;
+        }
+
+        function downloadDebugReport() {
+            const report = generateDebugReport();
+            const text = formatReportAsText(report);
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `storagebuddy-debug-${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function copyDebugReport() {
+            const report = generateDebugReport();
+            const text = formatReportAsText(report);
 
             try {
-                const response = await fetch('/api/update_data', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    btn.textContent = 'Updated!';
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                        // Reload current quest if one is selected
-                        if (selectedQuest) {
-                            loadQuestDetail(selectedQuest);
-                        }
-                    }, 2000);
-                } else {
-                    btn.textContent = 'Failed';
-                    alert('Update failed:\n' + data.messages.join('\n'));
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }, 2000);
-                }
-            } catch (error) {
-                btn.textContent = 'Error';
-                alert('Update failed: ' + error.message);
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                }, 2000);
+                await navigator.clipboard.writeText(text);
+                alert('Debug report copied to clipboard!');
+            } catch (err) {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Debug report copied to clipboard!');
             }
         }
 
-        function toggleDebugMode() {
-            debugMode = !debugMode;
-            const debugBtn = document.getElementById('debugBtn');
-            const updateBtn = document.getElementById('updateBtn');
-
+        // Global error handler for debug logging
+        window.addEventListener('error', (event) => {
+            const errorData = {
+                timestamp: new Date().toISOString(),
+                type: 'error',
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno
+            };
+            logDebugEvent('error', errorData);
             if (debugMode) {
-                debugBtn.textContent = 'Debug ON';
-                debugBtn.style.background = 'var(--danger)';
-                updateBtn.style.display = 'inline-block';
-                debugLog('Debug mode enabled');
-                debugLog('App state:', {
-                    currentTab,
-                    currentQuestView,
-                    currentRecipeView,
-                    selectedQuest,
-                    activeQuestsCount: activeQuests.length,
-                    recipesCount: allRecipes.length,
-                    inventoryItemCount: Object.keys(playerInventory).length,
-                    vendorItemCount: Object.keys(vendorItems).length
-                });
-            } else {
-                debugBtn.textContent = 'Enable Debug';
-                debugBtn.style.background = '#888';
-                updateBtn.style.display = 'none';
-                console.log('[StorageBuddy] Debug mode disabled');
+                debugConsoleErrors.push(errorData);
+                if (debugConsoleErrors.length > DEBUG_MAX_CONSOLE_ERRORS) {
+                    debugConsoleErrors.shift();
+                }
             }
-        }
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            const errorData = {
+                timestamp: new Date().toISOString(),
+                type: 'unhandled_rejection',
+                message: 'Unhandled Promise Rejection',
+                reason: String(event.reason)
+            };
+            logDebugEvent('error', errorData);
+            if (debugMode) {
+                debugConsoleErrors.push(errorData);
+                if (debugConsoleErrors.length > DEBUG_MAX_CONSOLE_ERRORS) {
+                    debugConsoleErrors.shift();
+                }
+            }
+        });
+
+        // Intercept console.error to capture logged errors
+        const originalConsoleError = console.error;
+        console.error = function(...args) {
+            if (debugMode) {
+                debugConsoleErrors.push({
+                    timestamp: new Date().toISOString(),
+                    type: 'console_error',
+                    message: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ')
+                });
+                if (debugConsoleErrors.length > DEBUG_MAX_CONSOLE_ERRORS) {
+                    debugConsoleErrors.shift();
+                }
+            }
+            originalConsoleError.apply(console, args);
+        };
+
+        // Re-open wizard when clicking footer button during recording
+        document.getElementById('debugBtn').addEventListener('click', (e) => {
+            if (debugMode) {
+                showDebugWizardStep2();
+                e.stopPropagation();
+            }
+        });
 
         // Character View Functions
+        async function loadCharacterList() {
+            // Load list of all characters for header dropdown
+            try {
+                const charResponse = await cancelableFetch('/api/characters');
+                if (!charResponse.ok) throw new Error('Server not responding');
+
+                const charData = await charResponse.json();
+                allCharacters = charData.data?.characters || [];
+
+                // Populate character select dropdown
+                populateCharacterSelect();
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.error('Failed to load character list:', error);
+            }
+        }
+
         async function loadCharacterData() {
             try {
-                const response = await cancelableFetch('/api/character_info');
-                if (!response.ok) throw new Error('Server not responding');
+                // Ensure character list is loaded
+                if (allCharacters.length === 0) {
+                    await loadCharacterList();
+                }
 
-                const data = await response.json();
-                characterData = data.data || {};
-                renderCharacterView();
+                // If a character is selected, load their details
+                if (selectedCharacterName) {
+                    await loadSelectedCharacterDetails();
+                } else {
+                    renderCharacterList();
+                }
             } catch (error) {
                 // Silently ignore abort errors (user switched tabs)
                 if (error.name === 'AbortError') return;
@@ -4687,6 +5354,102 @@
                 `;
                 DOM.questDetail.innerHTML = '';
             }
+        }
+
+        function populateCharacterSelect() {
+            const select = DOM.characterSelect;
+            select.innerHTML = '<option value="">Select Character...</option>';
+
+            for (const char of allCharacters) {
+                const option = document.createElement('option');
+                option.value = char.name;
+                option.textContent = `${char.name} (${char.race})`;
+                select.appendChild(option);
+            }
+
+            // Set current selection
+            if (selectedCharacterName) {
+                select.value = selectedCharacterName;
+            }
+        }
+
+        async function selectCharacter() {
+            selectedCharacterName = DOM.characterSelect.value;
+
+            // Save to localStorage so overlay can sync
+            if (selectedCharacterName) {
+                localStorage.setItem('storagebuddy-character', selectedCharacterName);
+            } else {
+                localStorage.removeItem('storagebuddy-character');
+            }
+
+            // Refresh current tab with new character filter
+            const currentTab = document.querySelector('.tab-btn.active')?.textContent?.toLowerCase() || '';
+
+            if (currentTab.includes('quest')) {
+                await loadActiveQuests();
+                switchQuestView();
+            } else if (currentTab.includes('craft')) {
+                await loadCraftingRecipes();
+                if (Object.keys(recipeQuantities).length > 0) {
+                    updateShoppingList();
+                }
+            } else if (currentTab.includes('character')) {
+                if (selectedCharacterName) {
+                    await loadSelectedCharacterDetails();
+                } else {
+                    renderCharacterList();
+                }
+            }
+        }
+
+        async function loadSelectedCharacterDetails() {
+            if (!selectedCharacterName) return;
+
+            try {
+                const response = await cancelableFetch(`/api/characters/${encodeURIComponent(selectedCharacterName)}`);
+                if (!response.ok) throw new Error('Failed to load character details');
+
+                const data = await response.json();
+                characterData = data.data || {};
+                renderCharacterView();
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                DOM.questListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p>Could not load character details</p>
+                        <p class="empty-state-hint">${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderCharacterList() {
+            const listContainer = DOM.questListContainer;
+            const detailContainer = DOM.questDetail;
+
+            if (allCharacters.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>No character data available</p>
+                        <p class="empty-state-hint">Export your Character JSON from the in-game VIP Menu</p>
+                    </div>
+                `;
+                detailContainer.innerHTML = '';
+                return;
+            }
+
+            // Show select character prompt (consistent with quests/crafting tabs)
+            listContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👤</div>
+                    <p>Select a character</p>
+                    <p class="empty-state-hint">Use the character dropdown in the header to view details</p>
+                </div>
+            `;
+            detailContainer.innerHTML = '';
         }
 
         function renderCharacterView() {
@@ -4706,20 +5469,65 @@
                 return;
             }
 
+            // Build left panel: Character header + Currencies
             let listHtml = '';
 
             // Character header
             listHtml += `
                 <div class="character-header">
-                    <div class="character-name">${escapeHtml(characterData.character || 'Unknown Character')}</div>
+                    <div class="character-name">${escapeHtml(characterData.name || 'Unknown Character')}</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">${escapeHtml(characterData.race || '')} - ${escapeHtml(characterData.server || '')}</div>
                 </div>
             `;
 
-            const showSkills = currentCharacterView === 'skills' || currentCharacterView === 'both';
-            const showFavor = currentCharacterView === 'favor' || currentCharacterView === 'both';
+            // Currencies section in left panel
+            if (characterData.currencies) {
+                // Format currency names nicely and filter out zero values
+                const currencies = Object.entries(characterData.currencies)
+                    .filter(([name, value]) => value > 0)
+                    .filter(([name, value]) => {
+                        if (!searchTerm) return true;
+                        return name.toLowerCase().includes(searchTerm);
+                    })
+                    .map(([name, value]) => {
+                        // Convert COMBAT_WISDOM to Combat Wisdom, etc.
+                        const displayName = name.replace(/_/g, ' ')
+                            .toLowerCase()
+                            .replace(/\b\w/g, c => c.toUpperCase());
+                        return [displayName, value];
+                    })
+                    .sort((a, b) => a[0].localeCompare(b[0]));
 
-            // Skills section
-            if (showSkills && characterData.skills) {
+                if (currencies.length > 0) {
+                    listHtml += `
+                        <div class="section-header">
+                            Currencies
+                            <span class="section-count">${currencies.length}</span>
+                        </div>
+                        <div class="currency-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                    `;
+
+                    for (const [name, value] of currencies) {
+                        const formattedValue = value.toLocaleString();
+                        listHtml += `
+                            <div class="currency-item" style="display: flex; justify-content: space-between; padding: 6px 10px; background: var(--bg-item); border-radius: 4px; font-size: 12px;">
+                                <span style="color: var(--text-secondary);">${escapeHtml(name)}</span>
+                                <span style="color: var(--accent); font-weight: 600;">${formattedValue}</span>
+                            </div>
+                        `;
+                    }
+
+                    listHtml += `</div>`;
+                }
+            }
+
+            listContainer.innerHTML = listHtml;
+
+            // Build right panel: Skills first, then NPC Favor
+            let detailHtml = '<div style="padding: 20px;">';
+
+            // Skills section in right panel
+            if (characterData.skills) {
                 const skills = Object.entries(characterData.skills)
                     .filter(([name, data]) => {
                         if (!searchTerm) return true;
@@ -4727,33 +5535,32 @@
                     })
                     .sort((a, b) => b[1].effectiveLevel - a[1].effectiveLevel);
 
-                listHtml += `
-                    <div class="section-header">
+                detailHtml += `
+                    <div class="section-header" style="margin-bottom: 12px;">
                         Skills
                         <span class="section-count">${skills.length} skills</span>
                     </div>
-                    <div class="skill-list">
                 `;
 
                 if (skills.length === 0) {
-                    listHtml += `<div class="empty-state" style="padding: 20px;">No matching skills</div>`;
+                    detailHtml += `<div class="empty-state" style="padding: 20px;">No matching skills</div>`;
                 } else {
+                    detailHtml += `<div class="skill-list">`;
                     for (const [name, data] of skills) {
                         const bonusText = data.bonusLevels > 0 ? `<span class="bonus">+${data.bonusLevels}</span>` : '';
-                        listHtml += `
+                        detailHtml += `
                             <div class="skill-item">
                                 <span class="skill-name">${escapeHtml(name)}</span>
                                 <span class="skill-level">${data.level}${bonusText}</span>
                             </div>
                         `;
                     }
+                    detailHtml += `</div>`;
                 }
-
-                listHtml += `</div>`;
             }
 
-            // Favor section
-            if (showFavor && characterData.favor) {
+            // NPC Favor section in right panel (below skills)
+            if (characterData.favor) {
                 const favor = Object.entries(characterData.favor)
                     .filter(([npc, data]) => {
                         if (!searchTerm) return true;
@@ -4762,8 +5569,8 @@
                     })
                     .sort((a, b) => b[1].rank - a[1].rank);
 
-                listHtml += `
-                    <div class="section-header">
+                detailHtml += `
+                    <div class="section-header" style="margin-top: 20px; margin-bottom: 12px;">
                         NPC Favor
                         <span class="section-count">${favor.length} NPCs</span>
                     </div>
@@ -4771,11 +5578,11 @@
                 `;
 
                 if (favor.length === 0) {
-                    listHtml += `<div class="empty-state" style="padding: 20px;">No matching NPCs</div>`;
+                    detailHtml += `<div class="empty-state" style="padding: 20px;">No matching NPCs</div>`;
                 } else {
                     for (const [npc, data] of favor) {
                         const levelClass = data.level.toLowerCase().replace(/\s+/g, '-');
-                        listHtml += `
+                        detailHtml += `
                             <div class="favor-item">
                                 <span class="favor-npc">${escapeHtml(npc)}</span>
                                 <span class="favor-level ${levelClass}">${escapeHtml(data.level)}</span>
@@ -4784,49 +5591,11 @@
                     }
                 }
 
-                listHtml += `</div>`;
+                detailHtml += `</div>`;
             }
 
-            listContainer.innerHTML = listHtml;
-
-            // Show character info in detail panel
-            detailContainer.innerHTML = `
-                <div style="padding: 20px;">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="font-size: 36px; margin-bottom: 10px;">👤</div>
-                        <h3 style="color: var(--text-primary); margin-bottom: 8px;">Character Info</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px;">View your skills and NPC relationships</p>
-                    </div>
-
-                    <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                        <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">View Filters</h4>
-                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
-                            <div style="margin-bottom: 4px;"><strong>Skills</strong> — Shows all your trained skills sorted by level</div>
-                            <div style="margin-bottom: 4px;"><strong>Favor</strong> — Shows NPC relationships sorted by favor level</div>
-                            <div><strong>Both</strong> — Displays both skills and favor together</div>
-                        </div>
-                    </div>
-
-                    <div style="background: var(--bg-item); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
-                        <h4 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Favor Levels</h4>
-                        <div style="font-size: 12px; line-height: 1.8; color: var(--text-secondary);">
-                            <div style="margin-bottom: 4px;"><span class="favor-level soul-mates" style="margin-right: 8px;">Soul Mates</span> Highest tier</div>
-                            <div style="margin-bottom: 4px;"><span class="favor-level like-family" style="margin-right: 8px;">Like Family</span></div>
-                            <div style="margin-bottom: 4px;"><span class="favor-level best-friends" style="margin-right: 8px;">Best Friends</span></div>
-                            <div style="margin-bottom: 4px;"><span class="favor-level close-friends" style="margin-right: 8px;">Close Friends</span></div>
-                            <div style="margin-bottom: 4px;"><span class="favor-level friends" style="margin-right: 8px;">Friends</span></div>
-                            <div style="margin-bottom: 4px;"><span class="favor-level comfortable" style="margin-right: 8px;">Comfortable</span></div>
-                            <div style="margin-bottom: 4px;"><span class="favor-level neutral" style="margin-right: 8px;">Neutral</span> Starting point</div>
-                            <div><span class="favor-level hate" style="margin-right: 8px;">Hate</span> Lowest tier</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function switchCharacterView() {
-            currentCharacterView = DOM.characterFilter.value;
-            renderCharacterView();
+            detailHtml += '</div>';
+            detailContainer.innerHTML = detailHtml;
         }
 
         // HTML entity map for escapeHtml (avoids creating DOM element per call)

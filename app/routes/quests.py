@@ -26,7 +26,10 @@ def get_active_quests():
     config = get_config()
     char_service = CharacterService(config.get_reports_dir())
 
-    active_quest_internals = char_service.get_active_quests()
+    # Get optional character filter from query parameter
+    character_name = request.args.get('character')
+
+    active_quest_internals = char_service.get_active_quests(character_name)
     if not active_quest_internals:
         return api_response(data={'quests': []})
 
@@ -57,6 +60,33 @@ def get_quest_checklist(quest_internal_name):
     log_file = g.chat_parser.get_latest_log_file()
     if log_file:
         g.tracker.update_checklist_from_log(checklist, log_file)
+
+    # Get current character from query param
+    current_character = request.args.get('character')
+
+    # Add multi-character favor checking for items that need favor
+    config = get_config()
+    char_service = CharacterService(config.get_reports_dir())
+    all_characters_favor = char_service.get_all_characters_favor()
+    vendor_service = get_vendor_service()
+
+    for item in checklist.get('items', []):
+        # Check if item needs favor (has vendor_data but isn't completed)
+        if item.get('vendor_data') and not item.get('completed', False):
+            favor_result = vendor_service.check_vendor_favor_all_characters_from_dicts(
+                item['vendor_data'],
+                all_characters_favor,
+                current_character
+            )
+
+            item['favor_check'] = {
+                'can_buy': favor_result['can_buy'],
+                'current_can_buy': favor_result['current_can_buy'],
+                'buyer': favor_result['buyer'],
+                'buyer_favor': favor_result['buyer_favor'],
+                'vendor_name': favor_result['vendor_name'],
+                'required_favor': favor_result['required_favor']
+            }
 
     return api_response(data=checklist)
 
@@ -98,7 +128,10 @@ def get_completable_quests():
     config = get_config()
     char_service = CharacterService(config.get_reports_dir())
 
-    active_quest_internals = char_service.get_active_quests()
+    # Get optional character filter from query parameter
+    character_name = request.args.get('character')
+
+    active_quest_internals = char_service.get_active_quests(character_name)
     if not active_quest_internals:
         return api_response(data={'quests': []})
 
@@ -131,7 +164,10 @@ def get_purchasable_quests():
     config = get_config()
     char_service = CharacterService(config.get_reports_dir())
 
-    active_quest_internals = char_service.get_active_quests()
+    # Get optional character filter from query parameter
+    character_name = request.args.get('character')
+
+    active_quest_internals = char_service.get_active_quests(character_name)
     if not active_quest_internals:
         return api_response(data={'quests': []})
 
@@ -164,7 +200,10 @@ def get_needs_favor_quests():
     config = get_config()
     char_service = CharacterService(config.get_reports_dir())
 
-    active_quest_internals = char_service.get_active_quests()
+    # Get optional character filter from query parameter
+    character_name = request.args.get('character')
+
+    active_quest_internals = char_service.get_active_quests(character_name)
     if not active_quest_internals:
         return api_response(data={'quests': []})
 
@@ -240,11 +279,12 @@ def get_needs_favor_quests():
 def overlay_data():
     """Get simplified quest data for overlay display"""
     view = request.args.get('view', 'completable')
+    character_name = request.args.get('character')
 
     config = get_config()
     char_service = CharacterService(config.get_reports_dir())
 
-    active_quest_internals = char_service.get_active_quests()
+    active_quest_internals = char_service.get_active_quests(character_name)
     if not active_quest_internals:
         return api_response(data={'quests': []})
 
@@ -252,24 +292,45 @@ def overlay_data():
     player_favor = char_service.get_favor()
     player_skills = char_service.get_effective_skill_levels()
 
-    # Get inventory data
+    # Get AGGREGATED inventory data from all characters
     player_inventory = {}
     inventory_details = {}
     try:
         from .decorators import get_tracker_components
         _, _, inventory_parser, _ = get_tracker_components()
         if inventory_parser:
-            items_file = inventory_parser.get_latest_items_file()
-            if items_file:
-                inventory_data = inventory_parser.parse_items(items_file)
-                for name, data in inventory_data.items():
-                    player_inventory[name] = data['total']
-                    inventory_details[name] = data
+            # Use aggregated inventory from all characters
+            aggregated = inventory_parser.parse_all_characters()
+            for item_name, agg_data in aggregated.items():
+                # Calculate totals across all characters
+                total_inventory = 0
+                total_storage = 0
+                combined_storage = {}
+
+                for char_name, char_data in agg_data.get('byCharacter', {}).items():
+                    total_inventory += char_data.get('inventory', 0)
+                    char_storage = char_data.get('storage', {})
+                    for loc, count in char_storage.items():
+                        # Include character name in storage location
+                        loc_key = f"{char_name}: {loc}"
+                        combined_storage[loc_key] = combined_storage.get(loc_key, 0) + count
+                        total_storage += count
+
+                player_inventory[item_name] = total_inventory + total_storage
+                inventory_details[item_name] = {
+                    'total': total_inventory + total_storage,
+                    'inventory': total_inventory,
+                    'storage': combined_storage
+                }
     except Exception as e:
         logger.warning(f"Could not load inventory for quest resolution: {e}")
 
     # Get item resolution service
     item_resolver = get_item_resolution_service()
+
+    # Get multi-character favor for vendor checking
+    all_characters_favor = char_service.get_all_characters_favor()
+    vendor_service = get_vendor_service()
 
     log_file = g.chat_parser.get_latest_log_file()
     simplified_quests = []
@@ -299,6 +360,8 @@ def overlay_data():
             'internal_name': quest_internal,
             'name': quest.name,
             'location': quest.displayed_location or 'Unknown',
+            'is_completable': checklist.get('is_completable', False),
+            'is_purchasable': checklist.get('is_purchasable', False),
             'items': []
         }
 
@@ -316,10 +379,36 @@ def overlay_data():
                 player_favor
             )
 
-            # Build vendor_info from possible_vendors if available
-            vendor_info = item.get('vendor_info')
-            if not vendor_info and item.get('possible_vendors'):
-                vendor_info = item['possible_vendors'][0] if item['possible_vendors'] else None
+            # Build vendor_info as formatted string from possible_vendors
+            vendor_info_str = None
+            vendor_data = item.get('possible_vendors', [])
+            if vendor_data:
+                v = vendor_data[0]
+                # Handle both dict and string formats for vendor data
+                if isinstance(v, dict):
+                    vendor_name = v.get('vendor') or v.get('name', 'Unknown')
+                    vendor_info_str = f"{vendor_name} ({v.get('location', 'Unknown')}) - {v.get('favor', 'Unknown')}"
+                elif isinstance(v, str):
+                    # Some vendor data may be pre-formatted strings
+                    vendor_info_str = v
+
+            # Check multi-character favor for vendor purchases
+            favor_check = None
+            # Filter vendor_data to only include dicts (some may be pre-formatted strings)
+            vendor_dicts = [v for v in vendor_data if isinstance(v, dict)]
+            if vendor_dicts and not item.get('completed', False):
+                favor_result = vendor_service.check_vendor_favor_all_characters_from_dicts(
+                    vendor_dicts,
+                    all_characters_favor,
+                    None  # No current character context in overlay
+                )
+                favor_check = {
+                    'can_buy': favor_result['can_buy'],
+                    'buyer': favor_result['buyer'],
+                    'buyer_favor': favor_result['buyer_favor'],
+                    'vendor_name': favor_result['vendor_name'],
+                    'required_favor': favor_result['required_favor']
+                }
 
             # Build item data with crafting info
             item_data = {
@@ -331,11 +420,13 @@ def overlay_data():
                 'in_storage': resolution.in_storage,
                 'storage_locations': resolution.storage_locations,
                 'source': resolution.source,
-                # Vendor info
-                'vendor_info': vendor_info,
+                # Vendor info as formatted string
+                'vendor_info': vendor_info_str,
                 'is_buyable': resolution.is_buyable,
                 'needs_favor': resolution.needs_favor,
                 'favor_met': resolution.favor_met,
+                # Multi-character favor check
+                'favor_check': favor_check,
                 # Crafting info
                 'is_craftable': resolution.is_craftable,
                 'recipe_id': resolution.recipe_id

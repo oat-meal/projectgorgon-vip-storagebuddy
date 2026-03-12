@@ -33,7 +33,8 @@
 ### Pop-Out Overlay
 - Click **"Pop Out Overlay"** for a compact in-game tracker
 - Use PowerToys (Windows) or window manager (Linux) to keep it on top
-- Syncs theme and pinned items automatically
+- Syncs theme, character selection, and pinned items with the main app
+- Select a character in the main app first - the overlay will use the same selection
 
 ### Themes
 - Click theme buttons in the header to change colors

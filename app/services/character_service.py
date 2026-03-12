@@ -22,6 +22,7 @@ class CharacterService:
     - Caching (invalidated when file changes)
     - Security validation
     - Consistent error handling
+    - Multi-character support
     """
 
     def __init__(self, reports_dir: Path):
@@ -52,6 +53,164 @@ class CharacterService:
         except OSError as e:
             logger.error(f"Error finding files matching {pattern}: {e}")
             return None
+
+    def _get_all_files(self, pattern: str) -> List[Path]:
+        """
+        Get all files matching pattern.
+
+        Args:
+            pattern: Glob pattern (e.g., 'Character_*.json')
+
+        Returns:
+            List of paths sorted by modification time (newest first)
+        """
+        try:
+            files = list(self._reports_dir.glob(pattern))
+            return sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)
+        except OSError as e:
+            logger.error(f"Error finding files matching {pattern}: {e}")
+            return []
+
+    def get_all_characters(self) -> List[Dict[str, Any]]:
+        """
+        Get list of all available characters with summary info.
+
+        Returns:
+            List of character summaries:
+            [
+                {
+                    'name': 'Boricha',
+                    'server': 'Arisetsu',
+                    'race': 'Elf',
+                    'questCount': 87,
+                    'timestamp': '2026-03-08 04:12:59Z',
+                    'fileName': 'Character_Boricha_Arisetsu.json'
+                }
+            ]
+        """
+        characters = []
+        char_files = self._get_all_files(CHARACTER_FILE_PATTERN)
+
+        for char_file in char_files:
+            try:
+                data = safe_read_json(
+                    char_file,
+                    basedir=self._reports_dir,
+                    max_size_mb=50
+                )
+                if data:
+                    characters.append({
+                        'name': data.get('Character', 'Unknown'),
+                        'server': data.get('ServerName', 'Unknown'),
+                        'race': data.get('Race', 'Unknown'),
+                        'questCount': len(data.get('ActiveQuests', [])),
+                        'timestamp': data.get('Timestamp', ''),
+                        'fileName': char_file.name
+                    })
+            except (SecurityError, json.JSONDecodeError) as e:
+                logger.error(f"Error loading character file {char_file.name}: {e}")
+
+        return characters
+
+    def get_character_by_name(self, name: str) -> Optional[Dict[str, Any]]:
+        """
+        Get character data by character name.
+
+        Args:
+            name: Character name (e.g., 'Boricha')
+
+        Returns:
+            Character data dict or None if not found
+        """
+        # Look for Character_<name>_*.json
+        pattern = f"Character_{name}_*.json"
+        char_file = self._get_latest_file(pattern)
+
+        if not char_file:
+            return None
+
+        cache_key = f"character:{char_file.name}"
+
+        def load_character():
+            try:
+                return safe_read_json(
+                    char_file,
+                    basedir=self._reports_dir,
+                    max_size_mb=50
+                )
+            except (SecurityError, json.JSONDecodeError) as e:
+                logger.error(f"Error loading character data: {e}")
+                return None
+
+        return self._cache.get_or_compute(
+            cache_key,
+            load_character,
+            ttl=5.0,
+            file_path=char_file
+        )
+
+    def get_character_details(self, name: str) -> Optional[Dict[str, Any]]:
+        """
+        Get detailed character info for the Character tab.
+
+        Args:
+            name: Character name
+
+        Returns:
+            Detailed character data including skills, favor, currencies, etc.
+        """
+        char_data = self.get_character_by_name(name)
+        if not char_data:
+            return None
+
+        from .npc_service import get_npc_service
+        npc_service = get_npc_service()
+
+        # Process skills
+        raw_skills = char_data.get('Skills', {})
+        skills = {}
+        for skill_name, skill_data in raw_skills.items():
+            level = skill_data.get('Level', 0)
+            bonus = skill_data.get('BonusLevels', 0)
+            skills[skill_name] = {
+                'level': level,
+                'bonusLevels': bonus,
+                'effectiveLevel': level + bonus,
+                'xpToNext': skill_data.get('XpTowardNextLevel', 0),
+                'xpNeeded': skill_data.get('XpNeededForNextLevel', 0)
+            }
+
+        # Process favor
+        raw_npcs = char_data.get('NPCs', {})
+        favor = {}
+        for internal_name, npc_data in raw_npcs.items():
+            favor_level = npc_data.get('FavorLevel')
+            if favor_level:
+                display_name = npc_service.get_display_name(internal_name)
+                normalized_level = normalize_favor_level(favor_level)
+                favor[display_name] = {
+                    'level': normalized_level,
+                    'rank': FAVOR_LEVELS.index(normalized_level) if normalized_level in FAVOR_LEVELS else -1
+                }
+
+        # Process currencies
+        currencies = char_data.get('Currencies', {})
+
+        # Process recipe completions
+        recipe_completions = char_data.get('RecipeCompletions', {})
+
+        return {
+            'name': char_data.get('Character', 'Unknown'),
+            'server': char_data.get('ServerName', 'Unknown'),
+            'race': char_data.get('Race', 'Unknown'),
+            'timestamp': char_data.get('Timestamp', ''),
+            'skills': skills,
+            'favor': favor,
+            'currencies': currencies,
+            'recipeCompletions': recipe_completions,
+            'activeQuests': char_data.get('ActiveQuests', []),
+            'activeWorkOrders': char_data.get('ActiveWorkOrders', [])
+        }
 
     def get_latest_character_file(self) -> Optional[Path]:
         """Get path to most recent Character JSON export"""
@@ -92,14 +251,21 @@ class CharacterService:
             file_path=char_file
         )
 
-    def get_active_quests(self) -> List[str]:
+    def get_active_quests(self, character_name: Optional[str] = None) -> List[str]:
         """
         Get list of active quest internal names.
+
+        Args:
+            character_name: Optional character name to filter by.
+                           If None, uses the latest character file.
 
         Returns:
             List of quest internal names
         """
-        char_data = self.get_character_data()
+        if character_name:
+            char_data = self.get_character_by_name(character_name)
+        else:
+            char_data = self.get_character_data()
         if not char_data:
             return []
         return char_data.get('ActiveQuests', [])
@@ -186,6 +352,51 @@ class CharacterService:
                 }
 
         return favor
+
+    def get_all_characters_favor(self) -> Dict[str, Dict[str, Dict[str, Any]]]:
+        """
+        Get NPC favor levels for all characters.
+
+        Returns:
+            Dict mapping character name to their favor data:
+            {
+                'Boricha': {
+                    'Joeh': {'level': 'Best Friends', 'rank': 4},
+                    'Marna': {'level': 'Friends', 'rank': 2}
+                },
+                'Bergheim': {
+                    'Joeh': {'level': 'Close Friends', 'rank': 3},
+                    ...
+                }
+            }
+        """
+        from .npc_service import get_npc_service
+
+        npc_service = get_npc_service()
+        all_favor = {}
+
+        for char_info in self.get_all_characters():
+            char_name = char_info['name']
+            char_data = self.get_character_by_name(char_name)
+            if not char_data:
+                continue
+
+            raw_npcs = char_data.get('NPCs', {})
+            favor = {}
+
+            for internal_name, npc_data in raw_npcs.items():
+                favor_level = npc_data.get('FavorLevel')
+                if favor_level:
+                    display_name = npc_service.get_display_name(internal_name)
+                    normalized_level = normalize_favor_level(favor_level)
+                    favor[display_name] = {
+                        'level': normalized_level,
+                        'rank': FAVOR_LEVELS.index(normalized_level) if normalized_level in FAVOR_LEVELS else -1
+                    }
+
+            all_favor[char_name] = favor
+
+        return all_favor
 
     def get_character_name(self) -> str:
         """Get character name from latest export"""
