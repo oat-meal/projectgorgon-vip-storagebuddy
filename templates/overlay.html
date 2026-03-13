@@ -598,6 +598,81 @@
         .open-app-link:hover {
             text-decoration: underline;
         }
+
+        /* Tooltip styles */
+        .quest-group {
+            position: relative;
+        }
+
+        .quest-tooltip {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 11px;
+            line-height: 1.5;
+            max-width: 350px;
+            min-width: 200px;
+            left: 0;
+            top: 100%;
+            margin-top: 4px;
+        }
+
+        .quest-group:hover .quest-tooltip {
+            display: block;
+        }
+
+        .tooltip-section {
+            margin-bottom: 6px;
+        }
+
+        .tooltip-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .tooltip-value {
+            color: var(--text-primary);
+        }
+
+        .tooltip-locations {
+            color: var(--accent);
+        }
+
+        .tooltip-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .tooltip-status.ready {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .tooltip-status.buyable {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .tooltip-status.needs-favor {
+            background: var(--favor-light);
+            color: var(--favor);
+        }
+
+        .tooltip-status.gathering {
+            background: var(--overlay-item-bg);
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -672,6 +747,68 @@
             if (loc.includes('dream')) return 'Dream';
             if (loc.includes('community')) return 'Community';
             return location;
+        }
+
+        // Format storage location with character name, bolding active character
+        function formatLocationWithCharacter(location, count, activeChar) {
+            // Parse "CharName: Location" format
+            const colonIndex = location.indexOf(': ');
+            if (colonIndex === -1) {
+                // No character prefix, just return as-is
+                const icon = getStorageIcon(location);
+                return `${icon} ${location}: ${count}`;
+            }
+
+            const charName = location.substring(0, colonIndex);
+            const locName = location.substring(colonIndex + 2);
+            const icon = getStorageIcon(locName);
+
+            // Bold the active character's entries
+            if (activeChar && charName === activeChar) {
+                return `${icon} <strong>${charName}</strong>: ${count}`;
+            } else {
+                return `${icon} ${charName}: ${count}`;
+            }
+        }
+
+        // Generate tooltip HTML for a quest
+        function generateQuestTooltip(quest, isCompletable, isPurchasable, needsFavor) {
+            let tooltipHtml = '';
+
+            // Status section
+            let statusClass = 'gathering';
+            let statusText = 'Gathering items...';
+            if (isCompletable) {
+                statusClass = 'ready';
+                statusText = '✓ Ready to turn in';
+            } else if (isPurchasable) {
+                statusClass = 'buyable';
+                statusText = '🛒 Can purchase items';
+            } else if (needsFavor) {
+                statusClass = 'needs-favor';
+                statusText = '⭐ Needs more favor';
+            }
+            tooltipHtml += `<div class="tooltip-section"><span class="tooltip-status ${statusClass}">${statusText}</span></div>`;
+
+            // Turn-in NPC
+            if (quest.turn_in_npc) {
+                tooltipHtml += `<div class="tooltip-section"><div class="tooltip-label">Turn in to:</div><div class="tooltip-value">📍 ${escapeHtml(quest.turn_in_npc)} (${escapeHtml(quest.location)})</div></div>`;
+            }
+
+            // Item locations summary
+            const locationSummary = [];
+            for (const item of quest.items) {
+                if (item.storage_locations && Object.keys(item.storage_locations).length > 0) {
+                    for (const [loc, count] of Object.entries(item.storage_locations)) {
+                        locationSummary.push(`${loc} (${count})`);
+                    }
+                }
+            }
+            if (locationSummary.length > 0) {
+                tooltipHtml += `<div class="tooltip-section"><div class="tooltip-label">Retrieve from:</div><div class="tooltip-locations">${locationSummary.join(', ')}</div></div>`;
+            }
+
+            return tooltipHtml;
         }
 
         // Aggregate materials across recipes (shared by pinned and ready views)
@@ -1012,12 +1149,10 @@
                     const total = (item.in_inventory || 0) + (item.in_storage || 0);
                     if (total > 0) {
                         let locationParts = [];
-                        if (item.in_inventory) locationParts.push(`📦 Inventory: ${item.in_inventory}`);
+                        // Storage locations now include "CharName: Inventory" entries
                         if (item.storage_locations) {
                             for (const [location, count] of Object.entries(item.storage_locations)) {
-                                const icon = getStorageIcon(location);
-                                const shortName = getStorageShortName(location);
-                                locationParts.push(`${icon} ${shortName}: ${count}`);
+                                locationParts.push(formatLocationWithCharacter(location, count, selectedCharacter));
                             }
                         }
                         if (locationParts.length > 0) {
@@ -1061,10 +1196,14 @@
                     `;
                 }).join('');
 
+                // Generate tooltip HTML
+                const tooltipHtml = generateQuestTooltip(quest, isCompletable, isPurchasable, needsFavor);
+
                 return `
                     <div class="${questClass}">
                         <div class="quest-name">${escapeHtml(quest.name)}</div>
                         <div class="item-list">${itemsHtml}</div>
+                        <div class="quest-tooltip">${tooltipHtml}</div>
                     </div>
                 `;
             }).join('');
@@ -1175,15 +1314,11 @@
                 const total = mat.in_inventory + mat.in_storage;
                 if (total > 0) {
                     let locationParts = [];
-                    if (mat.in_inventory) locationParts.push(`📦 Inventory: ${mat.in_inventory}`);
+                    // Storage locations now include "CharName: Inventory" entries
                     if (mat.storage_locations && Object.keys(mat.storage_locations).length > 0) {
                         for (const [location, count] of Object.entries(mat.storage_locations)) {
-                            const icon = getStorageIcon(location);
-                            const shortName = getStorageShortName(location);
-                            locationParts.push(`${icon} ${shortName}: ${count}`);
+                            locationParts.push(formatLocationWithCharacter(location, count, selectedCharacter));
                         }
-                    } else if (mat.in_storage) {
-                        locationParts.push(`🏦 Storage: ${mat.in_storage}`);
                     }
                     if (locationParts.length > 0) {
                         detailsHtml += `<div class="item-details">${locationParts.join(' • ')}</div>`;
@@ -1252,15 +1387,11 @@
                 const total = mat.in_inventory + mat.in_storage;
                 if (total > 0) {
                     let locationParts = [];
-                    if (mat.in_inventory) locationParts.push(`📦 Inventory: ${mat.in_inventory}`);
+                    // Storage locations now include "CharName: Inventory" entries
                     if (mat.storage_locations && Object.keys(mat.storage_locations).length > 0) {
                         for (const [location, count] of Object.entries(mat.storage_locations)) {
-                            const icon = getStorageIcon(location);
-                            const shortName = getStorageShortName(location);
-                            locationParts.push(`${icon} ${shortName}: ${count}`);
+                            locationParts.push(formatLocationWithCharacter(location, count, selectedCharacter));
                         }
-                    } else if (mat.in_storage) {
-                        locationParts.push(`🏦 Storage: ${mat.in_storage}`);
                     }
                     if (locationParts.length > 0) {
                         detailsHtml += `<div class="item-details">${locationParts.join(' • ')}</div>`;

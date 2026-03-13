@@ -37,6 +37,7 @@ class Quest:
     objectives: List[QuestObjective]
     displayed_location: Optional[str] = None
     keywords: List[str] = None
+    turn_in_npc: Optional[str] = None
 
     def is_guild_quest(self) -> bool:
         """Check if this is a guild quest"""
@@ -101,13 +102,25 @@ class QuestDatabase:
                             target=obj.get('Target')
                         ))
 
+                # Parse turn-in NPC from FavorNpc field (e.g., "AreaSerbule/NPC_Fainor" -> "Fainor")
+                turn_in_npc = None
+                favor_npc = quest_info.get('FavorNpc', '')
+                if favor_npc:
+                    # Extract NPC name from path like "AreaSerbule/NPC_Fainor"
+                    npc_part = favor_npc.split('/')[-1]  # Get last part
+                    if npc_part.startswith('NPC_'):
+                        turn_in_npc = npc_part[4:]  # Remove "NPC_" prefix
+                    else:
+                        turn_in_npc = npc_part
+
                 quest = Quest(
                     internal_name=quest_info['InternalName'],
                     name=quest_info.get('Name', quest_info['InternalName']),
                     description=quest_info.get('Description', ''),
                     objectives=objectives,
                     displayed_location=quest_info.get('DisplayedLocation'),
-                    keywords=quest_info.get('Keywords', [])
+                    keywords=quest_info.get('Keywords', []),
+                    turn_in_npc=turn_in_npc
                 )
 
                 self.quests[quest.internal_name] = quest
@@ -383,7 +396,12 @@ class QuestTracker:
                 total_inventory = 0
                 combined_storage = {}
                 for char_name, char_data in agg_data.get('byCharacter', {}).items():
-                    total_inventory += char_data.get('inventory', 0)
+                    char_inv = char_data.get('inventory', 0)
+                    total_inventory += char_inv
+                    # Treat inventory as a storage location with character name prefix
+                    if char_inv > 0:
+                        inv_key = f"{char_name}: Inventory"
+                        combined_storage[inv_key] = combined_storage.get(inv_key, 0) + char_inv
                     for loc, count in char_data.get('storage', {}).items():
                         # Prefix storage location with character name for clarity
                         storage_key = f"{char_name}: {loc}"

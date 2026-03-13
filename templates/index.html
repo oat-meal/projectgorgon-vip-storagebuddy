@@ -895,21 +895,44 @@
         }
 
         // Format storage location for display, showing character name if multi-character
-        // "Boricha:Saddlebag" -> "Boricha - Saddlebag"
+        // "Boricha: Saddlebag" -> "Boricha: Saddlebag"
         // "Saddlebag" -> "Saddlebag" (legacy format)
         function formatStorageLocation(location) {
-            if (location.includes(':')) {
-                const [charName, storageLoc] = location.split(':');
+            // Handle "CharName: Location" format (with space after colon)
+            const colonIndex = location.indexOf(': ');
+            if (colonIndex !== -1) {
+                const charName = location.substring(0, colonIndex);
+                const storageLoc = location.substring(colonIndex + 2);
                 // Format NPC storage names more nicely
                 let displayLoc = storageLoc;
                 if (storageLoc.startsWith('NPC_')) {
                     displayLoc = storageLoc.replace('NPC_', '') + ' (NPC)';
-                } else if (storageLoc === 'Inventory') {
-                    displayLoc = 'Inventory';
                 }
                 return `${charName}: ${displayLoc}`;
             }
+            // Legacy format without character prefix
             return location;
+        }
+
+        // Format storage location with character name, bolding active character
+        function formatLocationWithCharacter(location, count, activeChar) {
+            const colonIndex = location.indexOf(': ');
+            if (colonIndex === -1) {
+                // No character prefix, just return as-is
+                const icon = getStorageIcon(location);
+                return `${icon} ${location}: ${count}`;
+            }
+
+            const charName = location.substring(0, colonIndex);
+            const locName = location.substring(colonIndex + 2);
+            const icon = getStorageIcon(locName);
+
+            // Bold the active character's entries
+            if (activeChar && charName === activeChar) {
+                return `${icon} <strong>${charName}</strong>: ${count}`;
+            } else {
+                return `${icon} ${charName}: ${count}`;
+            }
         }
 
         let currentTab = 'help';
@@ -1713,14 +1736,11 @@
                             const isComplete = missing === 0;
 
                             // Build location info - compact format like overlay
+                            // Storage locations now include "CharName: Inventory" entries
                             let locationParts = [];
-                            if (inInventory > 0) {
-                                locationParts.push(`📦 Inventory: ${inInventory}`);
-                            }
                             if (storageLocations && Object.keys(storageLocations).length > 0) {
                                 for (const [loc, count] of Object.entries(storageLocations)) {
-                                    const icon = getStorageIcon(loc);
-                                    locationParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
+                                    locationParts.push(formatLocationWithCharacter(loc, count, selectedCharacterName));
                                 }
                             }
                             const hasLocations = locationParts.length > 0;
@@ -1780,17 +1800,12 @@
                             const progressText = `${totalHave}/${needed}`;
 
                             // Build simple storage line like overlay (small icon + location: count)
+                            // Storage locations now include "CharName: Inventory" entries
                             let storageLine = '';
                             let storageParts = [];
-                            // Include inventory if present
-                            if (inInventory > 0) {
-                                storageParts.push(`📦 Inventory: ${inInventory}`);
-                            }
-                            // Include all storage locations
                             if (storageLocations && Object.keys(storageLocations).length > 0) {
                                 for (const [loc, count] of Object.entries(storageLocations)) {
-                                    const icon = getStorageIcon(loc);
-                                    storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
+                                    storageParts.push(formatLocationWithCharacter(loc, count, selectedCharacterName));
                                 }
                             }
                             if (storageParts.length > 0) {
@@ -1978,23 +1993,18 @@
                     const isComplete = missing === 0;
 
                     // Build location info with individual storage locations
+                    // Storage locations now include "CharName: Inventory" entries
                     let locationInfo = '';
                     if (totalHave > 0) {
-                        locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">`;
-                        if (item.inInventory > 0) {
-                            locationInfo += `📦 Inventory: ${item.inInventory}`;
-                        }
-
-                        // Show individual storage locations
+                        let locationParts = [];
                         if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                             for (const [location, count] of Object.entries(item.storageLocations)) {
-                                const icon = getStorageIcon(location);
-                                if (item.inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
-                                locationInfo += `${icon} ${formatStorageLocation(location)}: ${count}`;
+                                locationParts.push(formatLocationWithCharacter(location, count, selectedCharacterName));
                             }
                         }
-
-                        locationInfo += `</div>`;
+                        if (locationParts.length > 0) {
+                            locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">${locationParts.join(' | ')}</div>`;
+                        }
                     }
 
                     // Determine retrieval method using categorizeMaterial
@@ -2065,14 +2075,11 @@
                     const wikiLink = `<a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 8px;" title="Search wiki for ${item.name}">📖 Wiki</a>`;
 
                     // Build storage line like Ready Quests format
+                    // Storage locations now include "CharName: Inventory" entries
                     let storageParts = [];
-                    if (item.inInventory > 0) {
-                        storageParts.push(`📦 Inventory: ${item.inInventory}`);
-                    }
                     if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                         for (const [loc, count] of Object.entries(item.storageLocations)) {
-                            const icon = getStorageIcon(loc);
-                            storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
+                            storageParts.push(formatLocationWithCharacter(loc, count, selectedCharacterName));
                         }
                     }
                     const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -2332,24 +2339,18 @@
                     const isComplete = missing === 0;
 
                     // Build location info with individual storage locations
+                    // Storage locations now include "CharName: Inventory" entries
                     let locationInfo = '';
                     if (totalHave > 0) {
-                        locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">`;
-                        if (item.inInventory > 0) {
-                            locationInfo += `📦 Inventory: ${item.inInventory}`;
-                        }
-
-                        // Show individual storage locations
+                        let locationParts = [];
                         if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                             for (const [location, count] of Object.entries(item.storageLocations)) {
-                                // Get appropriate icon for each location type
-                                const icon = getStorageIcon(location);
-                                if (item.inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
-                                locationInfo += `${icon} ${formatStorageLocation(location)}: ${count}`;
+                                locationParts.push(formatLocationWithCharacter(location, count, selectedCharacterName));
                             }
                         }
-
-                        locationInfo += `</div>`;
+                        if (locationParts.length > 0) {
+                            locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">${locationParts.join(' | ')}</div>`;
+                        }
                     }
 
                     // Determine retrieval method using categorizeMaterial for consistency
@@ -2421,14 +2422,11 @@
                     const wikiLink = `<a href="${wikiUrl}" target="_blank" style="color: var(--accent); text-decoration: underline; margin-left: 8px;" title="Search wiki for ${item.name}">📖 Wiki</a>`;
 
                     // Build storage line like Ready Quests format
+                    // Storage locations now include "CharName: Inventory" entries
                     let storageParts = [];
-                    if (item.inInventory > 0) {
-                        storageParts.push(`📦 Inventory: ${item.inInventory}`);
-                    }
                     if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                         for (const [loc, count] of Object.entries(item.storageLocations)) {
-                            const icon = getStorageIcon(loc);
-                            storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
+                            storageParts.push(formatLocationWithCharacter(loc, count, selectedCharacterName));
                         }
                     }
                     const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -3137,14 +3135,11 @@
                 const isComplete = missing === 0;
 
                 // Build storage line
+                // Storage locations now include "CharName: Inventory" entries
                 let storageParts = [];
-                if (item.inInventory > 0) {
-                    storageParts.push(`📦 Inventory: ${item.inInventory}`);
-                }
                 if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(item.storageLocations)) {
-                        const icon = getStorageIcon(loc);
-                        storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
+                        storageParts.push(formatLocationWithCharacter(loc, count, selectedCharacterName));
                     }
                 }
                 const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -3272,14 +3267,11 @@
                 const isComplete = missing === 0;
 
                 // Build storage line
+                // Storage locations now include "CharName: Inventory" entries
                 let storageParts = [];
-                if (item.inInventory > 0) {
-                    storageParts.push(`📦 Inventory: ${item.inInventory}`);
-                }
                 if (item.storageLocations && Object.keys(item.storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(item.storageLocations)) {
-                        const icon = getStorageIcon(loc);
-                        storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
+                        storageParts.push(formatLocationWithCharacter(loc, count, selectedCharacterName));
                     }
                 }
                 const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';
@@ -3812,24 +3804,18 @@
                 const inStorage = item.in_storage || 0;
 
                 // Build location info with individual storage locations
+                // Storage locations now include "CharName: Inventory" entries
                 let locationInfo = '';
                 if (totalCollected > 0) {
-                    locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">`;
-                    if (inInventory > 0) {
-                        locationInfo += `📦 Inventory: ${inInventory}`;
-                    }
-
-                    // Show individual storage locations
+                    let locationParts = [];
                     if (item.storage_locations && Object.keys(item.storage_locations).length > 0) {
                         for (const [location, count] of Object.entries(item.storage_locations)) {
-                            // Get appropriate icon for each location type
-                            const icon = getStorageIcon(location);
-                            if (inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
-                            locationInfo += `${icon} ${formatStorageLocation(location)}: ${count}`;
+                            locationParts.push(formatLocationWithCharacter(location, count, selectedCharacterName));
                         }
                     }
-
-                    locationInfo += `</div>`;
+                    if (locationParts.length > 0) {
+                        locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">${locationParts.join(' | ')}</div>`;
+                    }
                 }
 
                 // Show matching items for keyword-based quests (like Poetry, SnailShell)
@@ -4696,24 +4682,18 @@
                 }
 
                 // Build location info similar to quest page format
+                // Storage locations now include "CharName: Inventory" entries
                 let locationInfo = '';
                 if (totalOwned > 0) {
-                    locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">`;
-                    if (inInventory > 0) {
-                        locationInfo += `📦 Inventory: ${inInventory}`;
-                    }
-
-                    // Show individual storage locations
+                    let locationParts = [];
                     if (storageLocations && Object.keys(storageLocations).length > 0) {
                         for (const [location, count] of Object.entries(storageLocations)) {
-                            // Get appropriate icon for each location type
-                            const icon = getStorageIcon(location);
-                            if (inInventory > 0 || locationInfo.includes('|')) locationInfo += ' | ';
-                            locationInfo += `${icon} ${formatStorageLocation(location)}: ${count}`;
+                            locationParts.push(formatLocationWithCharacter(location, count, selectedCharacterName));
                         }
                     }
-
-                    locationInfo += `</div>`;
+                    if (locationParts.length > 0) {
+                        locationInfo = `<div style="font-size: 13px; color: var(--accent); margin-top: 4px;">${locationParts.join(' | ')}</div>`;
+                    }
                 }
 
                 // Determine retrieval method using enhanced categorization - always show source
@@ -4773,14 +4753,11 @@
                 }
 
                 // Build storage line like Ready Quests format
+                // Storage locations now include "CharName: Inventory" entries
                 let storageParts = [];
-                if (inInventory > 0) {
-                    storageParts.push(`📦 Inventory: ${inInventory}`);
-                }
                 if (storageLocations && Object.keys(storageLocations).length > 0) {
                     for (const [loc, count] of Object.entries(storageLocations)) {
-                        const icon = getStorageIcon(loc);
-                        storageParts.push(`${icon} ${formatStorageLocation(loc)}: ${count}`);
+                        storageParts.push(formatLocationWithCharacter(loc, count, selectedCharacterName));
                     }
                 }
                 const storageLine = storageParts.length > 0 ? storageParts.join(' &nbsp;•&nbsp; ') : '';

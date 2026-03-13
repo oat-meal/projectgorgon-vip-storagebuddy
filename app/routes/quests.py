@@ -308,7 +308,12 @@ def overlay_data():
                 combined_storage = {}
 
                 for char_name, char_data in agg_data.get('byCharacter', {}).items():
-                    total_inventory += char_data.get('inventory', 0)
+                    char_inv = char_data.get('inventory', 0)
+                    total_inventory += char_inv
+                    # Treat inventory as a storage location with character name prefix
+                    if char_inv > 0:
+                        inv_key = f"{char_name}: Inventory"
+                        combined_storage[inv_key] = combined_storage.get(inv_key, 0) + char_inv
                     char_storage = char_data.get('storage', {})
                     for loc, count in char_storage.items():
                         # Include character name in storage location
@@ -360,6 +365,7 @@ def overlay_data():
             'internal_name': quest_internal,
             'name': quest.name,
             'location': quest.displayed_location or 'Unknown',
+            'turn_in_npc': quest.turn_in_npc,
             'is_completable': checklist.get('is_completable', False),
             'is_purchasable': checklist.get('is_purchasable', False),
             'items': []
