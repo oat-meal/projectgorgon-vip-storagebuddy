@@ -6,12 +6,14 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 
 ### Quest Tracking
 - **Active Quest Tracking** - Automatically detects active quests from exported Character JSON
+- **Multi-Character Support** - Switch between characters to view quests and favor for each
 - **Quest Pinning** - Pin up to 20 quests for quick access
 - **Inventory Detection** - Reads exported Storage/Character JSON to track collected items
 - **Color-Coded Progress** - Green (ready), orange (buyable from vendor), purple (needs favor), gray (gather)
 - **Storage Location Tracking** - Shows where items are stored (Inventory, Bank, Saddlebag, Dream World Chest, Community Chest)
 - **Vendor Information** - Displays vendors, prices, and favor requirements for purchasable items
 - **Favor Tracking** - Reads NPC favor levels from Character JSON to show which vendor items you can access
+- **Multi-Character Favor Check** - Shows which of your characters can purchase vendor items based on favor
 - **Wiki Links** - Quick links to Project Gorgon Wiki for items that need to be farmed/gathered
 - **Region Filter** - Filter quests by turn-in location
 - **Search** - Find any quest in the game
@@ -30,9 +32,11 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 - **Compact Window** - View quest progress and crafting materials in a separate window
 - **Always-On-Top** - Keep visible over your game using PowerToys (Windows) or window manager (Linux)
 - **Theme Sync** - Automatically matches your selected theme
+- **Character Sync** - Syncs selected character from main page for accurate favor checking
 - **Pinned Sync** - Pinned quests and recipes sync from main page
 - **Aggregated Materials** - Shows all materials with storage locations, source info, and recipe associations
-- **Auto-Refresh** - Updates every 3 seconds
+- **Ready Filter** - Filter to show only completable or purchasable items
+- **Auto-Refresh** - Updates every 5 seconds
 
 ### Themes
 - **7 Color Themes** - Sepia, Catppuccin Latte, Catppuccin Mocha, Solarized Light, Nord, Gruvbox, High Contrast
@@ -125,13 +129,14 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed usage instructions.
 
 Use the built-in overlay for in-game reference:
 
-1. Click **"Pop Out Overlay"** button in the header
-2. A compact window opens with quest progress and crafting materials
-3. Position it over your game window
-4. Use an always-on-top tool to keep it visible:
+1. **Select a character** in the main app first
+2. Click **"Pop Out Overlay"** button in the header
+3. A compact window opens with quest progress and crafting materials
+4. Position it over your game window
+5. Use an always-on-top tool to keep it visible:
    - **Windows**: [PowerToys Always on Top](https://learn.microsoft.com/en-us/windows/powertoys/always-on-top) (Win+Ctrl+T)
    - **Linux**: Right-click title bar → "Always on Top"
-5. Theme and pinned items sync automatically from main window
+6. Theme, character selection, and pinned items sync automatically from main window
 
 ## Project Structure
 
