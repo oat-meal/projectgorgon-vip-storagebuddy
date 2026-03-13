@@ -20,6 +20,7 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 
 ### Crafting
 - **Recipe Browser** - Browse all crafting recipes by skill
+- **Skill Filter** - Filter recipes by crafting skill
 - **Skill Level Tracking** - Recipes show level requirements; grayed-out recipes require higher skill
 - **Smart Craftability** - Color-coded: green (ready), orange (buyable), purple (needs favor), blue (gather), gray (need skill)
 - **Pinned Recipes** - Pin up to 20 recipes and see aggregated material requirements
@@ -27,6 +28,12 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 - **Inventory Integration** - Shows what materials you have and where they're stored
 - **Material Sources** - Each ingredient shows its source: have, craft, buy, need favor, or gather
 - **Quantity Selection** - Set how many of each recipe you want to craft (1-999)
+
+### Character
+- **Skills Overview** - View all skills with current levels and bonus levels
+- **NPC Favor** - Color-coded favor levels for all NPCs (from Hate to Soul Mates)
+- **Currencies** - Track all in-game currencies
+- **Search** - Filter skills and NPCs by name
 
 ### Pop-Out Overlay
 - **Compact Window** - View quest progress and crafting materials in a separate window
@@ -48,6 +55,7 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 - **Auto-refresh** - Updates every 5 seconds
 - **Update Notifications** - Checks GitHub for new releases on launch and notifies when updates are available
 - **Interactive Help** - Built-in documentation with color legends and setup instructions
+- **Debug Report Wizard** - Built-in bug reporting tool that captures actions and generates debug reports
 
 ## How It Works
 
@@ -123,6 +131,7 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed usage instructions.
 
 - **Quests** - Shows active quests from your character data, filterable by region
 - **Crafting** - Browse recipes by skill, see skill requirements, build shopping lists with color-coded status
+- **Character** - View skills, NPC favor levels, and currencies for the selected character
 - **Help** - Built-in documentation, color legend, and setup instructions
 
 ### Pop-Out Overlay
