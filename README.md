@@ -5,7 +5,7 @@ A local web-based tool for Project Gorgon that helps you track quest objectives,
 ## Features
 
 ### Quest Tracking
-- **Active Quest Tracking** - Automatically detects active quests from exported Character JSON
+- **Active Quest Tracking** - Detects active quests with item requirements from exported Character JSON (focused on quests where you need to gather, buy, or find items in storage)
 - **Multi-Character Support** - Switch between characters to view quests and favor for each
 - **Quest Pinning** - Pin up to 20 quests for quick access
 - **Inventory Detection** - Reads exported Storage/Character JSON to track collected items
