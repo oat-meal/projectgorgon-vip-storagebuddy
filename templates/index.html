@@ -2094,10 +2094,11 @@
                         <div class="${itemClass}" style="padding: 12px 16px; margin-bottom: 8px; background: var(--bg-card); border-radius: 6px;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
-                                    <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: ${storageLine ? '6px' : '0'};">${item.name}${wikiLink}</td>
-                                    <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: ${storageLine ? '6px' : '0'};">${progressText}</td>
+                                    <td style="font-weight: 500; color: var(--text-primary); font-size: 14px; text-align: left; padding-bottom: 6px;">${item.name}${wikiLink}</td>
+                                    <td style="font-weight: 600; color: ${isComplete ? 'var(--success)' : 'var(--warning)'}; font-size: 14px; text-align: right; white-space: nowrap; padding-bottom: 6px;">${progressText}</td>
                                 </tr>
-                                ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center;">${storageLine}</td></tr>` : ''}
+                                ${storageLine ? `<tr><td colspan="2" style="font-size: 12px; color: var(--accent); text-align: center; padding-bottom: 4px;">${storageLine}</td></tr>` : ''}
+                                <tr><td colspan="2" style="font-size: 12px; color: ${methodColor}; font-weight: 500;">${retrievalMethod}</td></tr>
                                 <tr><td colspan="2" style="font-size: 11px; color: var(--text-muted); padding-top: 4px;">For: ${questsList}</td></tr>
                             </table>
                         </div>

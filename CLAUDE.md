@@ -4,7 +4,7 @@ A local web-based tool for Project Gorgon that helps track quest objectives, cra
 
 ## Quick Reference
 
-- **Version**: 0.7.3
+- **Version**: 0.7.4
 - **Stack**: Python 3 / Flask / HTML+CSS+JS (vanilla)
 - **Run**: `python3 web_server.py` (opens browser to http://127.0.0.1:5000)
 - **GitHub**: https://github.com/oat-meal/projectgorgon-vip-storagebuddy
